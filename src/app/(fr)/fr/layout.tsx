@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "../../globals.css";
 import { fontVars } from "@/lib/fonts";
 import { SITE } from "@/content/site";
+import AmbientBackground from "@/components/AmbientBackground";
+import ScrollProgress from "@/components/ScrollProgress";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.domain),
@@ -13,6 +15,8 @@ export default function FrLayout({ children }: { children: React.ReactNode }) {
     // the splash script stamps data-splash on <html> before hydration
     <html lang="fr" className={fontVars} suppressHydrationWarning>
       <body>
+        <AmbientBackground />
+        <ScrollProgress />
         <a href="#main" className="skip-link">Aller au contenu</a>
         {children}
       </body>

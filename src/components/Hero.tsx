@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import TypeIn from "./TypeIn";
+import HeroAtmosphere from "./HeroAtmosphere";
 import { SPLASH_DONE } from "./SplashController";
 import { CONTENT, type Locale } from "@/content/site";
 
@@ -60,6 +61,7 @@ export default function Hero({ locale }: { locale: Locale }) {
 
   return (
     <section id="hero" className="hero-surface relative overflow-hidden pt-[116px] pb-14 md:pt-[128px] md:pb-24">
+      <HeroAtmosphere />
       <div className="container grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-6 items-center">
         {/* Copy */}
         <div className="max-w-xl min-w-0">
