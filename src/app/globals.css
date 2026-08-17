@@ -160,24 +160,24 @@ html[data-splash] { overflow: hidden; }
 /* Fixed, shared by every route, so navigation feels continuous. */
 .bx-ambient { position: fixed; inset: 0; z-index: -10; pointer-events: none; overflow: hidden; background: var(--color-white); }
 .bx-orb {
-  position: absolute; border-radius: 9999px; filter: blur(60px);
+  position: absolute; border-radius: 9999px; filter: blur(70px);
   opacity: 0; transition: opacity 1.2s ease;
   will-change: transform;
 }
 .bx-ambient[data-ready] .bx-orb { opacity: 1; }
 .bx-orb-1 {
   width: 46rem; height: 46rem; top: -14rem; right: -10rem;
-  background: radial-gradient(circle, rgba(41,171,226,.20), transparent 62%);
+  background: radial-gradient(circle, rgba(41,171,226,.48), transparent 66%);
   animation: orbDrift1 26s ease-in-out infinite;
 }
 .bx-orb-2 {
   width: 38rem; height: 38rem; top: 38%; left: -14rem;
-  background: radial-gradient(circle, rgba(127,212,245,.18), transparent 62%);
+  background: radial-gradient(circle, rgba(120,190,255,.40), transparent 66%);
   animation: orbDrift2 32s ease-in-out infinite;
 }
 .bx-orb-3 {
   width: 34rem; height: 34rem; bottom: -12rem; left: 46%;
-  background: radial-gradient(circle, rgba(23,135,196,.13), transparent 62%);
+  background: radial-gradient(circle, rgba(96,165,250,.34), transparent 66%);
   animation: orbDrift3 38s ease-in-out infinite;
 }
 @keyframes orbDrift1 {
