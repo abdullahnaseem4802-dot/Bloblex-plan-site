@@ -31,11 +31,16 @@ async function forwardLead(lead: Lead) {
     if (!res.ok) throw new Error(`lead api ${res.status}`);
     return "forwarded";
   }
-  // Dev fallback: append to data/leads.jsonl so nothing is lost before the API is wired
-  const file = path.join(process.cwd(), "data", "leads.jsonl");
-  await fs.mkdir(path.dirname(file), { recursive: true });
-  await fs.appendFile(file, JSON.stringify({ ...lead, created_at: new Date().toISOString() }) + "\n", "utf8");
-  return "file";
+  // Local fallback so nothing is lost before the API is wired. Serverless
+  // filesystems are read-only, so this is best effort only.
+  try {
+    const file = path.join(process.cwd(), "data", "leads.jsonl");
+    await fs.mkdir(path.dirname(file), { recursive: true });
+    await fs.appendFile(file, JSON.stringify({ ...lead, created_at: new Date().toISOString() }) + "\n", "utf8");
+    return "file";
+  } catch {
+    return "unstored";
+  }
 }
 
 /* -------- notify team + confirmation email: Resend REST if configured -------- */
