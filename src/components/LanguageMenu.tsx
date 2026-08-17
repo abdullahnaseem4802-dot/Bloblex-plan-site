@@ -14,7 +14,7 @@ function Globe() {
 }
 
 /** alt = equivalent URL of the current page in each locale. */
-export default function LanguageMenu({ locale, alt }: { locale: Locale; alt: { en: string; fr: string } }) {
+export default function LanguageMenu({ locale, alt, dark = false }: { locale: Locale; alt: { en: string; fr: string }; dark?: boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -31,7 +31,7 @@ export default function LanguageMenu({ locale, alt }: { locale: Locale; alt: { e
       <button
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox" aria-expanded={open} aria-label="Change language"
-        className="flex items-center gap-1.5 text-sm font-semibold text-[var(--color-slate)] hover:text-[var(--color-ink)] transition-colors"
+        className={`flex items-center gap-1.5 text-sm font-semibold transition-colors ${dark ? "text-white/85 hover:text-white" : "text-[var(--color-slate)] hover:text-[var(--color-ink)]"}`}
       >
         <Globe /> {locale.toUpperCase()} <span aria-hidden className="text-[10px]">▾</span>
       </button>

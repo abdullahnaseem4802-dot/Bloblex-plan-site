@@ -246,3 +246,86 @@ html[data-splash] { overflow: hidden; }
 html[data-splash] .sheen::after { animation-delay: 4s; }
 @keyframes sheenSweep { from { background-position: 180% 0; } to { background-position: -60% 0; } }
 @media (prefers-reduced-motion: reduce) { .sheen::after { animation: none; display: none; } }
+
+/* ============================================================= */
+/*  CINEMATIC DARK HERO                                           */
+/*  A dark band at the top of an otherwise white site: glow, depth */
+/*  and 3D only read against darkness. Fades into white below.     */
+/* ============================================================= */
+.hero-dark {
+  position: relative;
+  background:
+    radial-gradient(60% 50% at 78% 18%, rgba(41,171,226,.32), transparent 62%),
+    radial-gradient(45% 45% at 12% 6%, rgba(23,135,196,.26), transparent 60%),
+    radial-gradient(55% 60% at 50% 110%, rgba(41,171,226,.18), transparent 60%),
+    linear-gradient(180deg, #060c18 0%, #0a1628 46%, #0d1d33 100%);
+  isolation: isolate;
+}
+/* engineering grid, fading out downward */
+.hero-dark::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(127,212,245,.10) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(127,212,245,.10) 1px, transparent 1px);
+  background-size: 72px 72px;
+  -webkit-mask-image: radial-gradient(120% 80% at 50% 0%, #000 10%, transparent 72%);
+  mask-image: radial-gradient(120% 80% at 50% 0%, #000 10%, transparent 72%);
+}
+/* soft hand-off into the white page below */
+.hero-dark::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 12rem;
+  pointer-events: none; z-index: 2;
+  background: linear-gradient(180deg, transparent, #ffffff 96%);
+}
+.hero-dark > * { position: relative; z-index: 1; }
+
+/* headline gradient that slowly flows */
+.text-flow {
+  background: linear-gradient(100deg, #7fd4f5, #ffffff 28%, #45bdec 55%, #7fd4f5 80%, #ffffff);
+  background-size: 260% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: flowShift 9s ease-in-out infinite;
+}
+@keyframes flowShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+@media (prefers-reduced-motion: reduce) { .text-flow { animation: none; } }
+
+/* glass pill on dark */
+.glass-pill {
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.07);
+  backdrop-filter: blur(10px);
+  color: #dceefb;
+}
+
+/* CTA with a light sweeping across it */
+.btn-shine { position: relative; overflow: hidden; }
+.btn-shine::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 40%;
+  left: -60%; transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent);
+  animation: shineSweep 4.5s ease-in-out infinite;
+}
+@keyframes shineSweep { 0% { left: -60%; } 55%,100% { left: 130%; } }
+@media (prefers-reduced-motion: reduce) { .btn-shine::after { animation: none; display: none; } }
+
+/* ---------- footer ---------- */
+.bx-footer {
+  background:
+    radial-gradient(60% 70% at 80% 0%, rgba(41,171,226,.16), transparent 60%),
+    linear-gradient(180deg, #0a1628 0%, #060c18 100%);
+}
+.bx-footer-aura  { animation: orbDrift2 30s ease-in-out infinite; }
+.bx-footer-aura2 { animation: orbDrift3 36s ease-in-out infinite; }
+/* huge wordmark ghosted into the base of the page */
+.bx-watermark {
+  background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,0) 78%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+/* link underline that draws in on hover */
+.bx-flink::after {
+  content: ""; position: absolute; left: 0; bottom: -2px; height: 1px; width: 100%;
+  background: var(--color-brand-400); transform: scaleX(0); transform-origin: left;
+  transition: transform .3s cubic-bezier(.2,.7,.2,1);
+}
+.bx-flink:hover::after { transform: scaleX(1); }
+@media (prefers-reduced-motion: reduce) { .bx-footer-aura, .bx-footer-aura2 { animation: none; } }

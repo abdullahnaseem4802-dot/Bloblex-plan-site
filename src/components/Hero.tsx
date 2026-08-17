@@ -33,7 +33,7 @@ export default function Hero({ locale }: { locale: Locale }) {
   const heroDelay = intro ? 0 : 0.1;
 
   return (
-    <section id="hero" className="hero-surface relative overflow-hidden pt-[116px] pb-14 md:pt-[128px] md:pb-24">
+    <section id="hero" className="hero-dark relative overflow-hidden pt-[132px] pb-44 md:pt-[148px] md:pb-56">
       <HeroAtmosphere />
       <div className="container grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-6 items-center">
         {/* Copy */}
@@ -41,30 +41,33 @@ export default function Hero({ locale }: { locale: Locale }) {
           <motion.p
             initial={reduce ? false : { opacity: 0, y: 12 }} animate={waiting ? { opacity: 0 } : { opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: heroDelay }}
-            className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-[var(--color-line)] bg-white/70 px-4 py-1.5 text-[0.82rem] font-semibold tracking-wide text-[var(--color-brand-700)] shadow-[var(--shadow-soft)] backdrop-blur"
+            className="glass-pill mb-7 inline-flex items-center gap-2.5 rounded-full px-4 py-1.5 text-[0.82rem] font-semibold tracking-wide"
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-brand-500)]" />
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-brand-400)] opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--color-brand-400)]" />
+            </span>
             {t.eyebrow}
           </motion.p>
 
           <h1
-            className={`text-[2.15rem] leading-[1.08] tracking-[-0.035em] font-semibold text-[var(--color-ink)] text-balance sm:text-[2.9rem] lg:text-[3.5rem] ${intro ? "sheen" : ""}`}
+            className="text-[2.3rem] leading-[1.06] tracking-[-0.035em] font-semibold text-white text-balance sm:text-[3rem] lg:text-[3.7rem]"
             /* stay blank behind the splash so no letters are pre-printed */
             style={waiting ? { visibility: "hidden" } : undefined}
           >
             {intro ? (
-              /* solid colours here: a transformed glyph cannot be painted
-                 through an ancestor's background-clip:text */
+              /* solid colours: a transformed glyph cannot be painted through
+                 an ancestor's background-clip:text */
               <TypeIn
                 delay={heroDelay}
                 segments={[
-                  { text: t.titleLine1, className: "text-[var(--color-ink)]" },
-                  { text: t.titleLine2, className: "text-[var(--color-brand-500)]" },
+                  { text: t.titleLine1, className: "text-white" },
+                  { text: t.titleLine2, className: "text-[var(--color-brand-300)]" },
                 ]}
               />
             ) : (
               <>
-                {t.titleLine1} <span className="text-gradient">{t.titleLine2}</span>
+                {t.titleLine1} <span className="text-flow">{t.titleLine2}</span>
               </>
             )}
           </h1>
@@ -72,7 +75,7 @@ export default function Hero({ locale }: { locale: Locale }) {
           <motion.p
             initial={reduce ? false : { opacity: 0, y: 16 }} animate={waiting ? { opacity: 0 } : { opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: heroDelay + 0.5 }}
-            className="mt-7 text-lg leading-relaxed text-[var(--color-slate)] max-w-[52ch]"
+            className="mt-7 max-w-[52ch] text-lg leading-relaxed text-[#a9bdd4]"
           >
             {t.lead}
           </motion.p>
@@ -82,17 +85,31 @@ export default function Hero({ locale }: { locale: Locale }) {
             transition={{ duration: 0.6, delay: heroDelay + 0.62 }}
             className="mt-9 flex flex-wrap items-center gap-3"
           >
-            <a href={`${base}#contact`} className="btn-primary">{t.ctaPrimary}</a>
-            <a href={`${base}#time`} className="btn-ghost">{t.ctaSecondary} →</a>
+            <a href={`${base}#contact`} className="btn-primary btn-shine text-base">{t.ctaPrimary}</a>
+            <a href={`${base}#time`} className="rounded-full px-5 py-3 font-semibold text-white/85 transition-colors hover:text-white">
+              {t.ctaSecondary} →
+            </a>
           </motion.div>
 
-          <motion.p
+          {/* trust strip */}
+          <motion.ul
             initial={reduce ? false : { opacity: 0 }} animate={waiting ? { opacity: 0 } : { opacity: 1 }}
-            transition={{ duration: 0.6, delay: heroDelay + 0.74 }}
-            className="mt-8 border-l-2 border-[var(--color-brand-200)] pl-4 text-sm font-medium text-[var(--color-mute)]"
+            transition={{ duration: 0.6, delay: heroDelay + 0.78 }}
+            className="mt-10 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/10 pt-6"
           >
-            {t.note}
-          </motion.p>
+            {t.trust.map((item, i) => (
+              <motion.li
+                key={item}
+                initial={reduce ? false : { opacity: 0, y: 8 }}
+                animate={waiting ? { opacity: 0 } : { opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: heroDelay + 0.85 + i * 0.09 }}
+                className="flex items-center gap-2 text-sm font-medium text-[#9fb4cd]"
+              >
+                <span className="text-[var(--color-brand-400)]">✓</span>
+                {item}
+              </motion.li>
+            ))}
+          </motion.ul>
         </div>
 
         {/* Signature 3D orbit: chips ride a real ring and pass behind the blob */}

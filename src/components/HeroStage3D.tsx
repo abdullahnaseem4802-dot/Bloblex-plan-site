@@ -39,7 +39,7 @@ export default function HeroStage3D({ chips }: { chips: string[] }) {
   return (
     <div ref={wrap} className="relative mx-auto aspect-square w-full max-w-[480px]" aria-hidden="true">
       {/* glow pool behind the whole rig */}
-      <div className="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(41,171,226,.30),rgba(41,171,226,.10)_45%,transparent_70%)] blur-2xl" />
+      <div className="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(41,171,226,.55),rgba(41,171,226,.18)_45%,transparent_70%)] blur-2xl" />
 
       <motion.div
         className="absolute inset-0"
@@ -47,11 +47,11 @@ export default function HeroStage3D({ chips }: { chips: string[] }) {
       >
         {/* orbit rings */}
         <div
-          className="absolute left-1/2 top-1/2 rounded-full border border-[var(--color-brand-300)]/60"
+          className="absolute left-1/2 top-1/2 rounded-full border border-[var(--color-brand-300)]/35"
           style={{ width: R * 2, height: R * 2, transform: `translate(-50%,-50%) rotateX(${90 - TILT}deg)` }}
         />
         <div
-          className="absolute left-1/2 top-1/2 rounded-full border border-dashed border-[var(--color-brand-200)]"
+          className="absolute left-1/2 top-1/2 rounded-full border border-dashed border-[var(--color-brand-300)]/25"
           style={{ width: R * 1.42, height: R * 1.42, transform: `translate(-50%,-50%) rotateX(${90 - TILT}deg)` }}
         />
 
@@ -102,7 +102,7 @@ function Chip({ label, spin, angle }: { label: string; spin: ReturnType<typeof u
   return (
     <motion.span
       style={{ rotateY: face, opacity, scale, translateX: "-50%", translateY: "-50%" }}
-      className="block whitespace-nowrap rounded-full border border-[var(--color-line)] bg-white/95 px-4 py-2 text-[0.85rem] font-semibold text-[var(--color-ink)] shadow-[0_10px_30px_-8px_rgba(10,22,40,.28)]"
+      className="block whitespace-nowrap rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[0.85rem] font-semibold text-white shadow-[0_10px_34px_-6px_rgba(41,171,226,.55)]"
     >
       {label}
     </motion.span>

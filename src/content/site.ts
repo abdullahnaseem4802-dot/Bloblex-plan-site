@@ -25,7 +25,7 @@ type Dict = {
   nav: { what: string; time: string; sectors: string; process: string; pricing: string; cta: string };
   hero: {
     eyebrow: string; titleLine1: string; titleLine2: string; lead: string;
-    ctaPrimary: string; ctaSecondary: string; note: string; chips: string[]; scroll: string; systemLabel: string;
+    ctaPrimary: string; ctaSecondary: string; note: string; chips: string[]; scroll: string; systemLabel: string; trust: string[];
   };
   what: { kicker: string; title: string; lead: string; cards: { title: string; body: string }[] };
   time: { kicker: string; title: string; lead: string; soon: string };
@@ -67,6 +67,7 @@ export const CONTENT: Record<Locale, Dict> = {
       chips: ["Automation", "AI tools", "Client portal", "Estimating", "Invoicing", "CRM"],
       scroll: "Scroll",
       systemLabel: "= Your system",
+      trust: ["Fixed scope & price", "You own the system", "Built around your workflow"],
     },
     what: {
       kicker: "What Blobex builds",
@@ -152,6 +153,7 @@ export const CONTENT: Record<Locale, Dict> = {
       chips: ["Automatisation", "Outils IA", "Portail client", "Estimation", "Facturation", "CRM"],
       scroll: "Défiler",
       systemLabel: "= Votre système",
+      trust: ["Portée et prix fixes", "Vous possédez le système", "Bâti autour de votre flux"],
     },
     what: {
       kicker: "Ce que Blobex bâtit",

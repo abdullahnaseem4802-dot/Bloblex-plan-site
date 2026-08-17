@@ -30,6 +30,10 @@ export default function Header({ locale, alt }: { locale: Locale; alt?: { en: st
     slug === "" ? "home" :
     (NAV_ORDER.find((k) => PAGES[k].slug[locale] === slug) ?? (onIndustry ? "industries" : ""));
 
+  // only the home page has the dark cinematic hero, so only there does the
+  // header invert while sitting at the top of the page
+  const overDark = !scrolled && slug === "";
+
   const links = [
     { key: "home", href: path(locale), label: locale === "en" ? "Home" : "Accueil" },
     ...NAV_ORDER.map((key) => ({ key, href: pagePath(locale, key), label: PAGES[key].nav[locale] })),
@@ -38,17 +42,17 @@ export default function Header({ locale, alt }: { locale: Locale; alt?: { en: st
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 backdrop-blur-xl ${
-        scrolled
-          ? "bg-white/92 border-[var(--color-line)] shadow-[0_8px_30px_-12px_rgba(10,22,40,.14)]"
-          : "bg-white/70 border-white/60"
+        overDark
+          ? "bg-[#0a1628]/45 border-white/10"
+          : "bg-white/92 border-[var(--color-line)] shadow-[0_8px_30px_-12px_rgba(10,22,40,.14)]"
       }`}
     >
       <div className="container flex items-center justify-between h-[76px]">
         <a href={path(locale)} aria-label="Blobex">
-          <BrandLogo size={40} />
+          <BrandLogo size={40} dark={overDark} />
         </a>
 
-        <nav className="hidden lg:flex items-center gap-1 rounded-full border border-[var(--color-line)] bg-[var(--color-panel)]/70 p-1.5 text-[0.92rem] font-medium" aria-label="Primary">
+        <nav className={`hidden lg:flex items-center gap-1 rounded-full border p-1.5 text-[0.92rem] font-medium transition-colors ${overDark ? "border-white/15 bg-white/10" : "border-[var(--color-line)] bg-[var(--color-panel)]/70"}`} aria-label="Primary">
           {links.map((l) => {
             const on = l.key === activeKey;
             return (
@@ -57,7 +61,9 @@ export default function Header({ locale, alt }: { locale: Locale; alt?: { en: st
                 className={`rounded-full px-4 py-2 transition-all duration-200 ${
                   on
                     ? "bg-white text-[var(--color-ink)] font-semibold shadow-[var(--shadow-soft)]"
-                    : "text-[var(--color-slate)] hover:bg-white/70 hover:text-[var(--color-ink)]"
+                    : overDark
+                      ? "text-white/80 hover:bg-white/15 hover:text-white"
+                      : "text-[var(--color-slate)] hover:bg-white/70 hover:text-[var(--color-ink)]"
                 }`}
               >
                 {l.label}
@@ -67,7 +73,7 @@ export default function Header({ locale, alt }: { locale: Locale; alt?: { en: st
         </nav>
 
         <div className="hidden lg:flex items-center gap-5">
-          <LanguageMenu locale={locale} alt={alts} />
+          <LanguageMenu locale={locale} alt={alts} dark={overDark} />
           <a href={pagePath(locale, "contact")} className="btn-primary">{t.cta}</a>
         </div>
 
@@ -76,9 +82,9 @@ export default function Header({ locale, alt }: { locale: Locale; alt?: { en: st
           aria-label="Menu" aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
-          <span className={`block h-0.5 w-6 bg-[var(--color-ink)] transition-transform ${open ? "translate-y-[7px] rotate-45" : ""}`} />
-          <span className={`block h-0.5 w-6 bg-[var(--color-ink)] transition-opacity ${open ? "opacity-0" : ""}`} />
-          <span className={`block h-0.5 w-6 bg-[var(--color-ink)] transition-transform ${open ? "-translate-y-[7px] -rotate-45" : ""}`} />
+          <span className={`block h-0.5 w-6 ${overDark ? "bg-white" : "bg-[var(--color-ink)]"} transition-transform ${open ? "translate-y-[7px] rotate-45" : ""}`} />
+          <span className={`block h-0.5 w-6 ${overDark ? "bg-white" : "bg-[var(--color-ink)]"} transition-opacity ${open ? "opacity-0" : ""}`} />
+          <span className={`block h-0.5 w-6 ${overDark ? "bg-white" : "bg-[var(--color-ink)]"} transition-transform ${open ? "-translate-y-[7px] -rotate-45" : ""}`} />
         </button>
       </div>
 
