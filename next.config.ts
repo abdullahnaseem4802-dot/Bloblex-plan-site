@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // hide the floating dev-tools badge (the "N" circle) in local development
+  devIndicators: false,
 };
 
 export default nextConfig;

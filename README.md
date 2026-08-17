@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Blobex — Website
 
-## Getting Started
+Marketing website for **Blobex Inc.** (Granby, Quebec, Canada): custom software,
+internal platforms, automation and client portals.
 
-First, run the development server:
+White, premium design built around the Blobex blob mascot, engineered for
+**technical SEO** and **lead conversion**. English at `/`, French at `/fr`.
+
+## Stack
+
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Motion · flag-icons
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev          # http://localhost:3000
+npm run build && npm run start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Copy `.env.example` to `.env.local`. Everything is optional for local work.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Purpose |
+| --- | --- |
+| `LEAD_API_URL` | Where contact-form submissions are POSTed (the client's admin API). Until set, leads append to `data/leads.jsonl`. |
+| `LEAD_API_KEY` | Optional bearer token for that API. |
+| `RESEND_API_KEY`, `LEAD_FROM_EMAIL`, `LEAD_TEAM_EMAIL` | Optional: let the site send the confirmation + team email itself. If unset, email is skipped. |
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├─ app/
+│  ├─ (en)/                  # English site at "/"   (<html lang="en">)
+│  ├─ (fr)/fr/               # French site at "/fr"  (<html lang="fr">)
+│  ├─ [industry]/            # industry pages, clean URLs (/construction-software)
+│  ├─ api/lead/route.ts      # contact form -> client's admin API (file fallback)
+│  ├─ sitemap.ts, robots.ts  # generated SEO files
+│  └─ globals.css            # design tokens, hero surface, splash
+├─ components/               # Header, Hero, interactive demos, Contact, Footer…
+├─ content/                  # ★ all copy + SEO text (EN/FR), routes, sectors
+└─ lib/seo.tsx               # metadata builders, JSON-LD, breadcrumbs
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Editing content and SEO
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Headlines, body copy, nav labels, **page titles, meta descriptions and URL slugs**
+all live in `src/content/` (`site.ts`, `pages.ts`, `routes.ts`, `sectors.ts`,
+`extras.ts`), keyed by locale. No component edits needed to change wording.
 
-## Deploy on Vercel
+## SEO
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Per-page unique titles and meta descriptions · canonical tags · EN/FR `hreflang`
+alternates · Schema.org (Organization, ProfessionalService, LocalBusiness,
+BreadcrumbList, WebSite) · generated `sitemap.xml` and `robots.txt` · semantic
+heading hierarchy · clean descriptive URLs · optimized images · accessible
+navigation, forms and alt text.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploying to Vercel
+
+Import this repository on Vercel. The framework is auto-detected (Next.js) and no
+build settings need changing. Add the environment variables above under
+**Settings → Environment Variables** when the client's lead API is ready.
+
+Before launch: set the real phone number, contact email and production domain in
+`src/content/site.ts`, and have a native speaker review the French copy.
