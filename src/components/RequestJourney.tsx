@@ -16,8 +16,16 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
   const reduce = useReducedMotion();
 
   const [mode, setMode] = useState<Mode>("manual");
-  const [done, setDone] = useState(0);          // steps completed
+  /* each mode keeps its own place, so flipping between them compares the two
+     runs rather than throwing away whichever one you were part way through */
+  const [progress, setProgress] = useState<Record<Mode, number>>({ manual: 0, system: 0 });
   const [running, setRunning] = useState(false); // system mode auto-advancing
+  const done = progress[mode];
+  const setDone = useCallback(
+    (v: number | ((d: number) => number)) =>
+      setProgress((p) => ({ ...p, [mode]: typeof v === "function" ? v(p[mode]) : v })),
+    [mode]
+  );
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clear = () => { if (timer.current) clearTimeout(timer.current); timer.current = null; };
@@ -31,9 +39,13 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
   /* in system mode the run halts on any step that needs a human decision */
   const waitingOnYou = mode === "system" && !finished && !running && !!nextStep?.system.you && done > 0;
 
-  const reset = useCallback((m: Mode) => {
-    clear(); setRunning(false); setDone(0); setMode(m);
+  /* switching mode keeps both runs; Restart clears only the current one */
+  const switchTo = useCallback((m: Mode) => {
+    clear(); setRunning(false); setMode(m);
   }, []);
+  const restart = useCallback(() => {
+    clear(); setRunning(false); setProgress((p) => ({ ...p, [mode]: 0 }));
+  }, [mode]);
 
   /* system mode: roll forward until a decision is required */
   const roll = useCallback((from: number) => {
@@ -42,7 +54,7 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
     const tick = (i: number) => {
       if (i >= STEPS.length) { setRunning(false); return; }
       timer.current = setTimeout(() => {
-        setDone(i + 1);
+        setProgress((p) => ({ ...p, system: i + 1 }));
         const upcoming = STEPS[i + 1];
         if (upcoming?.system.you) { setRunning(false); return; } // hand control back
         tick(i + 1);
@@ -196,10 +208,10 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
 
             {/* mode switch */}
             <div className="flex flex-wrap gap-2 border-t border-[var(--color-line)] px-5 py-4 md:px-7">
-              <ModeBtn on={mode === "manual"} tone={AMBER} onClick={() => reset("manual")}>{t.modeManual}</ModeBtn>
-              <ModeBtn on={mode === "system"} tone={GREEN} onClick={() => reset("system")}>{t.modeSystem}</ModeBtn>
+              <ModeBtn on={mode === "manual"} tone={AMBER} onClick={() => switchTo("manual")}>{t.modeManual}</ModeBtn>
+              <ModeBtn on={mode === "system"} tone={GREEN} onClick={() => switchTo("system")}>{t.modeSystem}</ModeBtn>
               <button
-                onClick={() => reset(mode)}
+                onClick={restart}
                 className="rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-slate)] transition-colors hover:text-[var(--color-ink)]"
               >
                 ↻ {t.restart}

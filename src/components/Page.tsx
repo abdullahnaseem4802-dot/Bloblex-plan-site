@@ -3,6 +3,8 @@ import Hero from "./Hero";
 import { WhatWeBuild, Process, Pricing } from "./Sections";
 import ScaleGraph from "./ScaleGraph";
 import RequestJourney from "./RequestJourney";
+import DayFeed from "./DayFeed";
+import SpeedRace from "./SpeedRace";
 import SystemComparison from "./SystemComparison";
 import SectorSwitcher from "./SectorSwitcher";
 import AutomationPicker from "./AutomationPicker";
@@ -24,10 +26,12 @@ export default function Page({ locale }: { locale: Locale }) {
         <WhatWeBuild locale={locale} />
         <ScaleGraph locale={locale} />
         <RequestJourney locale={locale} />
+        <DayFeed locale={locale} />
         <SystemComparison locale={locale} />
         <SectorSwitcher locale={locale} />
         <AutomationPicker locale={locale} />
         <Process locale={locale} />
+        <SpeedRace locale={locale} />
         <CompetitionGraph locale={locale} />
         <Pricing locale={locale} />
         <Uncomparable locale={locale} />
