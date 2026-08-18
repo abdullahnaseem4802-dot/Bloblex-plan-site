@@ -76,20 +76,20 @@ export default function DayFeed({ locale }: { locale: Locale }) {
               <div className="grid grid-cols-[1fr_1fr_auto] gap-2 sm:flex sm:flex-wrap">
                 <button
                   onClick={() => setPlaying((p) => !p)}
-                  className="rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-panel)]"
+                  className="whitespace-nowrap rounded-full border border-[var(--color-line)] px-3 py-2 text-[0.78rem] font-semibold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-panel)] sm:px-4 sm:text-sm"
                 >
                   {playing ? `❚❚ ${t.pause}` : `▶ ${t.play}`}
                 </button>
                 <button
                   onClick={step}
-                  className="rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-slate)] transition-colors hover:text-[var(--color-ink)]"
+                  className="whitespace-nowrap rounded-full border border-[var(--color-line)] px-3 py-2 text-[0.78rem] font-semibold text-[var(--color-slate)] transition-colors hover:text-[var(--color-ink)] sm:px-4 sm:text-sm"
                 >
                   ⏭ {t.oneLine}
                 </button>
                 <button
                   onClick={restart}
                   aria-label={t.restart}
-                  className="rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-slate)] transition-colors hover:text-[var(--color-ink)]"
+                  className="whitespace-nowrap rounded-full border border-[var(--color-line)] px-3 py-2 text-[0.78rem] font-semibold text-[var(--color-slate)] transition-colors hover:text-[var(--color-ink)] sm:px-4 sm:text-sm"
                 >
                   ↻
                 </button>

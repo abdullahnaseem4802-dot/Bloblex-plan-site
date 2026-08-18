@@ -36,7 +36,7 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
         </Reveal>
 
         {/* state switcher */}
-        <div className="mt-10 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+        <div className="mt-6 grid grid-cols-2 gap-2 sm:mt-10 sm:flex sm:flex-wrap">
           {t.tabs.map((label, i) => (
             <button
               key={label}
@@ -53,7 +53,7 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
           ))}
         </div>
 
-        <div className="mt-8 grid gap-10 lg:grid-cols-[1.35fr_1fr] lg:items-center lg:gap-8">
+        <div className="mt-4 grid gap-10 sm:mt-8 lg:grid-cols-[1.35fr_1fr] lg:items-center lg:gap-8">
           {/* ---------------- diagram ---------------- */}
           <div className="relative aspect-[3/4] w-full rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white pb-8 shadow-[var(--shadow-soft)] sm:aspect-[10/7] sm:pb-0">
             {/* viewBox is 1000x700, exactly the 10/7 container ratio, so strokes

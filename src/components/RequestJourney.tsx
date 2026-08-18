@@ -265,7 +265,7 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
               <ModeBtn on={mode === "system"} tone={GREEN} onClick={() => switchTo("system")}>{t.modeSystem}</ModeBtn>
               <button
                 onClick={restart}
-                className="col-span-2 rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-slate)] transition-colors hover:text-[var(--color-ink)] sm:col-span-1"
+                className="col-span-2 whitespace-nowrap rounded-full border border-[var(--color-line)] px-3 py-2 text-[0.78rem] font-semibold text-[var(--color-slate)] transition-colors hover:text-[var(--color-ink)] sm:col-span-1 sm:px-4 sm:text-sm"
               >
                 ↻ {t.restart}
               </button>
@@ -284,7 +284,7 @@ function ModeBtn({ on, tone, onClick, children }: { on: boolean; tone: string; o
     <button
       onClick={onClick}
       aria-pressed={on}
-      className="rounded-full border px-4 py-2 text-sm font-semibold transition-all"
+      className="whitespace-nowrap rounded-full border px-3 py-2 text-[0.78rem] font-semibold transition-all sm:px-4 sm:text-sm"
       style={
         on
           ? { background: tone, borderColor: "transparent", color: "#fff", boxShadow: `0 10px 26px -10px ${tone}` }
