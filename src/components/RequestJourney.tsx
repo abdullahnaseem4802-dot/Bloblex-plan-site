@@ -315,8 +315,8 @@ function Bar({
           transition={{ type: "spring", stiffness: 120, damping: 20 }}
         />
       </div>
-      <span className="w-24 shrink-0 text-right text-[0.82rem] font-bold" style={{ color }}>
-        {fmt(live, locale)} / {fmt(total, locale)}
+      <span className="flex w-24 shrink-0 items-center justify-end gap-1 whitespace-nowrap text-right text-[0.82rem] font-bold" style={{ color }}>
+        {live >= total ? <>✓ {fmt(total, locale)}</> : <>{fmt(live, locale)} / {fmt(total, locale)}</>}
       </span>
     </div>
   );

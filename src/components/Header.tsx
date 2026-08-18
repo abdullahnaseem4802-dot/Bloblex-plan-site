@@ -47,18 +47,18 @@ export default function Header({ locale, alt }: { locale: Locale; alt?: { en: st
           : "bg-white/92 border-[var(--color-line)] shadow-[0_8px_30px_-12px_rgba(10,22,40,.14)]"
       }`}
     >
-      <div className="container flex items-center justify-between gap-4 h-[76px]">
-        <a href={path(locale)} aria-label="Blobex">
+      <div className="container flex items-center justify-between gap-6 h-[76px] xl:gap-8">
+        <a href={path(locale)} aria-label="Blobex" className="shrink-0">
           <BrandLogo size={40} dark={overDark} />
         </a>
 
-        <nav className={`hidden xl:flex items-center gap-1 rounded-full border p-1 text-[0.92rem] font-medium transition-colors ${overDark ? "border-white/15 bg-white/10" : "border-[var(--color-line)] bg-[var(--color-panel)]/70"}`} aria-label="Primary">
+        <nav className={`hidden min-w-0 xl:flex items-center gap-0.5 rounded-full border p-1 text-[0.88rem] font-medium transition-colors ${overDark ? "border-white/15 bg-white/10" : "border-[var(--color-line)] bg-[var(--color-panel)]/70"}`} aria-label="Primary">
           {links.map((l) => {
             const on = l.key === activeKey;
             return (
               <a
                 key={l.href} href={l.href} aria-current={on ? "page" : undefined}
-                className={`whitespace-nowrap rounded-full px-3.5 py-2 transition-all duration-200 ${
+                className={`whitespace-nowrap rounded-full px-3 py-2 transition-all duration-200 ${
                   on
                     ? "bg-white text-[var(--color-ink)] font-semibold shadow-[var(--shadow-soft)]"
                     : overDark
@@ -72,9 +72,9 @@ export default function Header({ locale, alt }: { locale: Locale; alt?: { en: st
           })}
         </nav>
 
-        <div className="hidden xl:flex items-center gap-4">
+        <div className="hidden shrink-0 xl:flex items-center gap-4">
           <LanguageMenu locale={locale} alt={alts} dark={overDark} />
-          <a href={pagePath(locale, "contact")} className="btn-primary">{t.cta}</a>
+          <a href={pagePath(locale, "contact")} className="btn-primary whitespace-nowrap">{t.cta}</a>
         </div>
 
         <button

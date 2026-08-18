@@ -16,28 +16,28 @@ export function ChartFrame({ yLabel, xLabel, lowHigh = true }: { yLabel: string;
     <g>
       <defs>
         <marker id={arrow} markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto">
-          <path d="M1 1 L7 4.5 L1 8" fill="none" stroke="var(--color-ink-soft)" strokeWidth="2" />
+          <path d="M1 1 L7 4.5 L1 8" fill="none" stroke="#1c2b40" strokeWidth="2" />
         </marker>
       </defs>
       {/* gridlines */}
       {grid.map((y, i) => (
-        <line key={i} x1={x0} y1={y} x2={x1} y2={y} stroke="var(--color-line)" strokeWidth="1.2" strokeDasharray="3 5" />
+        <line key={i} x1={x0} y1={y} x2={x1} y2={y} stroke="#e7ecf3" strokeWidth="1.2" strokeDasharray="3 5" />
       ))}
       {/* axes */}
-      <line x1={x0} y1={y1} x2={x0} y2={y0 - 4} stroke="var(--color-ink-soft)" strokeWidth="2.6" markerEnd={`url(#${arrow})`} />
-      <line x1={x0} y1={y1} x2={x1 + 4} y2={y1} stroke="var(--color-ink-soft)" strokeWidth="2.6" markerEnd={`url(#${arrow})`} />
+      <line x1={x0} y1={y1} x2={x0} y2={y0 - 4} stroke="#1c2b40" strokeWidth="2.6" markerEnd={`url(#${arrow})`} />
+      <line x1={x0} y1={y1} x2={x1 + 4} y2={y1} stroke="#1c2b40" strokeWidth="2.6" markerEnd={`url(#${arrow})`} />
       {/* origin */}
-      <circle cx={x0} cy={y1} r="3" fill="var(--color-slate)" />
+      <circle cx={x0} cy={y1} r="3" fill="#1c2b40" />
       {/* qualitative scale */}
       {lowHigh && (
         <>
-          <text x={x0 - 8} y={y0 + 6} textAnchor="end" fontSize="9" fill="var(--color-mute)">High</text>
-          <text x={x0 - 8} y={y1} textAnchor="end" fontSize="9" fill="var(--color-mute)">Low</text>
+          <text x={x0 - 10} y={y0 + 14} textAnchor="end" fontSize="9" fill="#8a94a8">High</text>
+          <text x={x0 - 10} y={y1 - 1} textAnchor="end" fontSize="9" fill="#8a94a8">Low</text>
         </>
       )}
       {/* titles */}
-      <text x={16} y={(y0 + y1) / 2} textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--color-slate)" transform={`rotate(-90 16 ${(y0 + y1) / 2})`}>{yLabel}</text>
-      <text x={(x0 + x1) / 2} y={224} textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--color-slate)">{xLabel}</text>
+      <text x={16} y={(y0 + y1) / 2} textAnchor="middle" fontSize="11" fontWeight="700" fill="#55617a" transform={`rotate(-90 16 ${(y0 + y1) / 2})`}>{yLabel}</text>
+      <text x={(x0 + x1) / 2} y={224} textAnchor="middle" fontSize="11" fontWeight="700" fill="#55617a">{xLabel}</text>
     </g>
   );
 }

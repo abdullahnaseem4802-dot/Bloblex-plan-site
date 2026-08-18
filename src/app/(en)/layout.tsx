@@ -14,6 +14,9 @@ export default function EnLayout({ children }: { children: React.ReactNode }) {
   return (
     // the splash script stamps data-splash on <html> before hydration
     <html lang="en" className={fontVars} suppressHydrationWarning>
+      <head>
+        <meta name="color-scheme" content="light" />
+      </head>
       <body>
         <AmbientBackground />
         <ScrollProgress />
