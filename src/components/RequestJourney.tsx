@@ -309,7 +309,7 @@ function Bar({
       <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--color-line)]">
         <motion.span
           className="absolute inset-y-0 left-0 rounded-full"
-          style={{ background: color, opacity: active ? 0.28 : 1 }}
+          style={{ background: color, opacity: active ? 0.16 : 1 }}
           initial={{ width: 0 }}
           whileInView={{ width: `${(value / max) * 100}%` }}
           viewport={{ once: true }}
@@ -318,7 +318,7 @@ function Bar({
         {active && (
           <motion.span
             className="absolute inset-y-0 left-0 rounded-full"
-            style={{ background: color }}
+            style={{ background: color, boxShadow: live > 0 ? `0 0 0 1px ${color}` : undefined }}
             animate={{ width: `${(Math.min(live, max) / max) * 100}%` }}
             transition={{ type: "spring", stiffness: 120, damping: 20 }}
           />

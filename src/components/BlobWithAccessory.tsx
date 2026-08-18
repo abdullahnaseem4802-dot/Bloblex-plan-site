@@ -38,19 +38,20 @@ const ACCESSORY: Record<AccessoryKey, React.ReactNode> = {
     </g>
   ),
 
-  /* stethoscope worn round the neck, chest piece resting to one side */
+  /* stethoscope hung low like a necklace, routed around the face rather
+     than across it, chest piece dangling below */
   stethoscope: (
     <g fill="none" strokeLinecap="round">
-      <path d="M88 66 C82 96 96 116 112 122" stroke={STEEL_DK} strokeWidth={7} />
-      <path d="M152 66 C158 96 144 116 128 122" stroke={STEEL_DK} strokeWidth={7} />
-      <path d="M88 66 C82 96 96 116 112 122" stroke={STEEL} strokeWidth={3.5} />
-      <path d="M152 66 C158 96 144 116 128 122" stroke={STEEL} strokeWidth={3.5} />
-      <circle cx="88" cy="64" r="6" fill={STEEL} stroke={STEEL_DK} strokeWidth={2} />
-      <circle cx="152" cy="64" r="6" fill={STEEL} stroke={STEEL_DK} strokeWidth={2} />
-      <path d="M120 122 C120 146 104 162 126 172" stroke={STEEL_DK} strokeWidth={7} />
-      <path d="M120 122 C120 146 104 162 126 172" stroke={STEEL} strokeWidth={3.5} />
-      <circle cx="136" cy="174" r="13" fill={STEEL} stroke={STEEL_DK} strokeWidth={3} />
-      <circle cx="136" cy="174" r="6" fill={BRAND} stroke="none" />
+      <path d="M76 114 C70 138 90 154 116 158" stroke={STEEL_DK} strokeWidth={7} />
+      <path d="M178 108 C186 136 152 154 124 158" stroke={STEEL_DK} strokeWidth={7} />
+      <path d="M76 114 C70 138 90 154 116 158" stroke={STEEL} strokeWidth={3.5} />
+      <path d="M178 108 C186 136 152 154 124 158" stroke={STEEL} strokeWidth={3.5} />
+      <circle cx="76" cy="113" r="5.5" fill={STEEL} stroke={STEEL_DK} strokeWidth={2} />
+      <circle cx="178" cy="107" r="5.5" fill={STEEL} stroke={STEEL_DK} strokeWidth={2} />
+      <path d="M120 158 C120 172 134 176 142 184" stroke={STEEL_DK} strokeWidth={7} />
+      <path d="M120 158 C120 172 134 176 142 184" stroke={STEEL} strokeWidth={3.5} />
+      <circle cx="148" cy="188" r="11" fill={STEEL} stroke={STEEL_DK} strokeWidth={3} />
+      <circle cx="148" cy="188" r="5" fill={BRAND} stroke="none" />
     </g>
   ),
 
@@ -124,11 +125,6 @@ export default function BlobWithAccessory({ accessory }: { accessory: AccessoryK
   return (
     <svg viewBox="0 0 240 200" width="100%" height="100%" role="img" aria-hidden="true">
       <defs>
-        <radialGradient id="swBlob" cx="42%" cy="34%" r="78%">
-          <stop offset="0%" stopColor="#8ddaf7" />
-          <stop offset="52%" stopColor="#29abe2" />
-          <stop offset="100%" stopColor="#1274ab" />
-        </radialGradient>
         <filter id="propShadow" x="-30%" y="-30%" width="160%" height="160%">
           <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#0a1628" floodOpacity="0.22" />
         </filter>
@@ -138,29 +134,10 @@ export default function BlobWithAccessory({ accessory }: { accessory: AccessoryK
         animate={{ y: [0, -4, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       >
-        {/* body, drawn to match the brand mark: rounded blob with a drip on
-            the right, a big sheen across the crown and capsule eyes */}
-        <path
-          fill="url(#swBlob)"
-          d="M118 30 C74 30 40 56 40 100 c0 34 30 56 76 56 c22 0 40 -5 53 -14
-             c9 6 20 6 27 0 c7 -6 7 -17 -1 -24 c-4 -4 -6 -9 -5 -14
-             C196 60 164 30 118 30 Z"
-        />
-        {/* crown sheen */}
-        <path
-          d="M70 74 C82 52 112 44 138 48"
-          fill="none" stroke="#fff" strokeWidth={9} strokeLinecap="round" opacity={0.9}
-        />
-        <circle cx="61" cy="86" r="4.5" fill="#fff" opacity={0.85} />
-        {/* circuit taps on the flank, as on the logo */}
-        <g stroke="#0a1628" strokeWidth={2.6} strokeLinecap="round" opacity={0.9}>
-          <path d="M56 104 h22" /><circle cx="54" cy="104" r="3.2" fill="#0a1628" stroke="none" />
-          <path d="M56 116 h30" /><circle cx="54" cy="116" r="3.2" fill="#0a1628" stroke="none" />
-          <path d="M60 128 h20" /><circle cx="58" cy="128" r="3.2" fill="#0a1628" stroke="none" />
-        </g>
-        {/* capsule eyes */}
-        <rect x="104" y="92" width="11" height="26" rx="5.5" fill="#fff" />
-        <rect x="136" y="92" width="11" height="26" rx="5.5" fill="#fff" />
+        {/* The character is the real brand mark, not a redraw, so the shape is
+            always exactly the logo. Placed so its eyes land where the props
+            below expect them. */}
+        <image href="/img/brand/mark.png" x="34" y="44" width="172" height="115" preserveAspectRatio="xMidYMid meet" />
 
         <AnimatePresence mode="wait">
           <motion.g
