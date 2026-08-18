@@ -58,7 +58,7 @@ export default function Header({ locale, alt }: { locale: Locale; alt?: { en: st
             return (
               <a
                 key={l.href} href={l.href} aria-current={on ? "page" : undefined}
-                className={`rounded-full px-4 py-2 transition-all duration-200 ${
+                className={`whitespace-nowrap rounded-full px-3.5 py-2 transition-all duration-200 ${
                   on
                     ? "bg-white text-[var(--color-ink)] font-semibold shadow-[var(--shadow-soft)]"
                     : overDark
