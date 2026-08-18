@@ -53,9 +53,9 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
           ))}
         </div>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[1.35fr_1fr] lg:items-center">
+        <div className="mt-8 grid gap-10 lg:grid-cols-[1.35fr_1fr] lg:items-center lg:gap-8">
           {/* ---------------- diagram ---------------- */}
-          <div className="relative aspect-[10/7] w-full rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white shadow-[var(--shadow-soft)]">
+          <div className="relative aspect-[3/4] w-full rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white pb-8 shadow-[var(--shadow-soft)] sm:aspect-[10/7] sm:pb-0">
             {/* viewBox is 1000x700, exactly the 10/7 container ratio, so strokes
                 scale uniformly. Drawing lines in a stretched box was what made
                 them render as broken dashes. */}
@@ -139,7 +139,7 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
                 <motion.span
                   animate={{ borderColor: accent + "99", color: "#0a1628" }}
                   transition={{ duration: 0.4 }}
-                  className="block whitespace-nowrap rounded-lg border px-2.5 py-1 text-[0.62rem] font-semibold shadow-[var(--shadow-soft)] sm:text-[0.72rem]"
+                  className="block whitespace-nowrap rounded-lg border px-1.5 py-0.5 text-[0.5rem] font-semibold shadow-[var(--shadow-soft)] sm:px-2.5 sm:py-1 sm:text-[0.72rem]"
                   style={{ background: tab === 1 ? "rgba(224,129,51,.08)" : tab === 2 ? "rgba(41,171,226,.09)" : "#ffffff" }}
                 >
                   {labels[i]}
@@ -151,7 +151,7 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.35, delay: 0.15 + i * 0.03 }}
-                      className="mt-1 block whitespace-nowrap text-[0.42rem] font-bold tracking-[0.08em] text-[#0f9d63] sm:text-[0.5rem]"
+                      className="mt-1 hidden whitespace-nowrap text-[0.42rem] font-bold tracking-[0.08em] text-[#0f9d63] sm:block sm:text-[0.5rem]"
                     >
                       {t.badge}
                     </motion.span>
@@ -168,13 +168,20 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="absolute inset-x-4 bottom-3 text-center text-[0.7rem] font-semibold"
+                className="absolute inset-x-3 bottom-2 text-center text-[0.6rem] font-semibold sm:bottom-3 sm:text-[0.7rem]"
                 style={{ color: accent }}
               >
                 {state.note}
               </motion.p>
             </AnimatePresence>
           </div>
+
+          {/* the per-node tag is hidden on phones, so say it once here */}
+          {tab === 2 && (
+            <p className="-mt-6 text-center text-[0.68rem] font-bold tracking-[0.08em] text-[#0f9d63] sm:hidden">
+              {t.badge}
+            </p>
+          )}
 
           {/* ---------------- narrative ---------------- */}
           <AnimatePresence mode="wait">

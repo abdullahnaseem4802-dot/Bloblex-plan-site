@@ -1,4 +1,5 @@
 "use client";
+import { useId } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import type { AccessoryKey } from "@/content/sectors";
 
@@ -122,10 +123,13 @@ const ACCESSORY: Record<AccessoryKey, React.ReactNode> = {
 };
 
 export default function BlobWithAccessory({ accessory }: { accessory: AccessoryKey }) {
+  /* the desktop and mobile copies both render, so the filter needs its own id
+     or the visible one points at a filter inside a hidden svg */
+  const shadow = `propShadow-${useId().replace(/[:]/g, "")}`;
   return (
     <svg viewBox="0 0 240 200" width="100%" height="100%" role="img" aria-hidden="true">
       <defs>
-        <filter id="propShadow" x="-30%" y="-30%" width="160%" height="160%">
+        <filter id={shadow} x="-30%" y="-30%" width="160%" height="160%">
           <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#0a1628" floodOpacity="0.22" />
         </filter>
       </defs>
@@ -142,7 +146,7 @@ export default function BlobWithAccessory({ accessory }: { accessory: AccessoryK
         <AnimatePresence mode="wait">
           <motion.g
             key={accessory}
-            filter="url(#propShadow)"
+            filter={`url(#${shadow})`}
             initial={{ opacity: 0, scale: 0.7, y: -6 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.7, y: -6 }}

@@ -89,7 +89,7 @@ export default function Header({ locale, alt }: { locale: Locale; alt?: { en: st
       </div>
 
       {/* mobile drawer */}
-      <div className={`xl:hidden overflow-hidden bg-white border-b border-[var(--color-line)] transition-[max-height] duration-300 ${open ? "max-h-[420px]" : "max-h-0"}`}>
+      <div className={`xl:hidden overflow-hidden bg-white border-b border-[var(--color-line)] transition-[max-height] duration-300 ${open ? "max-h-[560px]" : "max-h-0"}`}>
         <nav className="container flex flex-col py-4 gap-1" aria-label="Mobile">
           {links.map((l) => {
             const on = l.key === activeKey;

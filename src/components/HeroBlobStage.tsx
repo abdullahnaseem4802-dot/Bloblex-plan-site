@@ -115,7 +115,7 @@ export default function HeroBlobStage({ chips, systemLabel }: { chips: string[];
           return (
             <motion.span
               key={seat.label}
-              className="absolute whitespace-nowrap rounded-full border border-white/25 bg-white/12 px-3.5 py-1.5 text-[0.78rem] font-semibold text-white backdrop-blur-sm"
+              className="absolute whitespace-nowrap rounded-full border border-white/25 bg-white/12 px-2.5 py-1 text-[0.62rem] font-semibold text-white backdrop-blur-sm sm:px-3.5 sm:py-1.5 sm:text-[0.78rem]"
               style={{ left: `${(seat.x / SIZE) * 100}%`, top: `${(seat.y / SIZE) * 100}%` }}
               initial={false}
               animate={
@@ -141,7 +141,7 @@ export default function HeroBlobStage({ chips, systemLabel }: { chips: string[];
 
         {/* the slime itself */}
         <motion.div
-          className="absolute left-1/2 top-1/2"
+          className="absolute left-1/2 top-1/2 w-[42%]"
           style={{ x: "-50%", y: "-50%" }}
           animate={
             reduce
@@ -159,8 +159,7 @@ export default function HeroBlobStage({ chips, systemLabel }: { chips: string[];
           <motion.img
             src="/img/brand/mark-ink-sm.png"
             alt=""
-            className="w-[46%] min-w-[150px] max-w-[210px] drop-shadow-[0_26px_48px_rgba(41,171,226,.5)]"
-            style={{ width: 200 }}
+            className="w-full drop-shadow-[0_26px_48px_rgba(41,171,226,.5)]"
             /* a swallow makes it squash, like something just went down */
             animate={reduce ? {} : { scaleX: [1, 1.09, 0.96, 1], scaleY: [1, 0.92, 1.05, 1] }}
             key={eaten}
