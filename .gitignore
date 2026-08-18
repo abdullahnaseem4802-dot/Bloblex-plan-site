@@ -44,5 +44,7 @@ next-env.d.ts
 # lead capture dev fallback
 /data/leads.jsonl
 
-# local QA scratch scripts
-/*.mjs
+# local QA scratch scripts (config .mjs files stay tracked)
+/qa*.mjs
+/diag.mjs
+/shot*.mjs
