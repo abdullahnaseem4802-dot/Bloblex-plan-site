@@ -345,3 +345,9 @@ html[data-splash] .sheen::after { animation-delay: 4s; }
   50%      { box-shadow: 0 0 0 12px rgba(23,135,196,0); }
 }
 @media (prefers-reduced-motion: reduce) { .bx-await { animation: none; } }
+
+/* Hero stage placement: the client wants the character lifted level with the
+   headline and nudged right, with clear air between it and the copy. */
+@media (min-width: 1024px) {
+  .hero-stage-offset { transform: translate(44px, -96px); }
+}
