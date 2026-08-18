@@ -77,9 +77,9 @@ export const FEED_UI: Record<Locale, {
   closingA: string; closingB: string; closingC: string;
 }> = {
   en: {
-    kicker: "A day, replayed",
-    titleA: "What gets ticked off",
-    titleB: "without you",
+    kicker: "Your day",
+    titleA: "This all got done",
+    titleB: "while you were on site",
     pause: "Pause", play: "Play", oneLine: "One line", restart: "Restart",
     doneLabel: "tasks done", yoursLabel: "from you",
     system: "THE SYSTEM", you: "YOU",
@@ -88,9 +88,9 @@ export const FEED_UI: Record<Locale, {
     closingC: "The rest happened while you were on a job site, on the phone, or having supper.",
   },
   fr: {
-    kicker: "Une journée, rejouée",
-    titleA: "Ce qui se coche",
-    titleB: "sans toi",
+    kicker: "Ta journée",
+    titleA: "Tout ça s'est fait",
+    titleB: "pendant que t'étais sur la job",
     pause: "Pause", play: "Jouer", oneLine: "Une ligne", restart: "Recommencer",
     doneLabel: "tâches faites", yoursLabel: "de ta part",
     system: "LE SYSTÈME", you: "TOI",

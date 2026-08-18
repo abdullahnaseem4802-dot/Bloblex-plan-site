@@ -2,7 +2,7 @@
    ONE REQUEST, FROM THE FIRST CALL TO THE INVOICE
    Client direction (Aug 2026): a twelve-step simulator with two modes.
      - by hand      every step is a human gesture, time piles up  -> 8 h 05
-     - your system  most steps run themselves, you approve three  -> 46 min
+     - your system  most steps run themselves, you approve three  -> 12 min
    French is the client's own wording (informal "tu").
    ================================================================= */
 import type { Locale } from "./site";
@@ -25,7 +25,7 @@ export const STEPS: Step[] = [
   {
     label: { en: "Qualify the client", fr: "Qualifier le client" },
     manual: { minutes: 15, note: { en: "CALL BACK, ASK AROUND", fr: "RAPPELER, QUESTIONNER" } },
-    system: { minutes: 2, note: { en: "SUMMARY READY", fr: "RÉSUMÉ PRÊT" } },
+    system: { minutes: 1, note: { en: "SUMMARY READY", fr: "RÉSUMÉ PRÊT" } },
   },
   {
     label: { en: "Open the file", fr: "Ouvrir le dossier" },
@@ -35,13 +35,13 @@ export const STEPS: Step[] = [
   {
     label: { en: "Chase plans and photos", fr: "Chercher plans et photos" },
     manual: { minutes: 45, note: { en: "FOLLOW-UPS", fr: "RELANCES" } },
-    system: { minutes: 3, note: { en: "SECURE LINK", fr: "LIEN SÉCURISÉ" } },
+    system: { minutes: 0, note: { en: "SECURE LINK", fr: "LIEN SÉCURISÉ" } },
   },
   {
     label: { en: "Read the plan", fr: "Lire le plan" },
     manual: { minutes: 60, note: { en: "BY HAND", fr: "À LA MAIN" } },
     system: {
-      minutes: 6,
+      minutes: 2,
       note: { en: "SYMBOLS PLACED", fr: "SYMBOLES PLACÉS" },
       you: { en: "You approve the plan the AI read", fr: "Tu valides le plan lu par l'IA" },
     },
@@ -49,13 +49,13 @@ export const STEPS: Step[] = [
   {
     label: { en: "Count the symbols", fr: "Compter les symboles" },
     manual: { minutes: 90, note: { en: "ONE BY ONE", fr: "UN PAR UN" } },
-    system: { minutes: 8, note: { en: "COUNTED", fr: "COMPTÉS" } },
+    system: { minutes: 0, note: { en: "COUNTED", fr: "COMPTÉS" } },
   },
   {
     label: { en: "Build the estimate", fr: "Monter l'estimation" },
     manual: { minutes: 75, note: { en: "SPREADSHEET", fr: "CHIFFRIER" } },
     system: {
-      minutes: 15,
+      minutes: 4,
       note: { en: "DRAFT READY", fr: "BROUILLON PRÊT" },
       you: { en: "You adjust the estimate", fr: "Tu ajustes l'estimation" },
     },
@@ -69,7 +69,7 @@ export const STEPS: Step[] = [
     label: { en: "Send and follow up", fr: "Envoyer et relancer" },
     manual: { minutes: 30, note: { en: "REMINDERS BY HAND", fr: "RELANCES À LA MAIN" } },
     system: {
-      minutes: 2,
+      minutes: 1,
       note: { en: "AUTO FOLLOW-UP", fr: "SUIVI AUTO" },
       you: { en: "You approve sending it to the client", fr: "Tu approuves l'envoi au client" },
     },
@@ -77,25 +77,26 @@ export const STEPS: Step[] = [
   {
     label: { en: "Schedule the job", fr: "Planifier le chantier" },
     manual: { minutes: 35, note: { en: "CALLS AND A WHITEBOARD", fr: "APPELS ET TABLEAU" } },
-    system: { minutes: 4, note: { en: "DRAG AND DROP", fr: "GLISSER-DÉPOSER" } },
+    system: { minutes: 1, note: { en: "DRAG AND DROP", fr: "GLISSER-DÉPOSER" } },
   },
   {
     label: { en: "Work order and hours", fr: "Bon de travail et heures" },
     manual: { minutes: 40, note: { en: "PAPER, THEN RE-TYPED", fr: "PAPIER, PUIS RETAPÉ" } },
-    system: { minutes: 3, note: { en: "ON THE TABLET", fr: "TABLETTE" } },
+    system: { minutes: 1, note: { en: "ON THE TABLET", fr: "TABLETTE" } },
   },
   {
     label: { en: "Invoicing and report", fr: "Facturation et rapport" },
     manual: { minutes: 35, note: { en: "REBUILT FROM SCRATCH", fr: "REFAIT AU COMPLET" } },
-    system: { minutes: 3, note: { en: "READY TO EXPORT", fr: "PRÊT À EXPORTER" } },
+    system: { minutes: 2, note: { en: "READY TO EXPORT", fr: "PRÊT À EXPORTER" } },
   },
 ];
 
 export const MANUAL_TOTAL = STEPS.reduce((a, s) => a + s.manual.minutes, 0); // 485 = 8 h 05
-export const SYSTEM_TOTAL = STEPS.reduce((a, s) => a + s.system.minutes, 0); // 46 min
+export const SYSTEM_TOTAL = STEPS.reduce((a, s) => a + s.system.minutes, 0); // 12 min
 export const DECISION_COUNT = STEPS.filter((s) => s.system.you).length;      // 3
 
 export const JOURNEY_UI: Record<Locale, {
+  lead: string;
   kicker: string;
   heading: string;
   title: string;
@@ -122,6 +123,7 @@ export const JOURNEY_UI: Record<Locale, {
   closing: string;
 }> = {
   en: {
+    lead: "Both run at the same time. Watch which one is still going.",
     kicker: "See it for yourself",
     heading: "One request, from the first call to the invoice.",
     title: "One request, from the first call to the invoice",
@@ -145,9 +147,10 @@ export const JOURNEY_UI: Record<Locale, {
     systemWaitHint: "WAITING ON YOU",
     systemDone: (mins, decisions) => `Quote sent. ${decisions} decisions from you, ${mins} of your time.`,
     todo: "TO DO",
-    closing: "Twelve boxes. Eight hours of human time for one request, or forty-six minutes. That is what decides how many you can answer.",
+    closing: "Eight hours of your people, or twelve minutes. Same request. That is what decides how many you can answer.",
   },
   fr: {
+    lead: "Les deux partent en même temps. Regarde lequel roule encore.",
     kicker: "Voyez par vous-même",
     heading: "Une demande, du premier appel jusqu'à la facture.",
     title: "Une demande, du premier appel jusqu'à la facture",
@@ -171,7 +174,7 @@ export const JOURNEY_UI: Record<Locale, {
     systemWaitHint: "EN ATTENTE DE TOI",
     systemDone: (mins, decisions) => `Soumission envoyée. ${decisions} décisions de ta part, ${mins} de ton temps.`,
     todo: "À FAIRE",
-    closing: "Douze cases. Huit heures de temps humain pour une demande, ou quarante-six minutes. C'est ce qui décide combien tu peux en répondre.",
+    closing: "Huit heures de ton monde, ou douze minutes. La même demande. C'est ça qui décide combien tu peux en répondre.",
   },
 };
 

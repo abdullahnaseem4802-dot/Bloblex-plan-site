@@ -15,7 +15,7 @@ export default function DayFeed({ locale }: { locale: Locale }) {
 
   const [shown, setShown] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [armed, setArmed] = useState(false);   // starts once scrolled into view
+  const [inView, setInView] = useState(false); // only ever runs while on screen
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
@@ -27,7 +27,8 @@ export default function DayFeed({ locale }: { locale: Locale }) {
     const el = boxRef.current;
     if (!el) return;
     const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setArmed(true); setPlaying(true); io.disconnect(); }
+      setInView(e.isIntersecting);
+      if (e.isIntersecting) setPlaying(true);
     }, { threshold: 0.3 });
     io.observe(el);
     return () => io.disconnect();
@@ -35,11 +36,11 @@ export default function DayFeed({ locale }: { locale: Locale }) {
 
   useEffect(() => {
     clear();
-    if (!playing || !armed) return;
+    if (!playing || !inView) return;
     if (shown >= FEED_TOTAL) { setPlaying(false); return; }
     timer.current = setTimeout(() => setShown((n) => n + 1), reduce ? 120 : 950);
     return clear;
-  }, [playing, armed, shown, reduce]);
+  }, [playing, inView, shown, reduce]);
 
   /* Keep the newest line in view by scrolling the list itself. scrollIntoView
      would walk up and move the window too, which fought the visitor's own

@@ -1,237 +1,213 @@
 "use client";
-import { useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import Reveal from "./Reveal";
+import ToolGlyph from "./ToolGlyph";
 import { type Locale } from "@/content/site";
-import { COMPARISON, NODES } from "@/content/comparison";
+import { COMPARISON, TOOLS, LOOSE, RING } from "@/content/comparison";
 
-const CX = 50, CY = 47; // centre of the stage, in %
+const RED = "#d2544c";
+const GREEN = "#0f9d63";
+const BRAND = "#29abe2";
 
-/* % -> viewBox units (1000 x 700) */
-const SX = (x: number) => x * 10;
-const SY = (y: number) => y * 7;
-
-/* State 2 wiring: every tool cross-wired to several others. Fixed pairs, so
-   the tangle renders identically on server and client. */
-const SPAGHETTI: [number, number][] = [];
-for (let i = 0; i < NODES.length; i++) {
-  for (const step of [1, 3, 5, 7]) SPAGHETTI.push([i, (i + step) % NODES.length]);
-}
-
+/** Both states at once, no tabs and nothing to click: the client's point is
+ *  that a visitor has three seconds and will not press anything to get it. */
 export default function SystemComparison({ locale }: { locale: Locale }) {
   const t = COMPARISON[locale];
   const reduce = useReducedMotion();
-  const [tab, setTab] = useState(0);
-  const state = t.states[tab];
-  const labels = tab === 2 ? t.owned : t.tools;
-  const accent = tab === 0 ? "#8a94a8" : tab === 1 ? "#d97316" : "#1787c4";
+  const ref = useRef<HTMLDivElement>(null);
+  const [live, setLive] = useState(false);
+
+  /* the picture only animates once it is actually on screen */
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setLive(true); io.disconnect(); }
+    }, { threshold: 0.25 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <section id="comparison" className="relative overflow-hidden bg-[var(--color-panel)] border-y border-[var(--color-line)] py-20 md:py-28">
-      <div className="container relative">
+    <section id="comparison" className="relative overflow-hidden border-y border-[var(--color-line)] bg-[var(--color-panel)] py-20 md:py-28">
+      <div className="container">
         <Reveal className="max-w-3xl">
           <p className="mb-4 text-[0.78rem] font-bold uppercase tracking-[0.2em] text-[var(--color-brand-600)]">{t.kicker}</p>
-          <h2 className="text-3xl md:text-[2.6rem] font-semibold leading-[1.1] tracking-[-0.03em]">{t.title}</h2>
-          <p className="mt-5 max-w-[58ch] text-lg leading-relaxed text-[var(--color-slate)]">{t.lead}</p>
+          <h2 className="text-3xl font-semibold leading-[1.06] tracking-[-0.03em] md:text-[3rem]">{t.title}</h2>
+          <p className="mt-5 max-w-[60ch] leading-relaxed text-[var(--color-slate)]">{t.lead}</p>
         </Reveal>
 
-        {/* state switcher */}
-        <div className="mt-6 grid grid-cols-2 gap-2 sm:mt-10 sm:flex sm:flex-wrap">
-          {t.tabs.map((label, i) => (
-            <button
-              key={label}
-              onClick={() => setTab(i)}
-              aria-pressed={tab === i}
-              className={`rounded-full border px-4 py-2.5 text-center text-sm font-semibold transition-all duration-200 last:col-span-2 sm:last:col-span-1 ${
-                tab === i
-                  ? "border-transparent bg-[var(--color-brand-500)] text-white shadow-[0_10px_30px_-8px_rgba(41,171,226,.8)]"
-                  : "border-[var(--color-line)] bg-white text-[var(--color-slate)] hover:border-[var(--color-brand-300)] hover:text-[var(--color-ink)]"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-4 grid gap-10 sm:mt-8 lg:grid-cols-[1.35fr_1fr] lg:items-center lg:gap-8">
-          {/* ---------------- diagram ---------------- */}
-          <div className="relative aspect-[3/4] w-full rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white pb-8 shadow-[var(--shadow-soft)] sm:aspect-[10/7] sm:pb-0">
-            {/* viewBox is 1000x700, exactly the 10/7 container ratio, so strokes
-                scale uniformly. Drawing lines in a stretched box was what made
-                them render as broken dashes. */}
-            <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1000 700" preserveAspectRatio="none" aria-hidden>
-              {/* state 2: everything wired to everything */}
-              {tab === 1 && SPAGHETTI.map(([a, b], i) => (
-                <g key={"s" + i}>
-                  <motion.line
-                    x1={SX(NODES[a].x)} y1={SY(NODES[a].y)} x2={SX(NODES[b].x)} y2={SY(NODES[b].y)}
-                    stroke="#e08133" strokeOpacity={0.45} strokeWidth={1.2} strokeLinecap="round"
-                    initial={reduce ? undefined : { opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5, delay: (i % 12) * 0.03 }}
-                  />
-                  {!reduce && i % 4 === 0 && (
-                    <motion.circle
-                      r={3} fill="#e08133"
-                      initial={{ cx: SX(NODES[a].x), cy: SY(NODES[a].y), opacity: 0 }}
-                      animate={{
-                        cx: [SX(NODES[a].x), SX(NODES[b].x)],
-                        cy: [SY(NODES[a].y), SY(NODES[b].y)],
-                        opacity: [0, 1, 1, 0],
-                      }}
-                      transition={{ duration: 3.2, repeat: Infinity, delay: (i % 8) * 0.55, ease: "linear" }}
-                    />
-                  )}
-                </g>
-              ))}
-
-              {/* state 3: clean spokes into the owned core */}
-              {tab === 2 && NODES.map((n, i) => (
-                <g key={"r" + i}>
-                  <motion.line
-                    x1={SX(n.x)} y1={SY(n.y)} x2={SX(CX)} y2={SY(CY)}
-                    stroke="#29abe2" strokeOpacity={0.55} strokeWidth={1.4} strokeLinecap="round"
-                    initial={reduce ? undefined : { opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5, delay: i * 0.04 }}
-                  />
-                  {!reduce && (
-                    <motion.circle
-                      r={3.2} fill="#29abe2"
-                      initial={{ cx: SX(n.x), cy: SY(n.y), opacity: 0 }}
-                      animate={{
-                        cx: [SX(n.x), SX(CX)],
-                        cy: [SY(n.y), SY(CY)],
-                        opacity: [0, 1, 1, 0],
-                      }}
-                      transition={{ duration: 2.6, repeat: Infinity, delay: i * 0.28, ease: "linear" }}
-                    />
-                  )}
-                </g>
-              ))}
-            </svg>
-
-            {/* state 3: the owned core */}
-            <AnimatePresence>
-              {tab === 2 && (
-                <motion.div
-                  className="absolute z-10 -translate-x-1/2 -translate-y-1/2 text-center"
-                  style={{ left: CX + "%", top: CY + "%" }}
-                  initial={reduce ? undefined : { opacity: 0, scale: 0.7 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.7 }}
-                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <span className="mx-auto mb-2 block h-14 w-14 rotate-45 rounded-[10px] border-2 border-[var(--color-brand-400)] bg-[var(--color-brand-50)] shadow-[0_0_36px_rgba(41,171,226,.45)]" />
-                  <span className="block font-[family-name:var(--font-display)] text-[0.95rem] font-bold tracking-wide text-[var(--color-ink)]">{t.centerTitle}</span>
-                  <span className="mt-1 block text-[0.6rem] font-bold tracking-[0.12em] text-[var(--color-brand-600)]">{t.centerSub}</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* the tools: identical positions in every state, only wiring changes */}
-            {NODES.map((n, i) => (
-              <div
-                key={i}
-                className="absolute z-20 -translate-x-1/2 -translate-y-1/2 text-center"
-                style={{ left: n.x + "%", top: n.y + "%" }}
-              >
-                <motion.span
-                  animate={{ borderColor: accent + "99", color: "#0a1628" }}
-                  transition={{ duration: 0.4 }}
-                  className="block whitespace-nowrap rounded-lg border px-1.5 py-0.5 text-[0.5rem] font-semibold shadow-[var(--shadow-soft)] sm:px-2.5 sm:py-1 sm:text-[0.72rem]"
-                  style={{ background: tab === 1 ? "rgba(224,129,51,.08)" : tab === 2 ? "rgba(41,171,226,.09)" : "#ffffff" }}
-                >
-                  {labels[i]}
-                </motion.span>
-                <AnimatePresence>
-                  {tab === 2 && (
-                    <motion.span
-                      initial={reduce ? undefined : { opacity: 0, y: -3 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.35, delay: 0.15 + i * 0.03 }}
-                      className="mt-1 hidden whitespace-nowrap text-[0.42rem] font-bold tracking-[0.08em] text-[#0f9d63] sm:block sm:text-[0.5rem]"
+        <div ref={ref} className="mt-10 grid items-stretch gap-4 lg:grid-cols-[1fr_auto_1fr] lg:gap-5">
+          {/* ---------------- you right now ---------------- */}
+          <Panel
+            side={t.left}
+            tone={RED}
+            live={live}
+            reduce={!!reduce}
+            picture={
+              <>
+                {TOOLS.map((tool, i) => {
+                  const p = LOOSE[i];
+                  return (
+                    <motion.div
+                      key={tool}
+                      className="absolute"
+                      style={{ left: `${p.x}%`, top: `${p.y}%` }}
+                      initial={reduce ? false : { opacity: 0, scale: 0.6 }}
+                      animate={live ? { opacity: 1, scale: 1 } : undefined}
+                      transition={{ duration: 0.45, delay: 0.05 * i, ease: [0.16, 1, 0.3, 1] }}
                     >
-                      {t.badge}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </div>
-            ))}
+                      <div
+                        className="-translate-x-1/2 -translate-y-1/2"
+                        style={{ transform: `translate(-50%,-50%) rotate(${p.r}deg)` }}
+                      >
+                        <ToolGlyph tool={tool} size={38} />
+                      </div>
+                    </motion.div>
+                  );
+                })}
+                {/* the broken hand-offs between them */}
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+                  {[[0, 3], [1, 4], [3, 6], [4, 7], [5, 6]].map(([a, b], i) => (
+                    <motion.line
+                      key={i}
+                      x1={LOOSE[a].x} y1={LOOSE[a].y} x2={LOOSE[b].x} y2={LOOSE[b].y}
+                      stroke={RED} strokeWidth="0.4" strokeDasharray="2 2.4" vectorEffect="non-scaling-stroke"
+                      initial={reduce ? false : { opacity: 0 }}
+                      animate={live ? { opacity: 0.5 } : undefined}
+                      transition={{ duration: 0.5, delay: 0.5 + i * 0.08 }}
+                    />
+                  ))}
+                </svg>
+              </>
+            }
+          />
 
-            {/* running caption for the current state */}
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={tab}
-                initial={reduce ? undefined : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="absolute inset-x-3 bottom-2 text-center text-[0.6rem] font-semibold sm:bottom-3 sm:text-[0.7rem]"
-                style={{ color: accent }}
-              >
-                {state.note}
-              </motion.p>
-            </AnimatePresence>
+          {/* ---------------- the bridge ---------------- */}
+          <div className="flex items-center justify-center lg:flex-col lg:gap-3">
+            <span className="hidden text-[0.62rem] font-bold uppercase tracking-[0.18em] text-[var(--color-mute)] lg:block">
+              {t.bridge}
+            </span>
+            <span
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-lg font-bold text-white shadow-[0_12px_30px_-10px_rgba(41,171,226,.9)]"
+              style={{ background: BRAND }}
+              aria-hidden="true"
+            >
+              <span className="lg:hidden">↓</span>
+              <span className="hidden lg:inline">→</span>
+            </span>
           </div>
 
-          {/* the per-node tag is hidden on phones, so say it once here */}
-          {tab === 2 && (
-            <p className="-mt-6 text-center text-[0.68rem] font-bold tracking-[0.08em] text-[#0f9d63] sm:hidden">
-              {t.badge}
-            </p>
-          )}
-
-          {/* ---------------- narrative ---------------- */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={tab}
-              initial={reduce ? undefined : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduce ? undefined : { opacity: 0, y: -8 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <h3 className="text-2xl font-semibold md:text-[1.9rem]">{state.headline}</h3>
-              <p className="mt-4 leading-relaxed text-[var(--color-slate)]">{state.body}</p>
-
-              {state.pros && (
-                <div className="mt-6">
-                  <p className="mb-2 text-[0.72rem] font-bold uppercase tracking-[0.16em] text-[#0f9d63]">{t.prosLabel}</p>
-                  <ul className="space-y-1.5">
-                    {state.pros.map((x) => (
-                      <li key={x} className="flex gap-2.5 text-[0.95rem] text-[var(--color-ink-soft)]">
-                        <span className="text-[#0f9d63]">+</span>{x}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {state.cons && (
-                <div className="mt-5">
-                  <p className="mb-2 text-[0.72rem] font-bold uppercase tracking-[0.16em]" style={{ color: accent }}>{t.consLabel}</p>
-                  <ul className="space-y-1.5">
-                    {state.cons.map((x) => (
-                      <li key={x} className="flex gap-2.5 text-[0.95rem] text-[var(--color-slate)]">
-                        <span style={{ color: accent }}>&minus;</span>{x}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {state.punch && (
-                <p
-                  className="mt-6 border-l-2 pl-4 font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-ink)]"
-                  style={{ borderColor: accent }}
+          {/* ---------------- what we build you ---------------- */}
+          <Panel
+            side={t.right}
+            tone={GREEN}
+            highlight
+            live={live}
+            reduce={!!reduce}
+            picture={
+              <>
+                {/* one boundary: everything lives inside it */}
+                <div className="absolute inset-[6%] rounded-[26px] border-2 border-dashed" style={{ borderColor: `${BRAND}55` }} />
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+                  {RING.map((p, i) => (
+                    <motion.line
+                      key={i}
+                      x1={50} y1={50} x2={p.x} y2={p.y}
+                      stroke={BRAND} strokeWidth="0.5" vectorEffect="non-scaling-stroke"
+                      initial={reduce ? false : { pathLength: 0, opacity: 0 }}
+                      animate={live ? { pathLength: 1, opacity: 0.55 } : undefined}
+                      transition={{ duration: 0.5, delay: 0.35 + i * 0.06, ease: "easeOut" }}
+                    />
+                  ))}
+                </svg>
+                {TOOLS.map((tool, i) => {
+                  const p = RING[i];
+                  return (
+                    <motion.div
+                      key={tool}
+                      className="absolute"
+                      style={{ left: `${p.x}%`, top: `${p.y}%` }}
+                      initial={reduce ? false : { opacity: 0, scale: 0.6 }}
+                      animate={live ? { opacity: 1, scale: 1 } : undefined}
+                      transition={{ duration: 0.45, delay: 0.05 * i, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      <div className="-translate-x-1/2 -translate-y-1/2">
+                        <ToolGlyph tool={tool} size={38} />
+                      </div>
+                    </motion.div>
+                  );
+                })}
+                {/* the hub */}
+                <motion.div
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white px-4 py-3 text-center shadow-[0_18px_44px_-14px_rgba(41,171,226,.75)]"
+                  initial={reduce ? false : { opacity: 0, scale: 0.7 }}
+                  animate={live ? { opacity: 1, scale: 1 } : undefined}
+                  transition={{ duration: 0.5, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  {state.punch}
-                </p>
-              )}
-            </motion.div>
-          </AnimatePresence>
+                  <p className="font-[family-name:var(--font-display)] text-[0.72rem] font-bold tracking-[0.1em]" style={{ color: BRAND }}>
+                    {t.centerTitle}
+                  </p>
+                </motion.div>
+              </>
+            }
+          />
         </div>
       </div>
     </section>
+  );
+}
+
+function Panel({
+  side, tone, picture, live, reduce, highlight,
+}: {
+  side: typeof COMPARISON["en"]["left"];
+  tone: string;
+  picture: React.ReactNode;
+  live: boolean;
+  reduce: boolean;
+  highlight?: boolean;
+}) {
+  return (
+    <motion.div
+      initial={reduce ? false : { opacity: 0, y: 16 }}
+      animate={live ? { opacity: 1, y: 0 } : undefined}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col rounded-[var(--radius-lg)] border bg-white p-5 md:p-6"
+      style={{
+        borderColor: highlight ? `${tone}55` : "var(--color-line)",
+        boxShadow: highlight ? `0 26px 60px -30px ${tone}` : "var(--shadow-soft)",
+      }}
+    >
+      <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em]" style={{ color: tone }}>
+        {side.label}
+      </p>
+      <p className="mt-1.5 text-xl font-semibold text-[var(--color-ink)] md:text-2xl">{side.headline}</p>
+
+      {/* the picture carries the argument */}
+      <div className="relative mt-5 aspect-[4/3] w-full rounded-[var(--radius)] border border-[var(--color-line)] bg-[var(--color-panel)]/60">
+        {picture}
+      </div>
+      <p className="mt-2 text-center text-[0.72rem] font-medium text-[var(--color-mute)]">{side.caption}</p>
+
+      <ul className="mt-4 space-y-1.5">
+        {side.points.map((p) => (
+          <li key={p} className="flex gap-2 text-sm text-[var(--color-slate)]">
+            <span className="mt-[2px] font-bold" style={{ color: tone }} aria-hidden="true">
+              {highlight ? "✓" : "✕"}
+            </span>
+            <span>{p}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-auto flex items-baseline gap-2 border-t border-[var(--color-line)] pt-4">
+        <span className="font-[family-name:var(--font-display)] text-3xl font-bold md:text-[2.4rem]" style={{ color: tone }}>
+          {side.statValue}
+        </span>
+        <span className="text-sm text-[var(--color-slate)]">{side.statLabel}</span>
+      </div>
+    </motion.div>
   );
 }

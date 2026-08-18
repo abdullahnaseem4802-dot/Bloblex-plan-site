@@ -3,321 +3,185 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Reveal from "./Reveal";
 import { type Locale } from "@/content/site";
-import { STEPS, MANUAL_TOTAL, SYSTEM_TOTAL, DECISION_COUNT, JOURNEY_UI, SYSTEM_CHATTER, fmt } from "@/content/journey";
-
-type Mode = "manual" | "system";
+import { STEPS, MANUAL_TOTAL, SYSTEM_TOTAL, DECISION_COUNT, SYSTEM_CHATTER, JOURNEY_UI, fmt } from "@/content/journey";
 
 const AMBER = "#d97316";
 const GREEN = "#0f9d63";
 const BLUE = "#1787c4";
 
+/* Both columns run at once, on their own, as soon as the section is on screen.
+   The client's note was that nobody will click through a simulator: it has to
+   land in about three seconds, side by side, with no interaction. */
+const TICK = 90;          // ms per frame of the race
+const MANUAL_PER_TICK = 7; // manual minutes consumed per frame
+
 export default function RequestJourney({ locale }: { locale: Locale }) {
   const t = JOURNEY_UI[locale];
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const [mode, setMode] = useState<Mode>("manual");
-  /* each mode keeps its own place, so flipping between them compares the two
-     runs rather than throwing away whichever one you were part way through */
-  const [progress, setProgress] = useState<Record<Mode, number>>({ manual: 0, system: 0 });
-  const [running, setRunning] = useState(false); // system mode auto-advancing
-  const done = progress[mode];
-  const setDone = useCallback(
-    (v: number | ((d: number) => number)) =>
-      setProgress((p) => ({ ...p, [mode]: typeof v === "function" ? v(p[mode]) : v })),
-    [mode]
-  );
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [manualMin, setManualMin] = useState(0);
+  const [systemMin, setSystemMin] = useState(0);
+  const [runId, setRunId] = useState(0);
 
-  const clear = () => { if (timer.current) clearTimeout(timer.current); timer.current = null; };
-  useEffect(() => clear, []);
+  const stop = () => { if (timer.current) { clearInterval(timer.current); timer.current = null; } };
+  useEffect(() => stop, []);
 
-  const manualSpent = STEPS.slice(0, progress.manual).reduce((a, s) => a + s.manual.minutes, 0);
-  const systemSpent = STEPS.slice(0, progress.system).reduce((a, s) => a + s.system.minutes, 0);
-  const spent = mode === "manual" ? manualSpent : systemSpent;
-  const finished = done >= STEPS.length;
-  const nextStep = STEPS[done];
-  /* in system mode the run halts on any step that needs a human decision */
-  const waitingOnYou = mode === "system" && !finished && !running && !!nextStep?.system.you && done > 0;
-
-  /* switching mode keeps both runs; Restart clears only the current one */
-  const switchTo = useCallback((m: Mode) => {
-    clear(); setRunning(false); setMode(m);
-  }, []);
-  const restart = useCallback(() => {
-    clear(); setRunning(false); setProgress((p) => ({ ...p, [mode]: 0 }));
-  }, [mode]);
-
-  /* system mode: roll forward until a decision is required */
-  const roll = useCallback((from: number) => {
-    clear();
-    setRunning(true);
-    const tick = (i: number) => {
-      if (i >= STEPS.length) { setRunning(false); return; }
-      timer.current = setTimeout(() => {
-        setProgress((p) => ({ ...p, system: i + 1 }));
-        const upcoming = STEPS[i + 1];
-        if (upcoming?.system.you) { setRunning(false); return; } // hand control back
-        tick(i + 1);
-      }, reduce ? 60 : 520);
-    };
-    tick(from);
+  const run = useCallback(() => {
+    stop();
+    if (reduce) { setManualMin(MANUAL_TOTAL); setSystemMin(SYSTEM_TOTAL); return; }
+    setManualMin(0); setSystemMin(0);
+    setRunId((n) => n + 1);
+    /* the system finishes early and then simply waits, which is the point */
+    const sysPerTick = SYSTEM_TOTAL / (MANUAL_TOTAL / MANUAL_PER_TICK / 6);
+    timer.current = setInterval(() => {
+      setManualMin((m) => (m + MANUAL_PER_TICK >= MANUAL_TOTAL ? (stop(), MANUAL_TOTAL) : m + MANUAL_PER_TICK));
+      setSystemMin((s) => Math.min(SYSTEM_TOTAL, s + sysPerTick));
+    }, TICK);
   }, [reduce]);
 
-  /* the system narrates itself while it works */
-  const chatter = SYSTEM_CHATTER[locale];
-  const [chat, setChat] = useState(0);
+  /* only ever plays while the visitor is actually looking at it */
   useEffect(() => {
-    if (mode !== "system" || !running) return;
-    const id = setInterval(() => setChat((c) => (c + 1) % chatter.length), 380);
-    return () => clearInterval(id);
-  }, [mode, running, chatter.length]);
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { run(); io.disconnect(); } }, { threshold: 0.3 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [run]);
 
-  const statusBar = (() => {
-    if (mode === "manual") {
-      if (finished) return { text: t.manualDone, cta: null as null | string, tone: AMBER };
-      return {
-        text: done === 0 ? t.manualIntro : `${t.stepOf(done + 1, STEPS.length)} ${t.manualHint}`,
-        cta: `${t.manualNext}  +${fmt(nextStep.manual.minutes, locale)}`,
-        tone: AMBER,
-      };
-    }
-    if (finished) return { text: t.systemDone(fmt(SYSTEM_TOTAL, locale), DECISION_COUNT), cta: null, tone: GREEN };
-    if (waitingOnYou) return { text: t.systemWaiting, cta: `${nextStep.system.you![locale]}  ${fmt(nextStep.system.minutes, locale)}`, tone: BLUE };
-    if (running) return { text: t.systemIntro, cta: null, tone: GREEN };
-    return { text: t.systemIntro, cta: `▶  ${t.systemPlay}`, tone: GREEN };
-  })();
-
-  /* every manual click throws off a "+8 min" receipt, so the cost of the
-     gesture is felt rather than just tallied */
-  const [receipts, setReceipts] = useState<{ id: number; at: number; label: string }[]>([]);
-  const receiptId = useRef(0);
-
-  const onCta = () => {
-    if (mode === "manual") {
-      const i = done;
-      if (i >= STEPS.length) return;
-      const id = ++receiptId.current;
-      setReceipts((r) => [...r, { id, at: i, label: `+${fmt(STEPS[i].manual.minutes, locale)}` }]);
-      setTimeout(() => setReceipts((r) => r.filter((x) => x.id !== id)), 1100);
-      setDone((d) => Math.min(d + 1, STEPS.length));
-      return;
-    }
-    roll(done);
-  };
+  const manualPct = (manualMin / MANUAL_TOTAL) * 100;
+  const systemPct = (systemMin / SYSTEM_TOTAL) * 100;
+  const manualDone = Math.round((manualMin / MANUAL_TOTAL) * STEPS.length);
+  const systemDone = systemPct >= 99.5 ? STEPS.length : Math.round((systemPct / 100) * STEPS.length);
 
   return (
     <section id="time" className="border-y border-[var(--color-line)] bg-[var(--color-panel)] py-20 md:py-28">
       <div className="container">
         <Reveal className="max-w-3xl">
           <p className="mb-4 text-[0.78rem] font-bold uppercase tracking-[0.2em] text-[var(--color-brand-600)]">{t.kicker}</p>
-          <h2 className="text-3xl md:text-[2.6rem] font-semibold leading-[1.1] tracking-[-0.03em]">{t.heading}</h2>
+          <h2 className="text-3xl font-semibold leading-[1.06] tracking-[-0.03em] md:text-[3rem]">{t.heading}</h2>
+          <p className="mt-5 max-w-[60ch] leading-relaxed text-[var(--color-slate)]">{t.lead}</p>
         </Reveal>
 
-        <Reveal delay={100}>
-          <div className="mt-10 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white shadow-[var(--shadow-card)]">
-            {/* status bar */}
-            <div className="flex flex-col gap-3 border-b border-[var(--color-line)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between md:px-7">
-              <AnimatePresence mode="wait">
-                <motion.p
-                  key={statusBar.text}
-                  initial={reduce ? undefined : { opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={reduce ? undefined : { opacity: 0, y: -4 }}
-                  transition={{ duration: 0.25 }}
-                  className="text-sm font-medium text-[var(--color-ink-soft)]"
-                >
-                  {statusBar.text}
-                </motion.p>
-              </AnimatePresence>
+        <div ref={ref} className="mt-10 grid gap-4 lg:grid-cols-2 lg:gap-5">
+          <Lane
+            key={`m${runId}`}
+            label={t.modeManual} tone={AMBER}
+            clock={fmt(Math.round(manualMin), locale)}
+            total={fmt(MANUAL_TOTAL, locale)}
+            pct={manualPct} done={manualDone} locale={locale}
+            sub={t.subManual}
+            finished={manualMin >= MANUAL_TOTAL}
+            finishNote={t.manualDone}
+            reduce={!!reduce}
+          />
+          <Lane
+            key={`s${runId}`}
+            label={t.modeSystem} tone={GREEN} highlight
+            clock={fmt(Math.round(systemMin), locale)}
+            total={fmt(SYSTEM_TOTAL, locale)}
+            pct={systemPct} done={systemDone} locale={locale}
+            sub={t.subSystem}
+            finished={systemPct >= 99.5}
+            finishNote={t.systemDone(fmt(SYSTEM_TOTAL, locale), DECISION_COUNT)}
+            chatter reduce={!!reduce}
+          />
+        </div>
 
-              {statusBar.cta && (
-                <motion.button
-                  onClick={onCta}
-                  /* pulse the glow, never the size: a click target must not move */
-                  animate={
-                    waitingOnYou && !reduce
-                      ? { boxShadow: [`0 0 0 0 ${statusBar.tone}00`, `0 0 0 10px ${statusBar.tone}00`, `0 0 0 0 ${statusBar.tone}00`] }
-                      : {}
-                  }
-                  transition={{ duration: 1.6, repeat: waitingOnYou ? Infinity : 0 }}
-                  className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:-translate-y-px ${waitingOnYou ? "bx-await" : "shadow-[0_10px_26px_-10px_rgba(10,22,40,.5)]"}`}
-                  style={{ background: statusBar.tone }}
-                >
-                  {statusBar.cta}
-                </motion.button>
-              )}
-            </div>
-
-            {/* headline + running total */}
-            <div className="flex flex-wrap items-start justify-between gap-4 px-5 pt-6 md:px-7">
-              <div>
-                <h3 className="text-lg font-semibold md:text-xl">{t.title}</h3>
-                <p className="mt-1 text-sm text-[var(--color-slate)]">
-                  {mode === "manual" ? t.subManual : t.subSystem}
-                </p>
-              </div>
-              <div className="text-right">
-                <motion.p
-                  key={spent}
-                  initial={reduce ? undefined : { scale: 0.85, opacity: 0.5 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="font-[family-name:var(--font-display)] text-3xl font-bold md:text-[2.6rem]"
-                  style={{ color: mode === "manual" ? AMBER : GREEN }}
-                >
-                  {fmt(spent, locale)}
-                </motion.p>
-                <p className="text-[0.62rem] font-bold tracking-[0.12em] text-[var(--color-mute)]">{t.ofYourTime}</p>
-              </div>
-            </div>
-
-            {/* the twelve steps */}
-            <ol className="grid grid-cols-2 gap-3 px-5 py-6 md:grid-cols-3 md:px-7 lg:grid-cols-6">
-              {STEPS.map((s, i) => {
-                const complete = i < done;
-                const isNext = i === done && !finished;
-                const cfg = mode === "manual" ? s.manual : s.system;
-                const needsYou = mode === "system" && !!s.system.you;
-                const activeTone = mode === "manual" ? AMBER : needsYou && isNext ? BLUE : GREEN;
-
-                return (
-                  <motion.li
-                    key={s.label.en}
-                    layout
-                    className="relative rounded-[var(--radius)] border p-3.5 transition-colors"
-                    style={{
-                      borderColor: complete ? `${activeTone}66` : isNext ? activeTone : "var(--color-line)",
-                      background: complete ? `${activeTone}0f` : isNext ? `${activeTone}0a` : "#fff",
-                      boxShadow: isNext ? `0 0 0 3px ${activeTone}22` : undefined,
-                    }}
-                  >
-                    <AnimatePresence>
-                      {receipts.filter((r) => r.at === i).map((r) => (
-                        <motion.span
-                          key={r.id}
-                          initial={{ opacity: 0, y: 4, scale: 0.9 }}
-                          animate={{ opacity: [0, 1, 1, 0], y: -34, scale: 1 }}
-                          transition={{ duration: 1.1, ease: "easeOut" }}
-                          className="pointer-events-none absolute -top-1 right-2 z-10 rounded-full px-2 py-0.5 text-[0.7rem] font-bold text-white"
-                          style={{ background: AMBER }}
-                        >
-                          {r.label}
-                        </motion.span>
-                      ))}
-                    </AnimatePresence>
-
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="text-[0.78rem] font-semibold leading-snug text-[var(--color-ink)]">{s.label[locale]}</p>
-                      {complete && <span style={{ color: activeTone }} className="text-sm font-bold">✓</span>}
-                    </div>
-
-                    {complete ? (
-                      <>
-                        <p className="mt-2 font-[family-name:var(--font-display)] text-lg font-bold" style={{ color: activeTone }}>
-                          {fmt(cfg.minutes, locale)}
-                        </p>
-                        <p className="text-[0.52rem] font-bold tracking-[0.08em] text-[var(--color-mute)]">
-                          {cfg.note[locale]}
-                        </p>
-                      </>
-                    ) : isNext ? (
-                      <>
-                        <span
-                          className="mt-2 block h-3 w-3 rounded-full"
-                          style={{ background: activeTone, boxShadow: `0 0 0 5px ${activeTone}26` }}
-                        />
-                        <p className="mt-2 text-[0.52rem] font-bold tracking-[0.08em]" style={{ color: activeTone }}>
-                          {needsYou ? t.systemWaitHint : t.todo}
-                        </p>
-                      </>
-                    ) : mode === "system" && running && i === done ? (
-                      <AnimatePresence mode="wait">
-                        <motion.p
-                          key={chatter[chat]}
-                          initial={{ opacity: 0, y: 3 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -3 }}
-                          transition={{ duration: 0.18 }}
-                          className="mt-3 font-mono text-[0.6rem] font-bold"
-                          style={{ color: GREEN }}
-                        >
-                          {chatter[chat]}
-                        </motion.p>
-                      </AnimatePresence>
-                    ) : (
-                      <p className="mt-3 text-[var(--color-mute)]">&mdash;</p>
-                    )}
-                  </motion.li>
-                );
-              })}
-            </ol>
-
-            {/* the two totals, side by side */}
-            <div className="space-y-2.5 border-t border-[var(--color-line)] px-5 py-6 md:px-7">
-              <Bar label={t.byHand} total={MANUAL_TOTAL} max={MANUAL_TOTAL} color={AMBER} locale={locale}
-                   live={manualSpent} active={mode === "manual"} />
-              <Bar label={t.yourSystem} total={SYSTEM_TOTAL} max={MANUAL_TOTAL} color={GREEN} locale={locale}
-                   live={systemSpent} active={mode === "system"} />
-            </div>
-
-            {/* mode switch */}
-            <div className="grid grid-cols-2 gap-2 border-t border-[var(--color-line)] px-5 py-4 sm:flex sm:flex-wrap md:px-7">
-              <ModeBtn on={mode === "manual"} tone={AMBER} onClick={() => switchTo("manual")}>{t.modeManual}</ModeBtn>
-              <ModeBtn on={mode === "system"} tone={GREEN} onClick={() => switchTo("system")}>{t.modeSystem}</ModeBtn>
-              <button
-                onClick={restart}
-                className="col-span-2 whitespace-nowrap rounded-full border border-[var(--color-line)] px-3 py-2 text-[0.78rem] font-semibold text-[var(--color-slate)] transition-colors hover:text-[var(--color-ink)] sm:col-span-1 sm:px-4 sm:text-sm"
-              >
-                ↻ {t.restart}
-              </button>
-            </div>
-          </div>
-        </Reveal>
-
-        <p className="mt-5 max-w-[62ch] text-sm text-[var(--color-mute)]">{t.closing}</p>
+        <p className="mt-6 max-w-[70ch] text-sm leading-relaxed text-[var(--color-mute)]">{t.closing}</p>
       </div>
     </section>
   );
 }
 
-function ModeBtn({ on, tone, onClick, children }: { on: boolean; tone: string; onClick: () => void; children: React.ReactNode }) {
+function Lane({
+  label, tone, clock, total, pct, done, sub, finished, finishNote, chatter, highlight, locale, reduce,
+}: {
+  label: string; tone: string; clock: string; total: string; pct: number; done: number;
+  sub: string; finished: boolean; finishNote: string; chatter?: boolean; highlight?: boolean;
+  locale: Locale; reduce: boolean;
+}) {
   return (
-    <button
-      onClick={onClick}
-      aria-pressed={on}
-      className="whitespace-nowrap rounded-full border px-3 py-2 text-[0.78rem] font-semibold transition-all sm:px-4 sm:text-sm"
-      style={
-        on
-          ? { background: tone, borderColor: "transparent", color: "#fff", boxShadow: `0 10px 26px -10px ${tone}` }
-          : { borderColor: "var(--color-line)", color: "var(--color-slate)", background: "#fff" }
-      }
+    <div
+      className="flex flex-col rounded-[var(--radius-lg)] border bg-white p-5 md:p-6"
+      style={{
+        borderColor: highlight ? `${tone}55` : "var(--color-line)",
+        boxShadow: highlight ? `0 26px 60px -30px ${tone}` : "var(--shadow-soft)",
+      }}
     >
-      {children}
-    </button>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em]" style={{ color: tone }}>{label}</p>
+          <p className="mt-1 text-sm text-[var(--color-slate)]">{sub}</p>
+        </div>
+        <p className="shrink-0 font-[family-name:var(--font-display)] text-3xl font-bold tabular-nums md:text-[2.6rem]" style={{ color: tone }}>
+          {clock}
+        </p>
+      </div>
+
+      {/* the race itself */}
+      <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-[var(--color-line)]">
+        <motion.span
+          className="block h-full rounded-full"
+          style={{ background: tone }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: reduce ? 0 : 0.12, ease: "linear" }}
+        />
+      </div>
+
+      {/* the twelve steps, ticking off as the lane advances */}
+      <ul className="mt-5 grid grid-cols-2 gap-x-4 gap-y-1.5">
+        {STEPS.map((s, i) => {
+          const on = i < done;
+          return (
+            <li key={s.label.en} className="flex items-center gap-2 text-[0.82rem]">
+              <span
+                className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[0.6rem] font-bold text-white transition-colors"
+                style={{ background: on ? tone : "var(--color-line)" }}
+                aria-hidden="true"
+              >
+                {on ? "✓" : ""}
+              </span>
+              <span className={on ? "text-[var(--color-ink)]" : "text-[var(--color-mute)]"}>{s.label[locale]}</span>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div className="mt-auto border-t border-[var(--color-line)] pt-4">
+        <AnimatePresence mode="wait">
+          {finished ? (
+            <motion.p
+              key="done"
+              initial={reduce ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+              className="text-sm font-semibold" style={{ color: tone }}
+            >
+              ✓ {finishNote}
+            </motion.p>
+          ) : (
+            <motion.p key="run" initial={false} className="text-sm text-[var(--color-slate)]">
+              {chatter ? <Chatter locale={locale} tone={tone} /> : <span className="tabular-nums">{clock} / {total}</span>}
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
   );
 }
 
-/** Shows how far this run has actually got. Nothing is drawn until the
- *  visitor advances, so an untouched mode reads as empty rather than full.
- *  Both bars share one scale, so the two runs stay comparable. */
-function Bar({
-  label, total, max, color, locale, live, active,
-}: { label: string; total: number; max: number; color: string; locale: Locale; live: number; active: boolean }) {
+/** the client's own list: sync, connected, 23 ms, AI thinking, verify, done */
+function Chatter({ locale, tone }: { locale: Locale; tone: string }) {
+  const words = SYSTEM_CHATTER[locale];
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setI((n) => (n + 1) % words.length), 700);
+    return () => clearInterval(id);
+  }, [words.length]);
   return (
-    <div className="flex items-center gap-3">
-      <span className={`w-24 shrink-0 text-[0.78rem] sm:w-28 ${active ? "font-bold text-[var(--color-ink)]" : "font-semibold text-[var(--color-slate)]"}`}>
-        {label}
-      </span>
-      <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--color-line)]">
-        <motion.span
-          className="absolute inset-y-0 left-0 rounded-full"
-          style={{ background: color }}
-          animate={{ width: `${(Math.min(live, max) / max) * 100}%` }}
-          transition={{ type: "spring", stiffness: 120, damping: 20 }}
-        />
-      </div>
-      <span className="flex w-24 shrink-0 items-center justify-end gap-1 whitespace-nowrap text-right text-[0.82rem] font-bold" style={{ color }}>
-        {live >= total ? <>✓ {fmt(total, locale)}</> : <>{fmt(live, locale)} / {fmt(total, locale)}</>}
-      </span>
-    </div>
+    <span className="inline-flex items-center gap-2 font-mono text-[0.76rem]" style={{ color: BLUE }}>
+      <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: tone }} />
+      {words[i]}
+    </span>
   );
 }

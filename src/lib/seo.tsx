@@ -21,7 +21,7 @@ function metaFor(opts: { locale: Locale; title: string; description: string; enP
     },
     twitter: { card: "summary_large_image", title, description },
     robots: { index: true, follow: true },
-    icons: { icon: "/img/favicon-src.png", apple: "/img/favicon-src.png" },
+    icons: { icon: "/img/icon-512.png", apple: "/img/icon-180.png" },
   };
 }
 
@@ -80,7 +80,7 @@ export function buildMetadata(locale: Locale): Metadata {
     },
     twitter: { card: "summary_large_image", title: c.ogTitle, description: c.ogDescription },
     robots: { index: true, follow: true },
-    icons: { icon: "/img/favicon-src.png", apple: "/img/favicon-src.png" },
+    icons: { icon: "/img/icon-512.png", apple: "/img/icon-180.png" },
   };
 }
 

@@ -1,151 +1,126 @@
 /* =================================================================
-   THREE-STATE SYSTEM COMPARISON
-   Client direction (Aug 2026): show three states side by side.
-     1. Today            - nothing talks, everything is re-typed
-     2. Their solution   - integrators wire tool to tool: spaghetti,
-                           one subscription and one breaking point per thread
-     3. What we propose  - every piece REBUILT inside one owned system
-   French copy is the client's own wording, kept verbatim (informal "tu").
+   SIDE-BY-SIDE COMPARISON
+   Client direction (Aug 2026), verbatim:
+     "It has to be clear: YOU RIGHT NOW vs WHAT WE WILL BUILD YOU,
+      side by side comparison. People scan, they don't read. They gotta
+      understand in 3 seconds. I said logos not text. People won't click
+      'leur solution' — who are we talking about?"
+
+   So: no tabs, no clicking, both sides visible at once, app tiles instead
+   of word pills, and the middle state ("their solution") is gone because
+   nobody knew who "they" were.
+   French is the client's own informal wording ("tu"), and speaks as "on",
+   never "je".
    ================================================================= */
 import type { Locale } from "./site";
+import type { ToolKey } from "@/components/ToolGlyph";
 
-/** Shared node layout, in % of the stage. Positions never change between
-    states: only the wiring does, which is the whole argument. */
-export const NODES: { x: number; y: number }[] = [
-  { x: 29, y: 14 }, { x: 50, y: 11 }, { x: 71, y: 14 },
-  { x: 20, y: 29 }, { x: 80, y: 29 },
-  { x: 15, y: 46 }, { x: 85, y: 46 },
-  { x: 20, y: 63 }, { x: 80, y: 63 },
-  { x: 29, y: 79 }, { x: 50, y: 84 }, { x: 71, y: 79 },
+/** The same eight tools appear on both sides. Only the wiring changes. */
+export const TOOLS: ToolKey[] = [
+  "sheet", "mail", "chat", "calendar",
+  "money", "photos", "contacts", "quote",
 ];
 
-export type ComparisonState = {
+/** Scattered placement for the "right now" side, in % of the stage. */
+export const LOOSE: { x: number; y: number; r: number }[] = [
+  { x: 18, y: 16, r: -12 }, { x: 54, y: 10, r: 8 },
+  { x: 82, y: 22, r: 14 }, { x: 30, y: 40, r: 6 },
+  { x: 70, y: 48, r: -9 }, { x: 14, y: 66, r: 11 },
+  { x: 48, y: 74, r: -6 }, { x: 80, y: 76, r: 7 },
+];
+
+/** Even ring for the "what we build" side. */
+export const RING: { x: number; y: number }[] = [
+  { x: 50, y: 12 }, { x: 79, y: 24 }, { x: 88, y: 50 }, { x: 79, y: 76 },
+  { x: 50, y: 88 }, { x: 21, y: 76 }, { x: 12, y: 50 }, { x: 21, y: 24 },
+];
+
+export type Side = {
+  /** the big scannable label above the picture */
+  label: string;
   headline: string;
-  body: string;
-  note: string;
-  punch?: string;
-  pros?: string[];
-  cons?: string[];
+  /** three short scannable lines, never a paragraph */
+  points: string[];
+  /** the one number that carries the argument */
+  statValue: string;
+  statLabel: string;
+  /** caption under the picture */
+  caption: string;
 };
 
 export type ComparisonCopy = {
   kicker: string;
   title: string;
   lead: string;
-  tabs: [string, string, string];
-  /** generic tool names, used for states 1 and 2 */
-  tools: string[];
-  /** the same tools, rebuilt and owned, used for state 3 */
-  owned: string[];
-  /** advantage / drawback lists, per the client's own bullet points */
-  prosLabel: string;
-  consLabel: string;
-  states: [
-    ComparisonState,
-    ComparisonState,
-    ComparisonState,
-  ];
+  left: Side;
+  right: Side;
   centerTitle: string;
-  centerSub: string;
-  badge: string;
+  /** the arrow between the two panels */
+  bridge: string;
 };
 
 export const COMPARISON: Record<Locale, ComparisonCopy> = {
   fr: {
-    kicker: "Trois façons de régler le problème",
-    title: "On ne branche pas ton système. On te le bâtit.",
-    lead: "Trois états, les mêmes outils. Seul le câblage change, et c'est là que tout se joue.",
-    tabs: ["1 · Aujourd'hui", "2 · Leur solution", "3 · Ce que je propose"],
-    prosLabel: "Avantage",
-    consLabel: "Inconvénients",
-    tools: ["Inventaire", "Teams", "CRM", "Horaires", "Estimation", "Courriel", "Comptabilité", "Documents", "Paie", "Achats", "Soumissions", "Chantiers"],
-    owned: ["Ton inventaire", "Ta messagerie", "Tes clients", "Tes horaires", "Ton estimation", "Ton courriel", "Ta comptabilité", "Tes documents", "Ta paie", "Tes achats", "Tes soumissions", "Tes chantiers"],
-    states: [
-      {
-        headline: "Rien ne se parle.",
-        body: "Chaque outil vit dans son coin. La même information est ressaisie trois ou quatre fois, et chaque ressaisie est une occasion de se tromper.",
-        note: "chacun de son bord : rien ne circule",
-        cons: [
-          "La même information tapée trois ou quatre fois",
-          "Chaque ressaisie est une occasion de se tromper",
-          "Le temps part en copier-coller, pas en travail",
-        ],
-      },
-      {
-        headline: "On branche tout sur tout.",
-        body: "On ne remplace rien : on branche tout sur tout. Ça marche, et le premier mois c'est même impressionnant. Chaque fil est par contre un abonnement de plus, un point de bris de plus, et une facture qui monte chaque fois que tu engages quelqu'un.",
-        note: "chacune : un abonnement, un point de bris, une facture mensuelle",
-        pros: ["Tu arrêtes de ressaisir la même information"],
-        cons: [
-          "Tu dépends de chacun des outils que tu utilises",
-          "Une affaire brise, et tout brise",
-          "Un abonnement de plus, une facture de plus, par fil",
-        ],
-        punch: "La ressaisie disparaît. Le travail reste.",
-      },
-      {
-        headline: "On te bâtit ton système.",
-        body: "On ne branche pas ton Teams : on te bâtit ton Teams. On ne connecte pas ton logiciel d'estimation : on refait ton processus d'estimation, à ta manière, dans ton système. Chaque morceau est recréé chez toi, donc chaque morceau, on peut le pousser aussi loin qu'on veut.",
-        note: "un actif à ton bilan, pas une dépense récurrente",
-        pros: [
-          "Tu possèdes le système, c'est un actif",
-          "Rien à brancher, donc rien à briser",
-          "Chaque morceau peut être poussé aussi loin que tu veux",
-        ],
-        punch: "Un seul système. À toi. Sans limite.",
-      },
-    ],
+    kicker: "La différence, en trois secondes",
+    title: "Toi maintenant. Toi avec ton système.",
+    lead: "Les mêmes outils des deux bords. Seul le câblage change.",
+    left: {
+      label: "TOI, MAINTENANT",
+      headline: "Rien ne se parle.",
+      points: [
+        "La même donnée tapée 4 fois",
+        "Chaque copier-coller peut se tromper",
+        "Rien ne se retrouve au bon endroit",
+      ],
+      statValue: "8 h 05",
+      statLabel: "pour une seule demande",
+      caption: "chacun de son bord",
+    },
+    right: {
+      label: "CE QU'ON TE BÂTIT",
+      headline: "Un seul système. À toi.",
+      points: [
+        "La donnée est entrée 1 fois",
+        "Tout se parle, tout suit",
+        "Tu le possèdes, c'est un actif",
+      ],
+      statValue: "12 min",
+      statLabel: "pour la même demande",
+      caption: "un seul système",
+    },
     centerTitle: "TON SYSTÈME",
-    centerSub: "UN SEUL · À TOI · SANS LIMITE",
-    badge: "RECRÉÉ · PAS BRANCHÉ",
+    bridge: "ON LE BÂTIT",
   },
 
   en: {
-    kicker: "Three ways to solve the same problem",
-    title: "We don't plug your system together. We build it.",
-    lead: "Three states, the same tools. Only the wiring changes, and that is where everything is decided.",
-    tabs: ["1 · Today", "2 · Their solution", "3 · What we propose"],
-    prosLabel: "Advantage",
-    consLabel: "Drawbacks",
-    tools: ["Inventory", "Teams", "CRM", "Schedules", "Estimating", "Email", "Accounting", "Documents", "Payroll", "Purchasing", "Quotes", "Job sites"],
-    owned: ["Your inventory", "Your messaging", "Your clients", "Your schedules", "Your estimating", "Your email", "Your accounting", "Your documents", "Your payroll", "Your purchasing", "Your quotes", "Your job sites"],
-    states: [
-      {
-        headline: "Nothing talks to anything.",
-        body: "Every tool lives on its own island. The same information gets re-typed three or four times, and every re-entry is a chance to get it wrong.",
-        note: "each on its own: nothing flows",
-        cons: [
-          "The same information typed three or four times",
-          "Every re-entry is a chance to get it wrong",
-          "Time goes into copy-paste instead of work",
-        ],
-      },
-      {
-        headline: "They wire everything into everything.",
-        body: "They replace nothing: they wire everything into everything. It works, and for the first month it is even impressive. But every thread is one more subscription, one more breaking point, and a bill that climbs every time you hire someone.",
-        note: "each one: a subscription, a breaking point, a monthly bill",
-        pros: ["You stop re-typing the same information"],
-        cons: [
-          "You depend on every tool you use",
-          "One thing breaks, and everything breaks",
-          "One more subscription and one more bill per thread",
-        ],
-        punch: "The re-typing disappears. The work remains.",
-      },
-      {
-        headline: "We build you your system.",
-        body: "We don't plug in your Teams: we build you your Teams. We don't connect your estimating software: we rebuild your estimating process, your way, inside your system. Every piece is recreated in-house, so every piece can be pushed as far as you want.",
-        note: "an asset on your balance sheet, not a recurring expense",
-        pros: [
-          "You own the system: it is an asset",
-          "Nothing is plugged in, so nothing can come unplugged",
-          "Every piece can be pushed as far as you want",
-        ],
-        punch: "One system. Yours. No limits.",
-      },
-    ],
+    kicker: "The difference, in three seconds",
+    title: "You right now. You with your system.",
+    lead: "The same tools on both sides. Only the wiring changes.",
+    left: {
+      label: "YOU RIGHT NOW",
+      headline: "Nothing talks.",
+      points: [
+        "The same data typed 4 times",
+        "Every copy-paste can go wrong",
+        "Nothing ends up where you need it",
+      ],
+      statValue: "8 h 05",
+      statLabel: "for one single request",
+      caption: "each on its own",
+    },
+    right: {
+      label: "WHAT WE BUILD YOU",
+      headline: "One system. Yours.",
+      points: [
+        "Data is entered once",
+        "Everything talks, everything follows",
+        "You own it — it's an asset",
+      ],
+      statValue: "12 min",
+      statLabel: "for the same request",
+      caption: "one single system",
+    },
     centerTitle: "YOUR SYSTEM",
-    centerSub: "ONE · YOURS · NO LIMITS",
-    badge: "REBUILT · NOT PLUGGED IN",
+    bridge: "WE BUILD IT",
   },
 };
