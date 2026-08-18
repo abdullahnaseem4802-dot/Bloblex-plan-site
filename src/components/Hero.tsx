@@ -34,7 +34,7 @@ export default function Hero({ locale }: { locale: Locale }) {
       <HeroAtmosphere />
       <div className="container grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-6 items-center">
         {/* Copy */}
-        <div className="max-w-xl min-w-0">
+        <div className="hero-copy-shift max-w-xl min-w-0">
           <motion.p
             initial={reduce ? false : { opacity: 0, y: 12 }} animate={waiting ? { opacity: 0 } : { opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: heroDelay }}
