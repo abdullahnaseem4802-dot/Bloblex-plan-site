@@ -137,7 +137,7 @@ export default function BlobWithAccessory({ accessory }: { accessory: AccessoryK
         {/* The character is the real brand mark, not a redraw, so the shape is
             always exactly the logo. Placed so its eyes land where the props
             below expect them. */}
-        <image href="/img/brand/mark.png" x="34" y="44" width="172" height="115" preserveAspectRatio="xMidYMid meet" />
+        <image href="/img/brand/mark-ink-sm.png" x="34" y="44" width="172" height="115" preserveAspectRatio="xMidYMid meet" />
 
         <AnimatePresence mode="wait">
           <motion.g

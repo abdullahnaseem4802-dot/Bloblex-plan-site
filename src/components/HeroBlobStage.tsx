@@ -157,7 +157,7 @@ export default function HeroBlobStage({ chips, systemLabel }: { chips: string[];
           }}
         >
           <motion.img
-            src="/img/brand/mark.png"
+            src="/img/brand/mark-ink-sm.png"
             alt=""
             className="w-[46%] min-w-[150px] max-w-[210px] drop-shadow-[0_26px_48px_rgba(41,171,226,.5)]"
             style={{ width: 200 }}
