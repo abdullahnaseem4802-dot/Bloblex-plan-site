@@ -48,7 +48,7 @@ export default function Hero({ locale }: { locale: Locale }) {
           </motion.p>
 
           <h1
-            className="text-[2.3rem] leading-[1.06] tracking-[-0.035em] font-semibold text-white text-balance sm:text-[3rem] lg:text-[3.7rem]"
+            className="text-[2.1rem] leading-[1.08] tracking-[-0.035em] font-semibold text-white text-balance sm:text-[2.7rem] lg:w-[750px] lg:max-w-none lg:text-[3.2rem] lg:text-wrap"
             /* stay blank behind the splash so no letters are pre-printed */
             style={waiting ? { visibility: "hidden" } : undefined}
           >
@@ -110,7 +110,7 @@ export default function Hero({ locale }: { locale: Locale }) {
         </div>
 
         {/* the slime grabs each bubble, swallows it, and produces one system */}
-        <div className="hero-stage-offset flex w-full items-center justify-center">
+        <div className="hero-stage-offset flex w-full items-center justify-center lg:self-start">
           <HeroBlobStage chips={t.chips} systemLabel={t.systemLabel} />
         </div>
       </div>

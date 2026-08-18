@@ -52,7 +52,7 @@ export default function Header({ locale, alt }: { locale: Locale; alt?: { en: st
           <BrandLogo size={40} dark={overDark} />
         </a>
 
-        <nav className={`hidden min-w-0 xl:flex items-center gap-0.5 rounded-full border p-1 text-[0.88rem] font-medium transition-colors ${overDark ? "border-white/15 bg-white/10" : "border-[var(--color-line)] bg-[var(--color-panel)]/70"}`} aria-label="Primary">
+        <nav className={`hidden shrink-0 xl:flex items-center gap-0.5 rounded-full border p-1 text-[0.88rem] font-medium transition-colors ${overDark ? "border-white/15 bg-white/10" : "border-[var(--color-line)] bg-[var(--color-panel)]/70"}`} aria-label="Primary">
           {links.map((l) => {
             const on = l.key === activeKey;
             return (

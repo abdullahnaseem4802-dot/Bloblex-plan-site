@@ -349,5 +349,5 @@ html[data-splash] .sheen::after { animation-delay: 4s; }
 /* Hero stage placement: the client wants the character lifted level with the
    headline and nudged right, with clear air between it and the copy. */
 @media (min-width: 1024px) {
-  .hero-stage-offset { transform: translate(44px, -96px); }
+  .hero-stage-offset { transform: translate(96px, -96px); }
 }
