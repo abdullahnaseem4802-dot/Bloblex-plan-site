@@ -41,12 +41,16 @@ export default function DayFeed({ locale }: { locale: Locale }) {
     return clear;
   }, [playing, armed, shown, reduce]);
 
-  /* keep the newest line in view inside the scroller */
+  /* Keep the newest line in view by scrolling the list itself. scrollIntoView
+     would walk up and move the window too, which fought the visitor's own
+     scrolling while the feed was playing. */
   useEffect(() => {
     const list = listRef.current;
     if (!list || shown === 0) return;
     const last = list.children[shown - 1] as HTMLElement | undefined;
-    last?.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+    if (!last) return;
+    const target = last.offsetTop + last.offsetHeight - list.clientHeight;
+    if (target > 0) list.scrollTo({ top: target, behavior: reduce ? "auto" : "smooth" });
   }, [shown, reduce]);
 
   const step = useCallback(() => { setPlaying(false); setShown((n) => Math.min(n + 1, FEED_TOTAL)); }, []);
@@ -99,7 +103,7 @@ export default function DayFeed({ locale }: { locale: Locale }) {
             </div>
 
             {/* the feed */}
-            <ul ref={listRef} className="max-h-[24rem] overflow-y-auto">
+            <ul ref={listRef} className="max-h-[24rem] overflow-y-auto [overscroll-behavior:auto]">
               <AnimatePresence initial={false}>
                 {DAY_FEED.slice(0, shown).map((item, i) => {
                   const mine = item.by === "you";
