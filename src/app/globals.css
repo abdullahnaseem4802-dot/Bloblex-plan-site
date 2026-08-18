@@ -329,3 +329,11 @@ html[data-splash] .sheen::after { animation-delay: 4s; }
 }
 .bx-flink:hover::after { transform: scaleX(1); }
 @media (prefers-reduced-motion: reduce) { .bx-footer-aura, .bx-footer-aura2 { animation: none; } }
+
+/* ---------- three-state system comparison ---------- */
+.bx-compare {
+  background:
+    radial-gradient(55% 50% at 85% 10%, rgba(41,171,226,.20), transparent 62%),
+    radial-gradient(45% 45% at 10% 90%, rgba(240,145,62,.10), transparent 60%),
+    linear-gradient(180deg, #0a1628 0%, #060c18 100%);
+}
