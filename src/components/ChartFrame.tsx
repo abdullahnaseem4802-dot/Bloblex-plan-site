@@ -16,7 +16,7 @@ export function ChartFrame({ yLabel, xLabel, lowHigh = true }: { yLabel: string;
     <g>
       <defs>
         <marker id={arrow} markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto">
-          <path d="M1 1 L7 4.5 L1 8" fill="none" stroke="var(--color-slate)" strokeWidth="1.8" />
+          <path d="M1 1 L7 4.5 L1 8" fill="none" stroke="var(--color-ink-soft)" strokeWidth="2" />
         </marker>
       </defs>
       {/* gridlines */}
@@ -24,8 +24,8 @@ export function ChartFrame({ yLabel, xLabel, lowHigh = true }: { yLabel: string;
         <line key={i} x1={x0} y1={y} x2={x1} y2={y} stroke="var(--color-line)" strokeWidth="1.2" strokeDasharray="3 5" />
       ))}
       {/* axes */}
-      <line x1={x0} y1={y1} x2={x0} y2={y0 - 4} stroke="var(--color-slate)" strokeWidth="2.2" markerEnd={`url(#${arrow})`} />
-      <line x1={x0} y1={y1} x2={x1 + 4} y2={y1} stroke="var(--color-slate)" strokeWidth="2.2" markerEnd={`url(#${arrow})`} />
+      <line x1={x0} y1={y1} x2={x0} y2={y0 - 4} stroke="var(--color-ink-soft)" strokeWidth="2.6" markerEnd={`url(#${arrow})`} />
+      <line x1={x0} y1={y1} x2={x1 + 4} y2={y1} stroke="var(--color-ink-soft)" strokeWidth="2.6" markerEnd={`url(#${arrow})`} />
       {/* origin */}
       <circle cx={x0} cy={y1} r="3" fill="var(--color-slate)" />
       {/* qualitative scale */}

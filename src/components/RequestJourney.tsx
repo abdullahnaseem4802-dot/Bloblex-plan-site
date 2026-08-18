@@ -31,9 +31,9 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
   const clear = () => { if (timer.current) clearTimeout(timer.current); timer.current = null; };
   useEffect(() => clear, []);
 
-  const spent = STEPS.slice(0, done).reduce(
-    (a, s) => a + (mode === "manual" ? s.manual.minutes : s.system.minutes), 0
-  );
+  const manualSpent = STEPS.slice(0, progress.manual).reduce((a, s) => a + s.manual.minutes, 0);
+  const systemSpent = STEPS.slice(0, progress.system).reduce((a, s) => a + s.system.minutes, 0);
+  const spent = mode === "manual" ? manualSpent : systemSpent;
   const finished = done >= STEPS.length;
   const nextStep = STEPS[done];
   /* in system mode the run halts on any step that needs a human decision */
@@ -253,10 +253,10 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
 
             {/* the two totals, side by side */}
             <div className="space-y-2.5 border-t border-[var(--color-line)] px-5 py-6 md:px-7">
-              <Bar label={t.byHand} value={MANUAL_TOTAL} max={MANUAL_TOTAL} color={AMBER} locale={locale}
-                   live={mode === "manual" ? spent : undefined} />
-              <Bar label={t.yourSystem} value={SYSTEM_TOTAL} max={MANUAL_TOTAL} color={GREEN} locale={locale}
-                   live={mode === "system" ? spent : undefined} />
+              <Bar label={t.byHand} total={MANUAL_TOTAL} max={MANUAL_TOTAL} color={AMBER} locale={locale}
+                   live={manualSpent} active={mode === "manual"} />
+              <Bar label={t.yourSystem} total={SYSTEM_TOTAL} max={MANUAL_TOTAL} color={GREEN} locale={locale}
+                   live={systemSpent} active={mode === "system"} />
             </div>
 
             {/* mode switch */}
@@ -296,36 +296,27 @@ function ModeBtn({ on, tone, onClick, children }: { on: boolean; tone: string; o
   );
 }
 
-/** `value` is the run's full cost, drawn as a pale reference. `live` is how
- *  far the visitor has actually got in this mode, drawn solid on top, so the
- *  bar moves with them instead of sitting at the total the whole time. */
+/** Shows how far this run has actually got. Nothing is drawn until the
+ *  visitor advances, so an untouched mode reads as empty rather than full.
+ *  Both bars share one scale, so the two runs stay comparable. */
 function Bar({
-  label, value, max, color, locale, live,
-}: { label: string; value: number; max: number; color: string; locale: Locale; live?: number }) {
-  const active = live !== undefined;
+  label, total, max, color, locale, live, active,
+}: { label: string; total: number; max: number; color: string; locale: Locale; live: number; active: boolean }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="w-24 shrink-0 text-[0.78rem] font-semibold text-[var(--color-slate)] sm:w-28">{label}</span>
+      <span className={`w-24 shrink-0 text-[0.78rem] sm:w-28 ${active ? "font-bold text-[var(--color-ink)]" : "font-semibold text-[var(--color-slate)]"}`}>
+        {label}
+      </span>
       <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--color-line)]">
         <motion.span
           className="absolute inset-y-0 left-0 rounded-full"
-          style={{ background: color, opacity: active ? 0.16 : 1 }}
-          initial={{ width: 0 }}
-          whileInView={{ width: `${(value / max) * 100}%` }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          style={{ background: color }}
+          animate={{ width: `${(Math.min(live, max) / max) * 100}%` }}
+          transition={{ type: "spring", stiffness: 120, damping: 20 }}
         />
-        {active && (
-          <motion.span
-            className="absolute inset-y-0 left-0 rounded-full"
-            style={{ background: color, boxShadow: live > 0 ? `0 0 0 1px ${color}` : undefined }}
-            animate={{ width: `${(Math.min(live, max) / max) * 100}%` }}
-            transition={{ type: "spring", stiffness: 120, damping: 20 }}
-          />
-        )}
       </div>
       <span className="w-24 shrink-0 text-right text-[0.82rem] font-bold" style={{ color }}>
-        {active ? `${fmt(live, locale)} / ${fmt(value, locale)}` : fmt(value, locale)}
+        {fmt(live, locale)} / {fmt(total, locale)}
       </span>
     </div>
   );
