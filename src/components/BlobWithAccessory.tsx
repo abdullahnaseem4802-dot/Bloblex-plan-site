@@ -138,12 +138,29 @@ export default function BlobWithAccessory({ accessory }: { accessory: AccessoryK
         animate={{ y: [0, -4, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       >
-        <path fill="url(#swBlob)" d="M120 30C82 30 40 50 40 102c0 38 34 58 80 58s80-20 80-58C200 50 158 30 120 30Z" />
-        <ellipse cx="94" cy="66" rx="26" ry="13" fill="#fff" opacity={0.22} />
-        <circle cx="98" cy="104" r="10" fill={INK} />
-        <circle cx="142" cy="104" r="10" fill={INK} />
-        <circle cx="94.6" cy="100.6" r="3.3" fill="#fff" />
-        <circle cx="138.6" cy="100.6" r="3.3" fill="#fff" />
+        {/* body, drawn to match the brand mark: rounded blob with a drip on
+            the right, a big sheen across the crown and capsule eyes */}
+        <path
+          fill="url(#swBlob)"
+          d="M118 30 C74 30 40 56 40 100 c0 34 30 56 76 56 c22 0 40 -5 53 -14
+             c9 6 20 6 27 0 c7 -6 7 -17 -1 -24 c-4 -4 -6 -9 -5 -14
+             C196 60 164 30 118 30 Z"
+        />
+        {/* crown sheen */}
+        <path
+          d="M70 74 C82 52 112 44 138 48"
+          fill="none" stroke="#fff" strokeWidth={9} strokeLinecap="round" opacity={0.9}
+        />
+        <circle cx="61" cy="86" r="4.5" fill="#fff" opacity={0.85} />
+        {/* circuit taps on the flank, as on the logo */}
+        <g stroke="#0a1628" strokeWidth={2.6} strokeLinecap="round" opacity={0.9}>
+          <path d="M56 104 h22" /><circle cx="54" cy="104" r="3.2" fill="#0a1628" stroke="none" />
+          <path d="M56 116 h30" /><circle cx="54" cy="116" r="3.2" fill="#0a1628" stroke="none" />
+          <path d="M60 128 h20" /><circle cx="58" cy="128" r="3.2" fill="#0a1628" stroke="none" />
+        </g>
+        {/* capsule eyes */}
+        <rect x="104" y="92" width="11" height="26" rx="5.5" fill="#fff" />
+        <rect x="136" y="92" width="11" height="26" rx="5.5" fill="#fff" />
 
         <AnimatePresence mode="wait">
           <motion.g

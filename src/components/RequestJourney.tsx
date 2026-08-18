@@ -253,8 +253,10 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
 
             {/* the two totals, side by side */}
             <div className="space-y-2.5 border-t border-[var(--color-line)] px-5 py-6 md:px-7">
-              <Bar label={t.byHand} value={MANUAL_TOTAL} max={MANUAL_TOTAL} color={AMBER} locale={locale} />
-              <Bar label={t.yourSystem} value={SYSTEM_TOTAL} max={MANUAL_TOTAL} color={GREEN} locale={locale} />
+              <Bar label={t.byHand} value={MANUAL_TOTAL} max={MANUAL_TOTAL} color={AMBER} locale={locale}
+                   live={mode === "manual" ? spent : undefined} />
+              <Bar label={t.yourSystem} value={SYSTEM_TOTAL} max={MANUAL_TOTAL} color={GREEN} locale={locale}
+                   live={mode === "system" ? spent : undefined} />
             </div>
 
             {/* mode switch */}
@@ -294,22 +296,36 @@ function ModeBtn({ on, tone, onClick, children }: { on: boolean; tone: string; o
   );
 }
 
-function Bar({ label, value, max, color, locale }: { label: string; value: number; max: number; color: string; locale: Locale }) {
+/** `value` is the run's full cost, drawn as a pale reference. `live` is how
+ *  far the visitor has actually got in this mode, drawn solid on top, so the
+ *  bar moves with them instead of sitting at the total the whole time. */
+function Bar({
+  label, value, max, color, locale, live,
+}: { label: string; value: number; max: number; color: string; locale: Locale; live?: number }) {
+  const active = live !== undefined;
   return (
     <div className="flex items-center gap-3">
       <span className="w-24 shrink-0 text-[0.78rem] font-semibold text-[var(--color-slate)] sm:w-28">{label}</span>
-      <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--color-line)]">
+      <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--color-line)]">
         <motion.span
-          className="block h-full rounded-full"
-          style={{ background: color }}
+          className="absolute inset-y-0 left-0 rounded-full"
+          style={{ background: color, opacity: active ? 0.28 : 1 }}
           initial={{ width: 0 }}
           whileInView={{ width: `${(value / max) * 100}%` }}
           viewport={{ once: true }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
         />
+        {active && (
+          <motion.span
+            className="absolute inset-y-0 left-0 rounded-full"
+            style={{ background: color }}
+            animate={{ width: `${(Math.min(live, max) / max) * 100}%` }}
+            transition={{ type: "spring", stiffness: 120, damping: 20 }}
+          />
+        )}
       </div>
-      <span className="w-16 shrink-0 text-right text-[0.82rem] font-bold" style={{ color }}>
-        {fmt(value, locale)}
+      <span className="w-24 shrink-0 text-right text-[0.82rem] font-bold" style={{ color }}>
+        {active ? `${fmt(live, locale)} / ${fmt(value, locale)}` : fmt(value, locale)}
       </span>
     </div>
   );

@@ -13,9 +13,9 @@ import type { Locale } from "./site";
     states: only the wiring does, which is the whole argument. */
 export const NODES: { x: number; y: number }[] = [
   { x: 29, y: 14 }, { x: 50, y: 11 }, { x: 71, y: 14 },
-  { x: 18, y: 29 }, { x: 82, y: 29 },
-  { x: 9,  y: 46 }, { x: 91, y: 46 },
-  { x: 18, y: 63 }, { x: 82, y: 63 },
+  { x: 20, y: 29 }, { x: 80, y: 29 },
+  { x: 15, y: 46 }, { x: 85, y: 46 },
+  { x: 20, y: 63 }, { x: 80, y: 63 },
   { x: 29, y: 79 }, { x: 50, y: 84 }, { x: 71, y: 79 },
 ];
 

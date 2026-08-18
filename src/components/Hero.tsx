@@ -110,7 +110,7 @@ export default function Hero({ locale }: { locale: Locale }) {
         </div>
 
         {/* the slime grabs each bubble, swallows it, and produces one system */}
-        <div className="flex w-full items-center justify-center">
+        <div className="flex w-full items-center justify-center lg:translate-x-[7%]">
           <HeroBlobStage chips={t.chips} systemLabel={t.systemLabel} />
         </div>
       </div>

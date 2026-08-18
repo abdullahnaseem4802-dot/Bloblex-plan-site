@@ -3,6 +3,7 @@ import Reveal from "../Reveal";
 import { WhatWeBuild, Process } from "../Sections";
 import AutomationPicker from "../AutomationPicker";
 import SectorSwitcher from "../SectorSwitcher";
+import SystemComparison from "../SystemComparison";
 import CostRace from "../CostRace";
 import Uncomparable from "../Uncomparable";
 import WhyCustom from "../WhyCustom";
@@ -45,6 +46,7 @@ export function WhatWeBuildPage({ locale }: { locale: Locale }) {
       <Breadcrumbs items={crumbs(locale, "whatWeBuild")} />
       <PageHero {...h} />
       <WhatWeBuild locale={locale} bare />
+      <SystemComparison locale={locale} />
       <WhyCustom locale={locale} />
       <AutomationPicker locale={locale} />
       <CtaBand locale={locale} />

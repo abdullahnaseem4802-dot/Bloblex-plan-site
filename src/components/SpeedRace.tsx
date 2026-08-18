@@ -15,16 +15,26 @@ export default function SpeedRace({ locale }: { locale: Locale }) {
   const reduce = useReducedMotion();
 
   const [state, setState] = useState<"idle" | "running" | "done">("idle");
+  const [runId, setRunId] = useState(0);   // bumping this remounts the lanes
   const boxRef = useRef<HTMLDivElement>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const clear = () => { timers.current.forEach(clearTimeout); timers.current = []; };
   useEffect(() => clear, []);
 
+  /* drop back to idle for a frame first, otherwise the bars are already at
+     their target width and "run it again" does nothing visible */
+  /* Remount the lanes on every run. Simply flipping the target width made
+     motion interpolate from wherever the bar already was, so replaying looked
+     like nothing happened. */
   const run = useCallback(() => {
     clear();
-    setState("running");
-    timers.current.push(setTimeout(() => setState("done"), reduce ? 200 : 2100));
+    setState("idle");
+    setRunId((n) => n + 1);
+    timers.current.push(setTimeout(() => {
+      setState("running");
+      timers.current.push(setTimeout(() => setState("done"), reduce ? 200 : 2100));
+    }, 80));
   }, [reduce]);
 
   /* play once when it scrolls into view */
@@ -72,6 +82,7 @@ export default function SpeedRace({ locale }: { locale: Locale }) {
               <div className="space-y-7">
                 {/* your system */}
                 <Lane
+                  key={`y${runId}`}
                   label={t.yours}
                   sub={t.yoursSub}
                   color={GREEN}
@@ -83,6 +94,7 @@ export default function SpeedRace({ locale }: { locale: Locale }) {
                 />
                 {/* the competitor */}
                 <Lane
+                  key={`r${runId}`}
                   label={t.rival}
                   sub={t.rivalSub}
                   color={RED}
