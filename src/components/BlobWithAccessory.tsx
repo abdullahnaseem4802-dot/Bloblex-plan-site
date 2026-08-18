@@ -2,83 +2,120 @@
 import { AnimatePresence, motion } from "motion/react";
 import type { AccessoryKey } from "@/content/sectors";
 
-/* Themed accessories on the blob (whiteboard 3d). Blob centered ~ (120,100). */
+/* Accessories the blob wears, one per industry (whiteboard 3d).
+   Drawn as solid shapes with a consistent weight and a soft shadow, so they
+   read as objects sitting on the character rather than sketched outlines.
+   Blob body is centred near (120, 100) in a 240 x 200 box. */
+
+const INK = "#0a1628";
+const GOLD = "#ffc93c";
+const GOLD_DK = "#e8a613";
+const STEEL = "#c9d6e4";
+const STEEL_DK = "#8ba0b8";
+const BRAND = "#29abe2";
+const BRAND_DK = "#1274ab";
+
 const ACCESSORY: Record<AccessoryKey, React.ReactNode> = {
+  /* hard hat, sitting on the crown */
   helmet: (
-    <g stroke="#0a1628" strokeWidth={3} strokeLinejoin="round">
-      <path d="M70 60 Q120 20 170 60 Z" fill="#ffd23f" />
-      <rect x="58" y="56" width="124" height="11" rx="5.5" fill="#ffd23f" />
-      <path d="M120 26 V56" stroke="#f0a500" strokeWidth={5} strokeLinecap="round" />
-      <path d="M96 40 V56 M144 40 V56" stroke="#f0a500" strokeWidth={4} strokeLinecap="round" />
+    <g>
+      <path d="M74 62 C74 30 166 30 166 62 Z" fill={GOLD} />
+      <path d="M104 36 C104 33 136 33 136 36 L136 62 L104 62 Z" fill={GOLD_DK} opacity={0.55} />
+      <rect x="58" y="60" width="124" height="13" rx="6.5" fill={GOLD} />
+      <rect x="58" y="66" width="124" height="7" rx="3.5" fill={GOLD_DK} opacity={0.5} />
+      <path d="M74 62 C74 30 166 30 166 62" fill="none" stroke={GOLD_DK} strokeWidth={2.5} opacity={0.6} />
     </g>
   ),
+
+  /* safety glasses across the eyes */
   glasses: (
-    <g stroke="#0a1628" strokeWidth={4} fill="none" strokeLinecap="round">
-      <rect x="76" y="90" width="36" height="28" rx="9" fill="#bfe9fb" fillOpacity={0.75} />
-      <rect x="128" y="90" width="36" height="28" rx="9" fill="#bfe9fb" fillOpacity={0.75} />
-      <path d="M112 102 h16" />
-      <path d="M76 96 l-14 -7" />
-      <path d="M164 96 l14 -7" />
+    <g>
+      <rect x="70" y="88" width="100" height="30" rx="14" fill={BRAND} opacity={0.18} />
+      <rect x="72" y="90" width="44" height="26" rx="12" fill="#d8f0fb" stroke={INK} strokeWidth={3} />
+      <rect x="124" y="90" width="44" height="26" rx="12" fill="#d8f0fb" stroke={INK} strokeWidth={3} />
+      <path d="M116 101 h8" stroke={INK} strokeWidth={3} strokeLinecap="round" />
+      <path d="M72 95 L56 88 M168 95 L184 88" stroke={INK} strokeWidth={3.5} strokeLinecap="round" />
     </g>
   ),
+
+  /* stethoscope worn round the neck, chest piece resting to one side */
   stethoscope: (
-    <g stroke="#0a1628" strokeWidth={4} fill="none" strokeLinecap="round">
-      {/* ear tubes draping over the head, forming a Y */}
-      <path d="M92 70 C 88 92 104 104 116 112" />
-      <path d="M150 70 C 154 92 138 104 126 112" />
-      <circle cx="92" cy="68" r="4" fill="#0a1628" />
-      <circle cx="150" cy="68" r="4" fill="#0a1628" />
-      {/* tube down to the chest piece */}
-      <path d="M121 112 C 121 138 106 158 130 166" />
-      <circle cx="135" cy="170" r="11" fill="#29abe2" />
-      <circle cx="135" cy="170" r="5" fill="#0a1628" stroke="none" />
+    <g fill="none" strokeLinecap="round">
+      <path d="M88 66 C82 96 96 116 112 122" stroke={STEEL_DK} strokeWidth={7} />
+      <path d="M152 66 C158 96 144 116 128 122" stroke={STEEL_DK} strokeWidth={7} />
+      <path d="M88 66 C82 96 96 116 112 122" stroke={STEEL} strokeWidth={3.5} />
+      <path d="M152 66 C158 96 144 116 128 122" stroke={STEEL} strokeWidth={3.5} />
+      <circle cx="88" cy="64" r="6" fill={STEEL} stroke={STEEL_DK} strokeWidth={2} />
+      <circle cx="152" cy="64" r="6" fill={STEEL} stroke={STEEL_DK} strokeWidth={2} />
+      <path d="M120 122 C120 146 104 162 126 172" stroke={STEEL_DK} strokeWidth={7} />
+      <path d="M120 122 C120 146 104 162 126 172" stroke={STEEL} strokeWidth={3.5} />
+      <circle cx="136" cy="174" r="13" fill={STEEL} stroke={STEEL_DK} strokeWidth={3} />
+      <circle cx="136" cy="174" r="6" fill={BRAND} stroke="none" />
     </g>
   ),
+
+  /* two hands meeting */
   handshake: (
-    <g stroke="#0a1628" strokeWidth={3} strokeLinejoin="round">
-      <rect x="146" y="150" width="42" height="16" rx="8" fill="#7fd4f5" />
-      <rect x="168" y="150" width="42" height="16" rx="8" fill="#29abe2" />
+    <g>
+      <rect x="140" y="146" width="46" height="18" rx="9" fill="#7fd4f5" stroke={INK} strokeWidth={2.5} />
+      <rect x="168" y="146" width="46" height="18" rx="9" fill={BRAND} stroke={INK} strokeWidth={2.5} />
+      <path d="M172 150 h10" stroke="#fff" strokeWidth={2.5} strokeLinecap="round" opacity={0.7} />
     </g>
   ),
+
+  /* delivery truck rolling underneath */
   truck: (
-    <g stroke="#0a1628" strokeWidth={3} strokeLinejoin="round">
-      <rect x="66" y="156" width="58" height="30" rx="5" fill="#29abe2" />
-      <path d="M124 164 h24 l14 14 v8 h-38 Z" fill="#7fd4f5" />
-      <circle cx="86" cy="190" r="9" fill="#0a1628" />
-      <circle cx="146" cy="190" r="9" fill="#0a1628" />
+    <g>
+      <rect x="62" y="150" width="62" height="34" rx="6" fill={BRAND} stroke={INK} strokeWidth={2.5} />
+      <path d="M124 160 h24 l16 15 v9 h-40 Z" fill="#7fd4f5" stroke={INK} strokeWidth={2.5} strokeLinejoin="round" />
+      <rect x="130" y="164" width="16" height="10" rx="2" fill="#d8f0fb" />
+      <circle cx="84" cy="188" r="9" fill={INK} />
+      <circle cx="84" cy="188" r="3.5" fill={STEEL} />
+      <circle cx="146" cy="188" r="9" fill={INK} />
+      <circle cx="146" cy="188" r="3.5" fill={STEEL} />
     </g>
   ),
+
+  /* shopping bags */
   bags: (
-    <g stroke="#0a1628" strokeWidth={3} strokeLinejoin="round">
-      <path d="M166 138 h34 l6 46 h-46 Z" fill="#29abe2" />
-      <path d="M176 138 c0 -11 14 -11 14 0" fill="none" />
-      <path d="M150 150 h22 l4 34 h-30 Z" fill="#7fd4f5" />
+    <g>
+      <path d="M160 146 h40 l5 44 h-50 Z" fill={BRAND} stroke={INK} strokeWidth={2.5} strokeLinejoin="round" />
+      <path d="M170 146 c0 -12 20 -12 20 0" fill="none" stroke={INK} strokeWidth={2.5} />
+      <path d="M142 156 h26 l4 34 h-34 Z" fill="#7fd4f5" stroke={INK} strokeWidth={2.5} strokeLinejoin="round" />
+      <path d="M149 156 c0 -9 14 -9 14 0" fill="none" stroke={INK} strokeWidth={2.5} />
     </g>
   ),
+
+  /* a small building */
   building: (
-    <g stroke="#0a1628" strokeWidth={3} strokeLinejoin="round">
-      <rect x="164" y="118" width="46" height="68" fill="#7fd4f5" />
-      <rect x="172" y="128" width="10" height="10" fill="#fff" />
-      <rect x="192" y="128" width="10" height="10" fill="#fff" />
-      <rect x="172" y="146" width="10" height="10" fill="#fff" />
-      <rect x="192" y="146" width="10" height="10" fill="#fff" />
-      <rect x="180" y="166" width="14" height="20" fill="#29abe2" />
+    <g>
+      <rect x="158" y="118" width="50" height="70" rx="4" fill="#7fd4f5" stroke={INK} strokeWidth={2.5} />
+      <rect x="166" y="128" width="11" height="11" rx="2" fill="#fff" />
+      <rect x="189" y="128" width="11" height="11" rx="2" fill="#fff" />
+      <rect x="166" y="147" width="11" height="11" rx="2" fill="#fff" />
+      <rect x="189" y="147" width="11" height="11" rx="2" fill="#fff" />
+      <rect x="174" y="166" width="18" height="22" rx="2" fill={BRAND} stroke={INK} strokeWidth={2.5} />
     </g>
   ),
+
+  /* reception bell */
   bell: (
-    <g stroke="#0a1628" strokeWidth={3} strokeLinejoin="round">
-      {/* service / reception bell */}
-      <path d="M92 178 a30 24 0 0 1 60 0 Z" fill="#29abe2" />
-      <rect x="84" y="178" width="76" height="9" rx="4.5" fill="#7fd4f5" />
-      <rect x="118" y="142" width="8" height="12" rx="4" fill="#0a1628" stroke="none" />
-      <circle cx="122" cy="140" r="5" fill="#0a1628" stroke="none" />
+    <g>
+      <path d="M92 176 a30 26 0 0 1 60 0 Z" fill={BRAND} stroke={INK} strokeWidth={2.5} strokeLinejoin="round" />
+      <path d="M92 176 a30 26 0 0 1 22 -25 l0 25 Z" fill="#7fd4f5" opacity={0.7} />
+      <rect x="82" y="176" width="80" height="11" rx="5.5" fill={STEEL} stroke={INK} strokeWidth={2.5} />
+      <rect x="118" y="142" width="8" height="12" rx="4" fill={STEEL_DK} />
+      <circle cx="122" cy="139" r="6" fill={STEEL} stroke={INK} strokeWidth={2.5} />
     </g>
   ),
+
+  /* laptop beside the blob */
   computer: (
-    <g stroke="#0a1628" strokeWidth={3} strokeLinejoin="round">
-      <rect x="160" y="126" width="54" height="36" rx="3" fill="#29abe2" />
-      <rect x="168" y="134" width="38" height="20" rx="2" fill="#bfe9fb" />
-      <rect x="152" y="162" width="70" height="9" rx="3" fill="#0a1628" />
+    <g>
+      <rect x="152" y="124" width="58" height="40" rx="4" fill={BRAND_DK} stroke={INK} strokeWidth={2.5} />
+      <rect x="158" y="130" width="46" height="28" rx="2" fill="#d8f0fb" />
+      <path d="M166 138 h20 M166 145 h28" stroke={BRAND} strokeWidth={3} strokeLinecap="round" />
+      <path d="M142 164 h78 l-6 10 h-66 Z" fill={STEEL} stroke={INK} strokeWidth={2.5} strokeLinejoin="round" />
     </g>
   ),
 };
@@ -92,6 +129,9 @@ export default function BlobWithAccessory({ accessory }: { accessory: AccessoryK
           <stop offset="52%" stopColor="#29abe2" />
           <stop offset="100%" stopColor="#1274ab" />
         </radialGradient>
+        <filter id="propShadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#0a1628" floodOpacity="0.22" />
+        </filter>
       </defs>
 
       <motion.g
@@ -100,18 +140,19 @@ export default function BlobWithAccessory({ accessory }: { accessory: AccessoryK
       >
         <path fill="url(#swBlob)" d="M120 30C82 30 40 50 40 102c0 38 34 58 80 58s80-20 80-58C200 50 158 30 120 30Z" />
         <ellipse cx="94" cy="66" rx="26" ry="13" fill="#fff" opacity={0.22} />
-        <circle cx="98" cy="104" r="10" fill="#0a1628" />
-        <circle cx="142" cy="104" r="10" fill="#0a1628" />
+        <circle cx="98" cy="104" r="10" fill={INK} />
+        <circle cx="142" cy="104" r="10" fill={INK} />
         <circle cx="94.6" cy="100.6" r="3.3" fill="#fff" />
         <circle cx="138.6" cy="100.6" r="3.3" fill="#fff" />
 
         <AnimatePresence mode="wait">
           <motion.g
             key={accessory}
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.6 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
+            filter="url(#propShadow)"
+            initial={{ opacity: 0, scale: 0.7, y: -6 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.7, y: -6 }}
+            transition={{ duration: 0.4, ease: [0.2, 1.3, 0.4, 1] }}
             style={{ transformOrigin: "120px 100px" }}
           >
             {ACCESSORY[accessory]}

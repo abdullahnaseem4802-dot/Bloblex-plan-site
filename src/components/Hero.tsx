@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import TypeIn from "./TypeIn";
 import HeroAtmosphere from "./HeroAtmosphere";
-import HeroStage3D from "./HeroStage3D";
+import HeroBlobStage from "./HeroBlobStage";
 import { CONTENT, type Locale } from "@/content/site";
 
 export default function Hero({ locale }: { locale: Locale }) {
@@ -109,8 +109,10 @@ export default function Hero({ locale }: { locale: Locale }) {
           </motion.ul>
         </div>
 
-        {/* Signature 3D orbit: chips ride a real ring and pass behind the blob */}
-        <HeroStage3D chips={t.chips} />
+        {/* the slime grabs each bubble, swallows it, and produces one system */}
+        <div className="flex w-full items-center justify-center">
+          <HeroBlobStage chips={t.chips} systemLabel={t.systemLabel} />
+        </div>
       </div>
 
     </section>

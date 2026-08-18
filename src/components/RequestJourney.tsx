@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Reveal from "./Reveal";
 import { type Locale } from "@/content/site";
-import { STEPS, MANUAL_TOTAL, SYSTEM_TOTAL, DECISION_COUNT, JOURNEY_UI, fmt } from "@/content/journey";
+import { STEPS, MANUAL_TOTAL, SYSTEM_TOTAL, DECISION_COUNT, JOURNEY_UI, SYSTEM_CHATTER, fmt } from "@/content/journey";
 
 type Mode = "manual" | "system";
 
@@ -63,6 +63,15 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
     tick(from);
   }, [reduce]);
 
+  /* the system narrates itself while it works */
+  const chatter = SYSTEM_CHATTER[locale];
+  const [chat, setChat] = useState(0);
+  useEffect(() => {
+    if (mode !== "system" || !running) return;
+    const id = setInterval(() => setChat((c) => (c + 1) % chatter.length), 380);
+    return () => clearInterval(id);
+  }, [mode, running, chatter.length]);
+
   const statusBar = (() => {
     if (mode === "manual") {
       if (finished) return { text: t.manualDone, cta: null as null | string, tone: AMBER };
@@ -78,8 +87,21 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
     return { text: t.systemIntro, cta: `▶  ${t.systemPlay}`, tone: GREEN };
   })();
 
+  /* every manual click throws off a "+8 min" receipt, so the cost of the
+     gesture is felt rather than just tallied */
+  const [receipts, setReceipts] = useState<{ id: number; at: number; label: string }[]>([]);
+  const receiptId = useRef(0);
+
   const onCta = () => {
-    if (mode === "manual") { setDone((d) => Math.min(d + 1, STEPS.length)); return; }
+    if (mode === "manual") {
+      const i = done;
+      if (i >= STEPS.length) return;
+      const id = ++receiptId.current;
+      setReceipts((r) => [...r, { id, at: i, label: `+${fmt(STEPS[i].manual.minutes, locale)}` }]);
+      setTimeout(() => setReceipts((r) => r.filter((x) => x.id !== id)), 1100);
+      setDone((d) => Math.min(d + 1, STEPS.length));
+      return;
+    }
     roll(done);
   };
 
@@ -168,6 +190,21 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
                       boxShadow: isNext ? `0 0 0 3px ${activeTone}22` : undefined,
                     }}
                   >
+                    <AnimatePresence>
+                      {receipts.filter((r) => r.at === i).map((r) => (
+                        <motion.span
+                          key={r.id}
+                          initial={{ opacity: 0, y: 4, scale: 0.9 }}
+                          animate={{ opacity: [0, 1, 1, 0], y: -34, scale: 1 }}
+                          transition={{ duration: 1.1, ease: "easeOut" }}
+                          className="pointer-events-none absolute -top-1 right-2 z-10 rounded-full px-2 py-0.5 text-[0.7rem] font-bold text-white"
+                          style={{ background: AMBER }}
+                        >
+                          {r.label}
+                        </motion.span>
+                      ))}
+                    </AnimatePresence>
+
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-[0.78rem] font-semibold leading-snug text-[var(--color-ink)]">{s.label[locale]}</p>
                       {complete && <span style={{ color: activeTone }} className="text-sm font-bold">✓</span>}
@@ -192,6 +229,20 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
                           {needsYou ? t.systemWaitHint : t.todo}
                         </p>
                       </>
+                    ) : mode === "system" && running && i === done ? (
+                      <AnimatePresence mode="wait">
+                        <motion.p
+                          key={chatter[chat]}
+                          initial={{ opacity: 0, y: 3 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -3 }}
+                          transition={{ duration: 0.18 }}
+                          className="mt-3 font-mono text-[0.6rem] font-bold"
+                          style={{ color: GREEN }}
+                        >
+                          {chatter[chat]}
+                        </motion.p>
+                      </AnimatePresence>
                     ) : (
                       <p className="mt-3 text-[var(--color-mute)]">&mdash;</p>
                     )}

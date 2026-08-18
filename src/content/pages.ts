@@ -11,108 +11,108 @@ type IndustryCopy = { hook: string; pains: string[]; outcomes: string[] };
 export const INDUSTRY_PAGES: Record<string, Record<Locale, IndustryCopy>> = {
   construction: {
     en: {
-      hook: "From the first lead to the final invoice, construction runs on estimates, change orders and site updates that rarely live in one place. Blobex connects them.",
+      hook: "From the first lead to the final invoice, construction runs on estimates, change orders and site updates that rarely live in one place. We connect them.",
       pains: ["Estimates rebuilt by hand in spreadsheets", "Site, office and accounting on different tools", "Change orders and margins lost between steps"],
       outcomes: ["AI-assisted estimating in minutes, not hours", "One source of truth from bid to billing", "Clear margins and fewer costly mistakes"],
     },
     fr: {
-      hook: "Du premier prospect à la facture finale, la construction roule sur des estimations, des avenants et des suivis de chantier rarement réunis au même endroit. Blobex les connecte.",
+      hook: "Du premier prospect à la facture finale, la construction roule sur des estimations, des avenants et des suivis de chantier rarement réunis au même endroit. On les connecte.",
       pains: ["Estimations refaites à la main dans des chiffriers", "Chantier, bureau et comptabilité sur des outils différents", "Avenants et marges perdus entre les étapes"],
       outcomes: ["Estimation assistée par IA en minutes, pas en heures", "Une seule source de vérité, de la soumission à la facturation", "Des marges claires et moins d'erreurs coûteuses"],
     },
   },
   manufacturing: {
     en: {
-      hook: "Manufacturing lives or dies on the link between orders, inventory and the shop floor. Blobex builds the system that keeps them in sync.",
+      hook: "Manufacturing lives or dies on the link between orders, inventory and the shop floor. We build the system that keeps them in sync.",
       pains: ["Quotes disconnected from real BOM costs", "Production schedules kept in someone's head", "No live view of inventory or capacity"],
       outcomes: ["Quote-to-production in one connected flow", "Scheduling and inventory that update themselves", "Fewer stockouts, less overtime, tighter margins"],
     },
     fr: {
-      hook: "Le manufacturier vit du lien entre les commandes, l'inventaire et le plancher de production. Blobex bâtit le système qui les garde synchronisés.",
+      hook: "Le manufacturier vit du lien entre les commandes, l'inventaire et le plancher de production. On bâtit le système qui les garde synchronisés.",
       pains: ["Soumissions déconnectées des coûts réels de nomenclature", "Ordonnancement gardé dans la tête de quelqu'un", "Aucune vue en temps réel de l'inventaire ou de la capacité"],
       outcomes: ["De la soumission à la production en un seul flux connecté", "Ordonnancement et inventaire qui se mettent à jour seuls", "Moins de ruptures, moins de temps supplémentaire, meilleures marges"],
     },
   },
   healthcare: {
     en: {
-      hook: "Clinics and health services juggle intake, scheduling, records and follow-ups across tools that don't talk. Blobex connects them, securely.",
+      hook: "Clinics and health services juggle intake, scheduling, records and follow-ups across tools that don't talk. We connect them, securely.",
       pains: ["Patient intake and records in separate systems", "Manual scheduling and reminder calls", "Follow-ups that slip through the cracks"],
       outcomes: ["Secure, connected intake-to-billing flow", "Automated scheduling and reminders", "Reliable follow-up and better patient experience"],
     },
     fr: {
-      hook: "Cliniques et services de santé jonglent avec l'accueil, les rendez-vous, les dossiers et les suivis sur des outils qui ne se parlent pas. Blobex les connecte, en toute sécurité.",
+      hook: "Cliniques et services de santé jonglent avec l'accueil, les rendez-vous, les dossiers et les suivis sur des outils qui ne se parlent pas. On les connecte, en toute sécurité.",
       pains: ["Accueil patient et dossiers dans des systèmes séparés", "Prise de rendez-vous et rappels manuels", "Des suivis qui passent entre les mailles"],
       outcomes: ["Flux sécurisé et connecté, de l'accueil à la facturation", "Rendez-vous et rappels automatisés", "Un suivi fiable et une meilleure expérience patient"],
     },
   },
   "professional-services": {
     en: {
-      hook: "For services firms, time is the product. Blobex connects leads, proposals, delivery and billing so none of it leaks.",
+      hook: "For services firms, time is the product. We connect leads, proposals, delivery and billing so none of it leaks.",
       pains: ["Proposals and follow-ups done manually", "Time and project data scattered", "Slow, error-prone invoicing"],
       outcomes: ["Lead-to-invoice in one pipeline", "Proposals, e-sign and delivery connected", "Faster billing and clearer profitability"],
     },
     fr: {
-      hook: "Pour les firmes de services, le temps est le produit. Blobex connecte prospects, propositions, livraison et facturation pour que rien ne se perde.",
+      hook: "Pour les firmes de services, le temps est le produit. On connecte prospects, propositions, livraison et facturation pour que rien ne se perde.",
       pains: ["Propositions et relances faites à la main", "Données de temps et de projet éparpillées", "Facturation lente et sujette aux erreurs"],
       outcomes: ["Du prospect à la facture dans un seul pipeline", "Propositions, signature et livraison connectées", "Facturation plus rapide et rentabilité plus claire"],
     },
   },
   logistics: {
     en: {
-      hook: "Logistics is a race against time. Blobex connects orders, dispatch, tracking and proof of delivery into one live system.",
+      hook: "Logistics is a race against time. We connect orders, dispatch, tracking and proof of delivery into one live system.",
       pains: ["Dispatch and tracking on separate tools", "Manual proof-of-delivery and billing", "No real-time view for clients"],
       outcomes: ["Order-to-delivery in one connected flow", "Automated proof of delivery and invoicing", "Live visibility for you and your clients"],
     },
     fr: {
-      hook: "La logistique est une course contre la montre. Blobex connecte commandes, répartition, suivi et preuve de livraison en un seul système en temps réel.",
+      hook: "La logistique est une course contre la montre. On connecte commandes, répartition, suivi et preuve de livraison en un seul système en temps réel.",
       pains: ["Répartition et suivi sur des outils séparés", "Preuve de livraison et facturation manuelles", "Aucune vue en temps réel pour les clients"],
       outcomes: ["De la commande à la livraison en un flux connecté", "Preuve de livraison et facturation automatisées", "Visibilité en temps réel pour vous et vos clients"],
     },
   },
   distribution: {
     en: {
-      hook: "Distributors move fast on thin margins. Blobex connects B2B ordering, warehouse and billing so nothing slows you down.",
+      hook: "Distributors move fast on thin margins. We connect B2B ordering, warehouse and billing so nothing slows you down.",
       pains: ["B2B orders re-keyed by hand", "Pricing and catalog out of sync", "Warehouse and accounting disconnected"],
       outcomes: ["Self-serve B2B ordering portal", "Live inventory, pricing and catalog", "Order-to-cash in one system"],
     },
     fr: {
-      hook: "Les distributeurs avancent vite sur de faibles marges. Blobex connecte commandes B2B, entrepôt et facturation pour que rien ne vous ralentisse.",
+      hook: "Les distributeurs avancent vite sur de faibles marges. On connecte commandes B2B, entrepôt et facturation pour que rien ne vous ralentisse.",
       pains: ["Commandes B2B ressaisies à la main", "Prix et catalogue désynchronisés", "Entrepôt et comptabilité déconnectés"],
       outcomes: ["Portail de commande B2B en libre-service", "Inventaire, prix et catalogue en temps réel", "De la commande à l'encaissement dans un seul système"],
     },
   },
   "real-estate": {
     en: {
-      hook: "Real estate runs on leads, listings, documents and timing. Blobex connects them so no opportunity goes cold.",
+      hook: "Real estate runs on leads, listings, documents and timing. We connect them so no opportunity goes cold.",
       pains: ["Leads spread across inboxes", "Documents and e-sign done manually", "Visit scheduling and commissions tracked by hand"],
       outcomes: ["Lead-to-close in one CRM", "Documents and e-sign connected", "Automated scheduling and commission tracking"],
     },
     fr: {
-      hook: "L'immobilier roule sur les prospects, les inscriptions, les documents et le timing. Blobex les connecte pour qu'aucune occasion ne refroidisse.",
+      hook: "L'immobilier roule sur les prospects, les inscriptions, les documents et le timing. On les connecte pour qu'aucune occasion ne refroidisse.",
       pains: ["Prospects éparpillés dans les boîtes courriel", "Documents et signature faits à la main", "Visites et commissions suivies manuellement"],
       outcomes: ["Du prospect à la conclusion dans un seul CRM", "Documents et signature connectés", "Visites et commissions suivies automatiquement"],
     },
   },
   hospitality: {
     en: {
-      hook: "Hospitality is experience at scale. Blobex connects reservations, guests, ordering and staff so every touchpoint is smooth.",
+      hook: "Hospitality is experience at scale. We connect reservations, guests, ordering and staff so every touchpoint is smooth.",
       pains: ["Reservations and guest data siloed", "Manual staff scheduling", "Reviews and follow-up left to chance"],
       outcomes: ["Reservation-to-billing in one flow", "Automated scheduling and guest follow-up", "A consistent, higher-rated guest experience"],
     },
     fr: {
-      hook: "L'hôtellerie, c'est l'expérience à grande échelle. Blobex connecte réservations, clients, commandes et personnel pour que chaque point de contact soit fluide.",
+      hook: "L'hôtellerie, c'est l'expérience à grande échelle. On connecte réservations, clients, commandes et personnel pour que chaque point de contact soit fluide.",
       pains: ["Réservations et données clients en silos", "Horaires du personnel gérés à la main", "Avis et suivis laissés au hasard"],
       outcomes: ["De la réservation à la facturation en un flux", "Horaires et suivis clients automatisés", "Une expérience client constante et mieux notée"],
     },
   },
   technology: {
     en: {
-      hook: "Tech products scale on clean data and automation. Blobex connects acquisition, onboarding, usage and billing into one engine.",
+      hook: "Tech products scale on clean data and automation. We connect acquisition, onboarding, usage and billing into one engine.",
       pains: ["Onboarding and billing stitched together manually", "Usage data trapped in silos", "Growth adds complexity, not clarity"],
       outcomes: ["Signup-to-revenue in one connected flow", "Automated onboarding and subscription billing", "Clear analytics that scale with you"],
     },
     fr: {
-      hook: "Les produits techno grandissent grâce à des données propres et à l'automatisation. Blobex connecte acquisition, intégration, usage et facturation en un seul moteur.",
+      hook: "Les produits techno grandissent grâce à des données propres et à l'automatisation. On connecte acquisition, intégration, usage et facturation en un seul moteur.",
       pains: ["Intégration et facturation reliées à la main", "Données d'usage prisonnières de silos", "La croissance ajoute de la complexité, pas de la clarté"],
       outcomes: ["De l'inscription au revenu en un flux connecté", "Intégration et facturation d'abonnement automatisées", "Une analytique claire qui grandit avec vous"],
     },
@@ -164,8 +164,8 @@ export const PAGE_META: Record<string, Record<Locale, Meta>> = {
     fr: { title: "Contacter Blobex. Démarrer un projet | Granby, Québec", description: "Dites-nous ce qui vous ralentit. Formulaire court et sans friction, le début d'une vraie conversation d'affaires." },
   },
   about: {
-    en: { title: "About Blobex. Custom Software in Granby, Quebec", description: "Blobex studies how your business operates and builds the custom software around it. Learn about our approach, ownership and process." },
-    fr: { title: "À propos de Blobex. Logiciels sur mesure à Granby, Québec", description: "Blobex étudie le fonctionnement de votre entreprise et bâtit le logiciel sur mesure autour. Découvrez notre approche, la propriété et le processus." },
+    en: { title: "About Blobex. Custom Software in Granby, Quebec", description: "We study how your business operates and build the custom software around it. Learn about our approach, ownership and process." },
+    fr: { title: "À propos de Blobex. Logiciels sur mesure à Granby, Québec", description: "On étudie le fonctionnement de votre entreprise et on bâtit le logiciel sur mesure autour. Découvrez notre approche, la propriété et le processus." },
   },
 };
 
@@ -191,7 +191,7 @@ export const PAGE_HERO: Record<string, Record<Locale, Hero>> = {
     fr: { kicker: "Amorçons la conversation", title: "Dites-nous ce qui vous ralentit.", lead: "Le début d'une vraie conversation d'affaires, pas un long questionnaire." },
   },
   about: {
-    en: { kicker: "About Blobex", title: "We build the client's system, not a generic product.", lead: "Blobex studies how your business actually operates, then builds custom software around your rules, data and workflow. Based in Granby, Quebec." },
-    fr: { kicker: "À propos de Blobex", title: "On bâtit le système du client, pas un produit générique.", lead: "Blobex étudie le fonctionnement réel de votre entreprise, puis bâtit le logiciel sur mesure autour de vos règles, vos données et votre flux. Basé à Granby, au Québec." },
+    en: { kicker: "About Blobex", title: "We build the client's system, not a generic product.", lead: "We study how your business actually operates, then build custom software around your rules, data and workflow. Based in Granby, Quebec." },
+    fr: { kicker: "À propos de Blobex", title: "On bâtit le système du client, pas un produit générique.", lead: "On étudie le fonctionnement réel de votre entreprise, puis on bâtit le logiciel sur mesure autour de vos règles, vos données et votre flux. Basé à Granby, au Québec." },
   },
 };

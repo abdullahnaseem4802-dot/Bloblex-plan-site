@@ -1,9 +1,9 @@
 import PageShell, { PageHero } from "../PageShell";
 import Reveal from "../Reveal";
-import { WhatWeBuild, Process, Pricing } from "../Sections";
+import { WhatWeBuild, Process } from "../Sections";
 import AutomationPicker from "../AutomationPicker";
 import SectorSwitcher from "../SectorSwitcher";
-import CompetitionGraph from "../CompetitionGraph";
+import CostRace from "../CostRace";
 import Uncomparable from "../Uncomparable";
 import WhyCustom from "../WhyCustom";
 import Assurances from "../Assurances";
@@ -103,8 +103,7 @@ export function PricingPage({ locale }: { locale: Locale }) {
     <PageShell locale={locale} alt={alt("pricing")}>
       <Breadcrumbs items={crumbs(locale, "pricing")} />
       <PageHero {...h} />
-      <Pricing locale={locale} bare />
-      <CompetitionGraph locale={locale} />
+      <CostRace locale={locale} />
       <Assurances locale={locale} />
       <Uncomparable locale={locale} />
       <CtaBand locale={locale} />

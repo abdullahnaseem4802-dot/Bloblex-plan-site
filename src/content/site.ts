@@ -13,7 +13,7 @@ export const SITE = {
   name: "Blobex",
   legalName: "Blobex Inc.",
   domain: "https://www.blobex.ca",
-  email: "contact@blobex.ca",
+  email: "equipe@blobex.ca",
   phone: "+1-000-000-0000", // TODO: real number from client
   location: { city: "Granby", region: "Quebec", country: "Canada", countryCode: "CA" },
   brandBlue: "#29abe2",
@@ -49,7 +49,7 @@ export const CONTENT: Record<Locale, Dict> = {
     meta: {
       title: "Custom Software & Systems That Run Your Business | Blobex, Granby QC",
       description:
-        "Blobex builds custom software, internal platforms, automation and client portals designed around how your business actually works. A system that fits your operations, not another software expense.",
+        "We build custom software, internal platforms, automation and client portals designed around how your business actually works. A system that fits your operations, not another software expense.",
       ogTitle: "Blobex: Custom Systems That Run Your Business",
       ogDescription:
         "We build the custom software your business runs on: automation, portals, estimating, AI and industry-specific tools, connected into one system.",
@@ -60,13 +60,13 @@ export const CONTENT: Record<Locale, Dict> = {
       titleLine1: "One system that runs",
       titleLine2: "your whole business.",
       lead:
-        "Blobex studies how your company actually works, then builds the custom software around it: automation, AI, estimating, portals and the tools your team needs, all connected. Not another subscription. A system that finally fits your operations.",
+        "We study how your company actually works, then build the custom software around it: automation, AI, estimating, portals and the tools your team needs, all connected. Not another subscription. A system that finally fits your operations.",
       ctaPrimary: "Start a project",
       ctaSecondary: "See how much time you lose",
       note: "An investment in growth, not another software expense.",
       chips: ["Automation", "AI tools", "Client portal", "Estimating", "Invoicing", "CRM"],
       scroll: "Scroll",
-      systemLabel: "= Your system",
+      systemLabel: "One System",
       trust: ["Fixed scope & price", "You own the system", "Built around your workflow"],
     },
     what: {
@@ -103,7 +103,7 @@ export const CONTENT: Record<Locale, Dict> = {
       kicker: "Pricing that protects you",
       title: "Fixed scope. Fixed price. No meter running.",
       lead:
-        "Agencies that bill by the hour have no reason to work fast. The longer it takes, the more they earn. Blobex defines the scope, deliverables and price before development. Additions are approved separately.",
+        "Agencies that bill by the hour have no reason to work fast. The longer it takes, the more they earn. We define the scope, deliverables and price before development. Additions are approved separately.",
     },
     contact: {
       kicker: "Start a conversation",
@@ -115,7 +115,7 @@ export const CONTENT: Record<Locale, Dict> = {
       ok: "Thank you, your request was sent. We'll be in touch shortly.",
       err: "Something went wrong. Please try again or email us directly.",
       reasonLabel: "Reason for contacting Blobex",
-      reasons: ["Request more information", "Launch or discuss a new project", "Analyze an operational or automation opportunity", "Improve or replace an existing system", "Partnership or another request"],
+      reasons: ["Request more information", "Launch or discuss a new project", "Analyze an operational or automation opportunity", "Improve or replace an existing system"],
       errName: "Please enter your full name.",
       errEmail: "Please enter a valid email address.",
       errPhone: "Please enter a valid phone number.",
@@ -135,7 +135,7 @@ export const CONTENT: Record<Locale, Dict> = {
     meta: {
       title: "Logiciels sur mesure qui font rouler votre entreprise | Blobex, Granby QC",
       description:
-        "Blobex conçoit des logiciels sur mesure, des plateformes internes, de l'automatisation et des portails clients bâtis autour du fonctionnement réel de votre entreprise. Un système qui s'adapte à vos opérations, pas une dépense logicielle de plus.",
+        "On conçoit des logiciels sur mesure, des plateformes internes, de l'automatisation et des portails clients bâtis autour du fonctionnement réel de votre entreprise. Un système qui s'adapte à vos opérations, pas une dépense logicielle de plus.",
       ogTitle: "Blobex : des systèmes sur mesure qui font rouler votre entreprise",
       ogDescription:
         "Nous bâtissons le logiciel sur mesure qui fait rouler votre entreprise : automatisation, portails, estimation, IA et outils propres à votre secteur, connectés en un seul système.",
@@ -146,13 +146,13 @@ export const CONTENT: Record<Locale, Dict> = {
       titleLine1: "Un seul système pour faire rouler",
       titleLine2: "toute votre entreprise.",
       lead:
-        "Blobex étudie le fonctionnement réel de votre entreprise, puis bâtit le logiciel sur mesure autour : automatisation, IA, estimation, portails et les outils dont votre équipe a besoin, tous connectés. Pas un abonnement de plus. Un système qui s'adapte enfin à vos opérations.",
+        "On étudie le fonctionnement réel de votre entreprise, puis on bâtit le logiciel sur mesure autour : automatisation, IA, estimation, portails et les outils dont votre équipe a besoin, tous connectés. Pas un abonnement de plus. Un système qui s'adapte enfin à vos opérations.",
       ctaPrimary: "Démarrer un projet",
       ctaSecondary: "Voyez le temps que vous perdez",
       note: "Un investissement dans la croissance, pas une dépense logicielle de plus.",
       chips: ["Automatisation", "Outils IA", "Portail client", "Estimation", "Facturation", "CRM"],
       scroll: "Défiler",
-      systemLabel: "= Votre système",
+      systemLabel: "Un seul système",
       trust: ["Portée et prix fixes", "Vous possédez le système", "Bâti autour de votre flux"],
     },
     what: {
@@ -189,7 +189,7 @@ export const CONTENT: Record<Locale, Dict> = {
       kicker: "Une tarification qui vous protège",
       title: "Portée fixe. Prix fixe. Pas de compteur qui roule.",
       lead:
-        "Les agences facturées à l'heure n'ont aucun intérêt à aller vite. Plus ça traîne, plus elles gagnent. Blobex définit la portée, les livrables et le prix avant le développement. Les ajouts sont approuvés séparément.",
+        "Les agences facturées à l'heure n'ont aucun intérêt à aller vite. Plus ça traîne, plus elles gagnent. On définit la portée, les livrables et le prix avant le développement. Les ajouts sont approuvés séparément.",
     },
     contact: {
       kicker: "Amorçons la conversation",
@@ -201,7 +201,7 @@ export const CONTENT: Record<Locale, Dict> = {
       ok: "Merci, votre demande a été envoyée. Nous vous contacterons sous peu.",
       err: "Une erreur est survenue. Réessayez ou écrivez-nous directement.",
       reasonLabel: "Raison du contact",
-      reasons: ["Obtenir plus d'information", "Lancer ou discuter d'un nouveau projet", "Analyser une opportunité d'automatisation", "Améliorer ou remplacer un système existant", "Partenariat ou autre demande"],
+      reasons: ["Obtenir plus d'information", "Lancer ou discuter d'un nouveau projet", "Analyser une opportunité d'automatisation", "Améliorer ou remplacer un système existant"],
       errName: "Veuillez entrer votre nom complet.",
       errEmail: "Veuillez entrer une adresse courriel valide.",
       errPhone: "Veuillez entrer un numéro de téléphone valide.",

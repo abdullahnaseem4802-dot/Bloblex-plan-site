@@ -175,6 +175,13 @@ export const JOURNEY_UI: Record<Locale, {
   },
 };
 
+/** Micro status the system flashes while a step runs, per the client:
+    "sync, connected, 23ms, ai thinking, completed, verify, done". */
+export const SYSTEM_CHATTER: Record<Locale, string[]> = {
+  en: ["sync", "connected", "23 ms", "AI thinking", "verify", "completed", "done"],
+  fr: ["sync", "connecté", "23 ms", "IA réfléchit", "vérifié", "complété", "terminé"],
+};
+
 export function fmt(mins: number, locale: Locale): string {
   if (mins === 0) return "0";
   const h = Math.floor(mins / 60);

@@ -1,6 +1,6 @@
 import Header from "./Header";
 import Hero from "./Hero";
-import { WhatWeBuild, Process, Pricing } from "./Sections";
+import { WhatWeBuild, Process } from "./Sections";
 import ScaleGraph from "./ScaleGraph";
 import RequestJourney from "./RequestJourney";
 import DayFeed from "./DayFeed";
@@ -8,7 +8,7 @@ import SpeedRace from "./SpeedRace";
 import SystemComparison from "./SystemComparison";
 import SectorSwitcher from "./SectorSwitcher";
 import AutomationPicker from "./AutomationPicker";
-import CompetitionGraph from "./CompetitionGraph";
+import CostRace from "./CostRace";
 import Uncomparable from "./Uncomparable";
 import Contact from "./Contact";
 import Footer from "./Footer";
@@ -32,8 +32,7 @@ export default function Page({ locale }: { locale: Locale }) {
         <AutomationPicker locale={locale} />
         <Process locale={locale} />
         <SpeedRace locale={locale} />
-        <CompetitionGraph locale={locale} />
-        <Pricing locale={locale} />
+        <CostRace locale={locale} />
         <Uncomparable locale={locale} />
         <Contact locale={locale} />
       </main>

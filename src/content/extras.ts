@@ -77,14 +77,14 @@ export const COMPETITION_UI: Record<Locale, {
   en: {
     kicker: "Why the way you're billed matters",
     title: "Hourly agencies profit when the project is slow.",
-    lead: "Bill by the hour and there's no reason to move fast. The longer it takes, the more they earn. Blobex commits to a fixed scope, timeline and price. Your cost stays flat; only the progress goes up.",
+    lead: "Bill by the hour and there's no reason to move fast. The longer it takes, the more they earn. We commit to a fixed scope, timeline and price. Your cost stays flat; only the progress goes up.",
     themLabel: "Agencies, billed by the hour", usLabel: "Blobex, fixed price & timeline",
     xAxis: "Project progress", yAxis: "Your cost", note: "Fixed price, fixed timeline. It rises with how productive we are, not with the clock.",
   },
   fr: {
     kicker: "Pourquoi le mode de facturation compte",
     title: "Les agences à l'heure profitent quand le projet traîne.",
-    lead: "Facturé à l'heure, personne n'a intérêt à aller vite. Plus ça traîne, plus elles gagnent. Blobex s'engage sur une portée, un échéancier et un prix fixes. Votre coût reste stable ; seule la progression monte.",
+    lead: "Facturé à l'heure, personne n'a intérêt à aller vite. Plus ça traîne, plus elles gagnent. On s'engage sur une portée, un échéancier et un prix fixes. Votre coût reste stable ; seule la progression monte.",
     themLabel: "Agences, facturées à l'heure", usLabel: "Blobex, prix & échéancier fixes",
     xAxis: "Avancement du projet", yAxis: "Votre coût", note: "Prix fixe, échéancier fixe. Ça monte avec notre productivité, pas avec l'horloge.",
   },
@@ -142,12 +142,12 @@ export const POSITIONING_UI: Record<Locale, {
 }> = {
   en: {
     kicker: "Positioning & value",
-    title: "Blobex builds the client's system, not a generic product.",
-    lead: "Blobex is not selling programming hours. Blobex is building operational leverage.",
+    title: "We build the client's system, not a generic product.",
+    lead: "We are not selling programming hours. We are building operational leverage.",
     coreTitle: "Core positioning",
     whyTitle: "Why the investment matters",
     core: [
-      "Blobex studies how your business actually operates.",
+      "We study how your business actually operates.",
       "We create custom software, platforms and specialized tools around your rules, data and workflow.",
       "We go beyond a basic CRM: estimating, design, inventory, production, operations, billing, portals, AI and industry-specific tools.",
     ],
@@ -161,12 +161,12 @@ export const POSITIONING_UI: Record<Locale, {
   },
   fr: {
     kicker: "Positionnement & valeur",
-    title: "Blobex bâtit le système du client, pas un produit générique.",
-    lead: "Blobex ne vend pas des heures de programmation. Blobex bâtit un levier opérationnel.",
+    title: "On bâtit le système du client, pas un produit générique.",
+    lead: "On ne vend pas des heures de programmation. On bâtit un levier opérationnel.",
     coreTitle: "Positionnement de base",
     whyTitle: "Pourquoi l'investissement compte",
     core: [
-      "Blobex étudie le fonctionnement réel de votre entreprise.",
+      "On étudie le fonctionnement réel de votre entreprise.",
       "Nous créons des logiciels, plateformes et outils spécialisés autour de vos règles, vos données et votre flux.",
       "Nous allons au-delà d'un simple CRM : estimation, conception, inventaire, production, opérations, facturation, portails, IA et outils sectoriels.",
     ],

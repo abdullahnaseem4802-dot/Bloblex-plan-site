@@ -47,12 +47,12 @@ export default function Header({ locale, alt }: { locale: Locale; alt?: { en: st
           : "bg-white/92 border-[var(--color-line)] shadow-[0_8px_30px_-12px_rgba(10,22,40,.14)]"
       }`}
     >
-      <div className="container flex items-center justify-between h-[76px]">
+      <div className="container flex items-center justify-between gap-4 h-[76px]">
         <a href={path(locale)} aria-label="Blobex">
           <BrandLogo size={40} dark={overDark} />
         </a>
 
-        <nav className={`hidden lg:flex items-center gap-1 rounded-full border p-1.5 text-[0.92rem] font-medium transition-colors ${overDark ? "border-white/15 bg-white/10" : "border-[var(--color-line)] bg-[var(--color-panel)]/70"}`} aria-label="Primary">
+        <nav className={`hidden xl:flex items-center gap-1 rounded-full border p-1 text-[0.92rem] font-medium transition-colors ${overDark ? "border-white/15 bg-white/10" : "border-[var(--color-line)] bg-[var(--color-panel)]/70"}`} aria-label="Primary">
           {links.map((l) => {
             const on = l.key === activeKey;
             return (
@@ -72,13 +72,13 @@ export default function Header({ locale, alt }: { locale: Locale; alt?: { en: st
           })}
         </nav>
 
-        <div className="hidden lg:flex items-center gap-5">
+        <div className="hidden xl:flex items-center gap-4">
           <LanguageMenu locale={locale} alt={alts} dark={overDark} />
           <a href={pagePath(locale, "contact")} className="btn-primary">{t.cta}</a>
         </div>
 
         <button
-          className="lg:hidden flex flex-col gap-[5px] p-2"
+          className="xl:hidden flex flex-col gap-[5px] p-2"
           aria-label="Menu" aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
@@ -89,7 +89,7 @@ export default function Header({ locale, alt }: { locale: Locale; alt?: { en: st
       </div>
 
       {/* mobile drawer */}
-      <div className={`lg:hidden overflow-hidden bg-white border-b border-[var(--color-line)] transition-[max-height] duration-300 ${open ? "max-h-[420px]" : "max-h-0"}`}>
+      <div className={`xl:hidden overflow-hidden bg-white border-b border-[var(--color-line)] transition-[max-height] duration-300 ${open ? "max-h-[420px]" : "max-h-0"}`}>
         <nav className="container flex flex-col py-4 gap-1" aria-label="Mobile">
           {links.map((l) => {
             const on = l.key === activeKey;
