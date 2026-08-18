@@ -7,6 +7,10 @@ import { COMPARISON, NODES } from "@/content/comparison";
 
 const CX = 50, CY = 47; // centre of the stage, in %
 
+/* % -> viewBox units (1000 x 700) */
+const SX = (x: number) => x * 10;
+const SY = (y: number) => y * 7;
+
 /* State 2 wiring: every tool cross-wired to several others. Fixed pairs, so
    the tangle renders identically on server and client. */
 const SPAGHETTI: [number, number][] = [];
@@ -52,28 +56,58 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
         <div className="mt-8 grid gap-8 lg:grid-cols-[1.35fr_1fr] lg:items-center">
           {/* ---------------- diagram ---------------- */}
           <div className="relative aspect-[10/7] w-full rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white shadow-[var(--shadow-soft)]">
-            <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
-              {/* state 2: the tangle */}
+            {/* viewBox is 1000x700, exactly the 10/7 container ratio, so strokes
+                scale uniformly. Drawing lines in a stretched box was what made
+                them render as broken dashes. */}
+            <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1000 700" preserveAspectRatio="none" aria-hidden>
+              {/* state 2: everything wired to everything */}
               {tab === 1 && SPAGHETTI.map(([a, b], i) => (
-                <motion.line
-                  key={"s" + i}
-                  x1={NODES[a].x} y1={NODES[a].y} x2={NODES[b].x} y2={NODES[b].y}
-                  stroke="#e08133" strokeOpacity={0.5} strokeWidth={1} vectorEffect="non-scaling-stroke"
-                  initial={reduce ? undefined : { pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 0.6, delay: (i % 12) * 0.03 }}
-                />
+                <g key={"s" + i}>
+                  <motion.line
+                    x1={SX(NODES[a].x)} y1={SY(NODES[a].y)} x2={SX(NODES[b].x)} y2={SY(NODES[b].y)}
+                    stroke="#e08133" strokeOpacity={0.45} strokeWidth={1.2} strokeLinecap="round"
+                    initial={reduce ? undefined : { opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: (i % 12) * 0.03 }}
+                  />
+                  {!reduce && i % 4 === 0 && (
+                    <motion.circle
+                      r={3} fill="#e08133"
+                      initial={{ cx: SX(NODES[a].x), cy: SY(NODES[a].y), opacity: 0 }}
+                      animate={{
+                        cx: [SX(NODES[a].x), SX(NODES[b].x)],
+                        cy: [SY(NODES[a].y), SY(NODES[b].y)],
+                        opacity: [0, 1, 1, 0],
+                      }}
+                      transition={{ duration: 3.2, repeat: Infinity, delay: (i % 8) * 0.55, ease: "linear" }}
+                    />
+                  )}
+                </g>
               ))}
+
               {/* state 3: clean spokes into the owned core */}
               {tab === 2 && NODES.map((n, i) => (
-                <motion.line
-                  key={"r" + i}
-                  x1={n.x} y1={n.y} x2={CX} y2={CY}
-                  stroke="#29abe2" strokeOpacity={0.6} strokeWidth={1} vectorEffect="non-scaling-stroke"
-                  initial={reduce ? undefined : { pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 0.55, delay: i * 0.045 }}
-                />
+                <g key={"r" + i}>
+                  <motion.line
+                    x1={SX(n.x)} y1={SY(n.y)} x2={SX(CX)} y2={SY(CY)}
+                    stroke="#29abe2" strokeOpacity={0.55} strokeWidth={1.4} strokeLinecap="round"
+                    initial={reduce ? undefined : { opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: i * 0.04 }}
+                  />
+                  {!reduce && (
+                    <motion.circle
+                      r={3.2} fill="#29abe2"
+                      initial={{ cx: SX(n.x), cy: SY(n.y), opacity: 0 }}
+                      animate={{
+                        cx: [SX(n.x), SX(CX)],
+                        cy: [SY(n.y), SY(CY)],
+                        opacity: [0, 1, 1, 0],
+                      }}
+                      transition={{ duration: 2.6, repeat: Infinity, delay: i * 0.28, ease: "linear" }}
+                    />
+                  )}
+                </g>
               ))}
             </svg>
 

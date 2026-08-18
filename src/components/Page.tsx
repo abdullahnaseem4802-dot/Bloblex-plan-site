@@ -1,4 +1,3 @@
-import Splash from "./Splash";
 import Header from "./Header";
 import Hero from "./Hero";
 import { WhatWeBuild, Process, Pricing } from "./Sections";
@@ -18,7 +17,6 @@ import type { Locale } from "@/content/site";
 export default function Page({ locale }: { locale: Locale }) {
   return (
     <>
-      <Splash />
       <JsonLd locale={locale} />
       <Header locale={locale} />
       <main>

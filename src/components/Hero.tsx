@@ -4,7 +4,6 @@ import { motion, useReducedMotion } from "motion/react";
 import TypeIn from "./TypeIn";
 import HeroAtmosphere from "./HeroAtmosphere";
 import HeroStage3D from "./HeroStage3D";
-import { SPLASH_DONE } from "./SplashController";
 import { CONTENT, type Locale } from "@/content/site";
 
 export default function Hero({ locale }: { locale: Locale }) {
@@ -12,20 +11,18 @@ export default function Hero({ locale }: { locale: Locale }) {
   const reduce = useReducedMotion();
   const base = locale === "en" ? "" : "/fr";
 
-  /* The headline reveal is part of the site intro: it plays once, on a fresh
-     open or reload, and starts the instant the splash curtain lifts.
-     "static" = internal navigation, "wait" = splash still up, "play" = reveal. */
+  /* The headline reveal is the site intro. There is no splash screen any
+     more, so it plays once per session on a real page load and stays static
+     on internal navigation. */
   const [phase, setPhase] = useState<"static" | "wait" | "play">("static");
   useEffect(() => {
-    const w = window as unknown as { __blobexSplashDone?: boolean };
-    if (w.__blobexSplashDone || !document.documentElement.hasAttribute("data-splash")) return;
-
-    setPhase("wait");
-    const play = () => setPhase("play");
-    window.addEventListener(SPLASH_DONE, play, { once: true });
-    // safety net: never leave the headline hidden if the event is missed
-    const failsafe = setTimeout(play, 6000);
-    return () => { window.removeEventListener(SPLASH_DONE, play); clearTimeout(failsafe); };
+    try {
+      if (sessionStorage.getItem("blobex_intro")) return;
+      sessionStorage.setItem("blobex_intro", "1");
+      setPhase("play");
+    } catch {
+      /* private mode: just skip the intro */
+    }
   }, []);
 
   const intro = phase === "play";

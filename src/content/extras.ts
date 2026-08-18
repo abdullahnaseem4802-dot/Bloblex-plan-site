@@ -43,6 +43,7 @@ export const AUTOMATION_UI: Record<Locale, {
 export const SCALE_UI: Record<Locale, {
   kicker: string; title: string; lead: string;
   panelA: string; panelB: string; work: string; time: string; capacity: string; xAxis: string; yAxis: string; note: string;
+  workShort: string; timeShort: string; capacityShort: string;
 }> = {
   en: {
     kicker: "Scale without the chaos",
@@ -51,6 +52,7 @@ export const SCALE_UI: Record<Locale, {
     panelA: "Without a connected system",
     panelB: "With a Blobex system",
     work: "Admin work", time: "Your free time", capacity: "Your capacity",
+    workShort: "Admin", timeShort: "Free time", capacityShort: "Capacity",
     xAxis: "Number of clients →", yAxis: "Workload / time",
     note: "Same growth, a completely different curve.",
   },
@@ -61,6 +63,7 @@ export const SCALE_UI: Record<Locale, {
     panelA: "Sans système connecté",
     panelB: "Avec un système Blobex",
     work: "Travail administratif", time: "Votre temps libre", capacity: "Votre capacité",
+    workShort: "Admin", timeShort: "Temps libre", capacityShort: "Capacité",
     xAxis: "Nombre de clients →", yAxis: "Charge / temps",
     note: "Même croissance, une courbe complètement différente.",
   },

@@ -9,7 +9,11 @@ import { SCALE_UI } from "@/content/extras";
    more clients → more admin work / less time WITHOUT a system, flat + rising capacity WITH one. */
 function Chart({
   lines, yLabel, xLabel, reduce,
-}: { lines: { d: string; color: string; dash?: boolean; delay?: number }[]; yLabel: string; xLabel: string; reduce: boolean | null }) {
+}: {
+  /* label/lx/ly draw the series name right on the curve, because people scan */
+  lines: { d: string; color: string; dash?: boolean; delay?: number; label?: string; lx?: number; ly?: number }[];
+  yLabel: string; xLabel: string; reduce: boolean | null;
+}) {
   return (
     <svg viewBox="0 0 360 240" className="w-full h-auto" aria-hidden>
       <ChartFrame yLabel={yLabel} xLabel={xLabel} />
@@ -23,6 +27,20 @@ function Chart({
           transition={{ duration: 1.1, ease: "easeInOut", delay: l.delay ?? 0 }}
         />
       ))}
+      {lines.map((l, i) =>
+        l.label ? (
+          <text
+            key={"t" + i}
+            x={l.lx} y={l.ly}
+            textAnchor="end"
+            fontSize="12"
+            fontWeight="700"
+            fill={l.color}
+          >
+            {l.label}
+          </text>
+        ) : null
+      )}
     </svg>
   );
 }
@@ -60,8 +78,8 @@ export default function ScaleGraph({ locale }: { locale: Locale }) {
               <figcaption className="mb-2 font-semibold text-[var(--color-ink)]">{t.panelA}</figcaption>
               <Chart reduce={reduce} yLabel={t.yAxis} xLabel={t.xAxis}
                 lines={[
-                  { d: "M54 182 C150 174 235 96 330 40", color: RED },
-                  { d: "M54 52 C150 76 240 160 330 180", color: SLATE, dash: true, delay: 0.2 },
+                  { d: "M54 182 C150 174 235 96 330 40", color: RED, label: t.workShort, lx: 326, ly: 32 },
+                  { d: "M54 52 C150 76 240 160 330 180", color: SLATE, dash: true, delay: 0.2, label: t.timeShort, ly: 172, lx: 326 },
                 ]} />
               <Legend items={[{ color: RED, label: t.work }, { color: SLATE, label: t.time, dash: true }]} />
             </figure>
@@ -72,8 +90,8 @@ export default function ScaleGraph({ locale }: { locale: Locale }) {
               <figcaption className="mb-2 font-semibold text-[var(--color-brand-800)]">{t.panelB}</figcaption>
               <Chart reduce={reduce} yLabel={t.yAxis} xLabel={t.xAxis}
                 lines={[
-                  { d: "M54 156 C150 154 240 151 330 148", color: BLUE },
-                  { d: "M54 164 C150 138 240 98 330 50", color: GREEN, delay: 0.2 },
+                  { d: "M54 156 C150 154 240 151 330 148", color: BLUE, label: t.workShort, lx: 326, ly: 166 },
+                  { d: "M54 164 C150 138 240 98 330 50", color: GREEN, delay: 0.2, label: t.capacityShort, lx: 326, ly: 42 },
                 ]} />
               <Legend items={[{ color: BLUE, label: t.work }, { color: GREEN, label: t.capacity }]} />
             </figure>
