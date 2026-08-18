@@ -36,13 +36,13 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
         </Reveal>
 
         {/* state switcher */}
-        <div className="mt-10 flex flex-wrap gap-2">
+        <div className="mt-10 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
           {t.tabs.map((label, i) => (
             <button
               key={label}
               onClick={() => setTab(i)}
               aria-pressed={tab === i}
-              className={`rounded-full border px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
+              className={`rounded-full border px-4 py-2.5 text-center text-sm font-semibold transition-all duration-200 last:col-span-2 sm:last:col-span-1 ${
                 tab === i
                   ? "border-transparent bg-[var(--color-brand-500)] text-white shadow-[0_10px_30px_-8px_rgba(41,171,226,.8)]"
                   : "border-[var(--color-line)] bg-white text-[var(--color-slate)] hover:border-[var(--color-brand-300)] hover:text-[var(--color-ink)]"

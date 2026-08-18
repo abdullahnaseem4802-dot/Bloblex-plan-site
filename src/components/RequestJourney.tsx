@@ -260,12 +260,12 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
             </div>
 
             {/* mode switch */}
-            <div className="flex flex-wrap gap-2 border-t border-[var(--color-line)] px-5 py-4 md:px-7">
+            <div className="grid grid-cols-2 gap-2 border-t border-[var(--color-line)] px-5 py-4 sm:flex sm:flex-wrap md:px-7">
               <ModeBtn on={mode === "manual"} tone={AMBER} onClick={() => switchTo("manual")}>{t.modeManual}</ModeBtn>
               <ModeBtn on={mode === "system"} tone={GREEN} onClick={() => switchTo("system")}>{t.modeSystem}</ModeBtn>
               <button
                 onClick={restart}
-                className="rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-slate)] transition-colors hover:text-[var(--color-ink)]"
+                className="col-span-2 rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-slate)] transition-colors hover:text-[var(--color-ink)] sm:col-span-1"
               >
                 ↻ {t.restart}
               </button>

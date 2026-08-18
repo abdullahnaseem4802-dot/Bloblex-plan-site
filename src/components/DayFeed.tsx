@@ -72,8 +72,8 @@ export default function DayFeed({ locale }: { locale: Locale }) {
         <Reveal delay={100}>
           <div ref={boxRef} className="mt-10 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white shadow-[var(--shadow-card)]">
             {/* controls */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-line)] px-5 py-4 md:px-7">
-              <div className="flex flex-wrap gap-2">
+            <div className="flex flex-col items-stretch gap-3 border-b border-[var(--color-line)] px-5 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between md:px-7">
+              <div className="grid grid-cols-[1fr_1fr_auto] gap-2 sm:flex sm:flex-wrap">
                 <button
                   onClick={() => setPlaying((p) => !p)}
                   className="rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-panel)]"

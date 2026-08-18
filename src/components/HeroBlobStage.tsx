@@ -69,8 +69,7 @@ export default function HeroBlobStage({ chips, systemLabel }: { chips: string[];
 
   return (
     <div
-      className="relative mx-auto"
-      style={{ width: "min(100%, 500px)", aspectRatio: "1 / 1" }}
+      className="hero-stage-box relative mx-auto"
       aria-hidden="true"
     >
       <div className="absolute inset-0" style={{ containerType: "size" }}>

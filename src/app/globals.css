@@ -348,6 +348,14 @@ html[data-splash] .sheen::after { animation-delay: 4s; }
 
 /* Hero stage placement: the client wants the character lifted level with the
    headline and nudged right, with clear air between it and the copy. */
+/* The stage reserves a square for the bubbles to orbit in. On a phone that
+   square left a dead band under the character before the next section, so it
+   is flatter there and only becomes square once there is room. */
+.hero-stage-box { width: min(100%, 500px); aspect-ratio: 1 / 0.78; }
+@media (min-width: 640px) {
+  .hero-stage-box { aspect-ratio: 1 / 1; }
+}
+
 @media (min-width: 1024px) {
   .hero-stage-offset { transform: translate(96px, 14px); }
   /* the hero has spare margin on the left, so the copy leans into it and

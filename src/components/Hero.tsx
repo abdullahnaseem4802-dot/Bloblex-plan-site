@@ -30,9 +30,9 @@ export default function Hero({ locale }: { locale: Locale }) {
   const heroDelay = intro ? 0 : 0.1;
 
   return (
-    <section id="hero" className="hero-dark relative overflow-hidden pt-[132px] pb-44 md:pt-[148px] md:pb-56">
+    <section id="hero" className="hero-dark relative overflow-hidden pt-[132px] pb-6 sm:pb-24 md:pt-[148px] md:pb-56">
       <HeroAtmosphere />
-      <div className="container grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-6 items-center">
+      <div className="container grid gap-4 sm:gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-6 items-center">
         {/* Copy */}
         <div className="hero-copy-shift max-w-xl min-w-0">
           <motion.p
