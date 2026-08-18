@@ -11,7 +11,7 @@ function Chart({
   lines, yLabel, xLabel, reduce,
 }: {
   /* label/lx/ly draw the series name right on the curve, because people scan */
-  lines: { d: string; color: string; dash?: boolean; delay?: number; label?: string; lx?: number; ly?: number }[];
+  lines: { d: string; color: string; dash?: boolean; delay?: number; label?: string; lx?: number; ly?: number; anchor?: "start" | "end" }[];
   yLabel: string; xLabel: string; reduce: boolean | null;
 }) {
   return (
@@ -32,7 +32,7 @@ function Chart({
           <text
             key={"t" + i}
             x={l.lx} y={l.ly}
-            textAnchor="end"
+            textAnchor={l.anchor ?? "end"}
             fontSize="12"
             fontWeight="700"
             fill={l.color}
@@ -79,7 +79,7 @@ export default function ScaleGraph({ locale }: { locale: Locale }) {
               <Chart reduce={reduce} yLabel={t.yAxis} xLabel={t.xAxis}
                 lines={[
                   { d: "M54 182 C150 174 235 96 330 40", color: RED, label: t.workShort, lx: 326, ly: 32 },
-                  { d: "M54 52 C150 76 240 160 330 180", color: SLATE, dash: true, delay: 0.2, label: t.timeShort, ly: 172, lx: 326 },
+                  { d: "M54 52 C150 76 240 160 330 180", color: SLATE, dash: true, delay: 0.2, label: t.timeShort, ly: 44, lx: 74, anchor: "start" },
                 ]} />
               <Legend items={[{ color: RED, label: t.work }, { color: SLATE, label: t.time, dash: true }]} />
             </figure>

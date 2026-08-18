@@ -5,7 +5,8 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 const SIZE = 460;            // stage box, square
 const C = SIZE / 2;
 const RX = 170, RY = 132;    // where the bubbles wait
-const GRAB_MS = 1500;        // per bubble
+const REACH_MS = 620;        // arm goes out and takes hold
+const PULL_MS = 640;         // arm hauls the bubble back in
 const PAYOFF_MS = 2600;      // how long "One System" stays
 
 /** The hero act, as the client described it: the slime reaches out, grabs each
@@ -14,7 +15,8 @@ const PAYOFF_MS = 2600;      // how long "One System" stays
 export default function HeroBlobStage({ chips, systemLabel }: { chips: string[]; systemLabel: string }) {
   const reduce = useReducedMotion();
   const [eaten, setEaten] = useState(0);        // how many are inside
-  const [reaching, setReaching] = useState(-1); // which one the tendril has hold of
+  const [reaching, setReaching] = useState(-1); // which one the arm has hold of
+  const [pulling, setPulling] = useState(-1);   // which one is being hauled in
   const [payoff, setPayoff] = useState(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
@@ -25,6 +27,7 @@ export default function HeroBlobStage({ chips, systemLabel }: { chips: string[];
 
   useEffect(() => {
     if (reduce) { setEaten(chips.length); return; }
+    setPulling(-1);
     const clear = () => { timers.current.forEach(clearTimeout); timers.current = []; };
     let stop = false;
 
@@ -40,13 +43,21 @@ export default function HeroBlobStage({ chips, systemLabel }: { chips: string[];
         }, PAYOFF_MS));
         return;
       }
+      /* beat 1: the arm goes out and takes hold */
       setReaching(i);
+      setPulling(-1);
       timers.current.push(setTimeout(() => {
         if (stop) return;
-        setEaten(i + 1);
-        setReaching(-1);
-        timers.current.push(setTimeout(() => cycle(i + 1), 180));
-      }, GRAB_MS));
+        /* beat 2: the arm hauls it back in */
+        setPulling(i);
+        timers.current.push(setTimeout(() => {
+          if (stop) return;
+          setEaten(i + 1);
+          setReaching(-1);
+          setPulling(-1);
+          timers.current.push(setTimeout(() => cycle(i + 1), 200));
+        }, PULL_MS));
+      }, REACH_MS));
     };
 
     timers.current.push(setTimeout(() => cycle(0), 700));
@@ -75,9 +86,13 @@ export default function HeroBlobStage({ chips, systemLabel }: { chips: string[];
                 strokeWidth={9}
                 strokeLinecap="round"
                 initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: [0, 1, 1], opacity: [0, 1, 0.85] }}
+                animate={
+                  pulling === reaching
+                    ? { pathLength: 0.05, opacity: 0.9 }   /* retracting, bubble in tow */
+                    : { pathLength: 1, opacity: 1 }        /* reaching out */
+                }
                 exit={{ pathLength: 0, opacity: 0 }}
-                transition={{ duration: GRAB_MS / 1000, times: [0, 0.45, 1], ease: "easeInOut" }}
+                transition={{ duration: (pulling === reaching ? PULL_MS : REACH_MS) / 1000, ease: pulling === reaching ? [0.6, 0, 0.3, 1] : "easeOut" }}
               />
             )}
           </AnimatePresence>
@@ -95,7 +110,8 @@ export default function HeroBlobStage({ chips, systemLabel }: { chips: string[];
         {/* the bubbles */}
         {seats.map((seat, i) => {
           const inside = i < eaten;
-          const held = reaching === i;
+          const held = reaching === i && pulling !== i;
+          const hauled = pulling === i;
           return (
             <motion.span
               key={seat.label}
@@ -104,12 +120,19 @@ export default function HeroBlobStage({ chips, systemLabel }: { chips: string[];
               initial={false}
               animate={
                 inside
-                  ? { x: "-50%", y: "-50%", left: "50%", top: "50%", scale: 0, opacity: 0 }
-                  : held
-                    ? { x: "-50%", y: "-50%", scale: [1, 1.12, 0.9], opacity: 1 }
-                    : { x: "-50%", y: "-50%", scale: 1, opacity: 1 }
+                  ? { left: "50%", top: "50%", x: "-50%", y: "-50%", scale: 0, opacity: 0 }
+                  : hauled
+                    /* dragged along the arm, back into the blob */
+                    ? { left: "50%", top: "50%", x: "-50%", y: "-50%", scale: 0.25, opacity: 0.9 }
+                    : held
+                      /* caught: a wobble, but it has not moved yet */
+                      ? { x: "-50%", y: "-50%", scale: [1, 1.14, 1.04], opacity: 1 }
+                      : { x: "-50%", y: "-50%", scale: 1, opacity: 1 }
               }
-              transition={{ duration: held ? GRAB_MS / 1000 : 0.55, ease: [0.5, 0, 0.2, 1] }}
+              transition={{
+                duration: hauled ? PULL_MS / 1000 : held ? REACH_MS / 1000 : 0.5,
+                ease: hauled ? [0.6, 0, 0.3, 1] : "easeOut",
+              }}
             >
               {seat.label}
             </motion.span>

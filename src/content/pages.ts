@@ -183,8 +183,8 @@ export const PAGE_HERO: Record<string, Record<Locale, Hero>> = {
     fr: { kicker: "Notre façon de travailler", title: "Un processus clair, avec le prix défini avant de bâtir.", lead: "Comprendre, mesurer, concevoir, bâtir, déployer, améliorer, avec une portée, un échéancier et un prix fixes convenus d'avance." },
   },
   pricing: {
-    en: { kicker: "Pricing that protects you", title: "Fixed scope. Fixed price. No meter running.", lead: "Project-based pricing defined before development. Additions are approved separately, so you always know what you're paying for." },
-    fr: { kicker: "Une tarification qui vous protège", title: "Portée fixe. Prix fixe. Pas de compteur qui roule.", lead: "Tarification par projet définie avant le développement. Les ajouts sont approuvés séparément, vous savez toujours ce que vous payez." },
+    en: { kicker: "Pricing that protects you", title: "The price is agreed before we build, not after.", lead: "Project-based pricing defined before development. Additions are approved separately, so you always know what you're paying for." },
+    fr: { kicker: "Une tarification qui vous protège", title: "Le prix est convenu avant de bâtir, pas après.", lead: "Tarification par projet définie avant le développement. Les ajouts sont approuvés séparément, vous savez toujours ce que vous payez." },
   },
   contact: {
     en: { kicker: "Start a conversation", title: "Tell us what slows you down.", lead: "The start of a useful business conversation, not a long questionnaire." },
