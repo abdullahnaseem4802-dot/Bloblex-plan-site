@@ -2,7 +2,7 @@ import Header from "./Header";
 import Hero from "./Hero";
 import { WhatWeBuild, Process, Pricing } from "./Sections";
 import ScaleGraph from "./ScaleGraph";
-import TimeGame from "./TimeGame";
+import RequestJourney from "./RequestJourney";
 import SystemComparison from "./SystemComparison";
 import SectorSwitcher from "./SectorSwitcher";
 import AutomationPicker from "./AutomationPicker";
@@ -23,7 +23,7 @@ export default function Page({ locale }: { locale: Locale }) {
         <Hero locale={locale} />
         <WhatWeBuild locale={locale} />
         <ScaleGraph locale={locale} />
-        <TimeGame locale={locale} />
+        <RequestJourney locale={locale} />
         <SystemComparison locale={locale} />
         <SectorSwitcher locale={locale} />
         <AutomationPicker locale={locale} />

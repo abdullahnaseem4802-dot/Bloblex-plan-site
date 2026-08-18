@@ -1,0 +1,253 @@
+"use client";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Reveal from "./Reveal";
+import { type Locale } from "@/content/site";
+import { STEPS, MANUAL_TOTAL, SYSTEM_TOTAL, DECISION_COUNT, JOURNEY_UI, fmt } from "@/content/journey";
+
+type Mode = "manual" | "system";
+
+const AMBER = "#d97316";
+const GREEN = "#0f9d63";
+const BLUE = "#1787c4";
+
+export default function RequestJourney({ locale }: { locale: Locale }) {
+  const t = JOURNEY_UI[locale];
+  const reduce = useReducedMotion();
+
+  const [mode, setMode] = useState<Mode>("manual");
+  const [done, setDone] = useState(0);          // steps completed
+  const [running, setRunning] = useState(false); // system mode auto-advancing
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clear = () => { if (timer.current) clearTimeout(timer.current); timer.current = null; };
+  useEffect(() => clear, []);
+
+  const spent = STEPS.slice(0, done).reduce(
+    (a, s) => a + (mode === "manual" ? s.manual.minutes : s.system.minutes), 0
+  );
+  const finished = done >= STEPS.length;
+  const nextStep = STEPS[done];
+  /* in system mode the run halts on any step that needs a human decision */
+  const waitingOnYou = mode === "system" && !finished && !running && !!nextStep?.system.you && done > 0;
+
+  const reset = useCallback((m: Mode) => {
+    clear(); setRunning(false); setDone(0); setMode(m);
+  }, []);
+
+  /* system mode: roll forward until a decision is required */
+  const roll = useCallback((from: number) => {
+    clear();
+    setRunning(true);
+    const tick = (i: number) => {
+      if (i >= STEPS.length) { setRunning(false); return; }
+      timer.current = setTimeout(() => {
+        setDone(i + 1);
+        const upcoming = STEPS[i + 1];
+        if (upcoming?.system.you) { setRunning(false); return; } // hand control back
+        tick(i + 1);
+      }, reduce ? 60 : 520);
+    };
+    tick(from);
+  }, [reduce]);
+
+  const statusBar = (() => {
+    if (mode === "manual") {
+      if (finished) return { text: t.manualDone, cta: null as null | string, tone: AMBER };
+      return {
+        text: done === 0 ? t.manualIntro : `${t.stepOf(done + 1, STEPS.length)} ${t.manualHint}`,
+        cta: `${t.manualNext}  +${fmt(nextStep.manual.minutes, locale)}`,
+        tone: AMBER,
+      };
+    }
+    if (finished) return { text: t.systemDone(fmt(SYSTEM_TOTAL, locale), DECISION_COUNT), cta: null, tone: GREEN };
+    if (waitingOnYou) return { text: t.systemWaiting, cta: `${nextStep.system.you![locale]}  ${fmt(nextStep.system.minutes, locale)}`, tone: BLUE };
+    if (running) return { text: t.systemIntro, cta: null, tone: GREEN };
+    return { text: t.systemIntro, cta: `▶  ${t.systemPlay}`, tone: GREEN };
+  })();
+
+  const onCta = () => {
+    if (mode === "manual") { setDone((d) => Math.min(d + 1, STEPS.length)); return; }
+    roll(done);
+  };
+
+  return (
+    <section id="time" className="border-y border-[var(--color-line)] bg-[var(--color-panel)] py-20 md:py-28">
+      <div className="container">
+        <Reveal className="max-w-3xl">
+          <p className="mb-4 text-[0.78rem] font-bold uppercase tracking-[0.2em] text-[var(--color-brand-600)]">{t.kicker}</p>
+          <h2 className="text-3xl md:text-[2.6rem] font-semibold leading-[1.1] tracking-[-0.03em]">{t.heading}</h2>
+        </Reveal>
+
+        <Reveal delay={100}>
+          <div className="mt-10 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white shadow-[var(--shadow-card)]">
+            {/* status bar */}
+            <div className="flex flex-col gap-3 border-b border-[var(--color-line)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between md:px-7">
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={statusBar.text}
+                  initial={reduce ? undefined : { opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={reduce ? undefined : { opacity: 0, y: -4 }}
+                  transition={{ duration: 0.25 }}
+                  className="text-sm font-medium text-[var(--color-ink-soft)]"
+                >
+                  {statusBar.text}
+                </motion.p>
+              </AnimatePresence>
+
+              {statusBar.cta && (
+                <motion.button
+                  onClick={onCta}
+                  /* pulse the glow, never the size: a click target must not move */
+                  animate={
+                    waitingOnYou && !reduce
+                      ? { boxShadow: [`0 0 0 0 ${statusBar.tone}00`, `0 0 0 10px ${statusBar.tone}00`, `0 0 0 0 ${statusBar.tone}00`] }
+                      : {}
+                  }
+                  transition={{ duration: 1.6, repeat: waitingOnYou ? Infinity : 0 }}
+                  className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:-translate-y-px ${waitingOnYou ? "bx-await" : "shadow-[0_10px_26px_-10px_rgba(10,22,40,.5)]"}`}
+                  style={{ background: statusBar.tone }}
+                >
+                  {statusBar.cta}
+                </motion.button>
+              )}
+            </div>
+
+            {/* headline + running total */}
+            <div className="flex flex-wrap items-start justify-between gap-4 px-5 pt-6 md:px-7">
+              <div>
+                <h3 className="text-lg font-semibold md:text-xl">{t.title}</h3>
+                <p className="mt-1 text-sm text-[var(--color-slate)]">
+                  {mode === "manual" ? t.subManual : t.subSystem}
+                </p>
+              </div>
+              <div className="text-right">
+                <motion.p
+                  key={spent}
+                  initial={reduce ? undefined : { scale: 0.85, opacity: 0.5 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="font-[family-name:var(--font-display)] text-3xl font-bold md:text-[2.6rem]"
+                  style={{ color: mode === "manual" ? AMBER : GREEN }}
+                >
+                  {fmt(spent, locale)}
+                </motion.p>
+                <p className="text-[0.62rem] font-bold tracking-[0.12em] text-[var(--color-mute)]">{t.ofYourTime}</p>
+              </div>
+            </div>
+
+            {/* the twelve steps */}
+            <ol className="grid grid-cols-2 gap-3 px-5 py-6 md:grid-cols-3 md:px-7 lg:grid-cols-6">
+              {STEPS.map((s, i) => {
+                const complete = i < done;
+                const isNext = i === done && !finished;
+                const cfg = mode === "manual" ? s.manual : s.system;
+                const needsYou = mode === "system" && !!s.system.you;
+                const activeTone = mode === "manual" ? AMBER : needsYou && isNext ? BLUE : GREEN;
+
+                return (
+                  <motion.li
+                    key={s.label.en}
+                    layout
+                    className="relative rounded-[var(--radius)] border p-3.5 transition-colors"
+                    style={{
+                      borderColor: complete ? `${activeTone}66` : isNext ? activeTone : "var(--color-line)",
+                      background: complete ? `${activeTone}0f` : isNext ? `${activeTone}0a` : "#fff",
+                      boxShadow: isNext ? `0 0 0 3px ${activeTone}22` : undefined,
+                    }}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-[0.78rem] font-semibold leading-snug text-[var(--color-ink)]">{s.label[locale]}</p>
+                      {complete && <span style={{ color: activeTone }} className="text-sm font-bold">✓</span>}
+                    </div>
+
+                    {complete ? (
+                      <>
+                        <p className="mt-2 font-[family-name:var(--font-display)] text-lg font-bold" style={{ color: activeTone }}>
+                          {fmt(cfg.minutes, locale)}
+                        </p>
+                        <p className="text-[0.52rem] font-bold tracking-[0.08em] text-[var(--color-mute)]">
+                          {cfg.note[locale]}
+                        </p>
+                      </>
+                    ) : isNext ? (
+                      <>
+                        <span
+                          className="mt-2 block h-3 w-3 rounded-full"
+                          style={{ background: activeTone, boxShadow: `0 0 0 5px ${activeTone}26` }}
+                        />
+                        <p className="mt-2 text-[0.52rem] font-bold tracking-[0.08em]" style={{ color: activeTone }}>
+                          {needsYou ? t.systemWaitHint : t.todo}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="mt-3 text-[var(--color-mute)]">&mdash;</p>
+                    )}
+                  </motion.li>
+                );
+              })}
+            </ol>
+
+            {/* the two totals, side by side */}
+            <div className="space-y-2.5 border-t border-[var(--color-line)] px-5 py-6 md:px-7">
+              <Bar label={t.byHand} value={MANUAL_TOTAL} max={MANUAL_TOTAL} color={AMBER} locale={locale} />
+              <Bar label={t.yourSystem} value={SYSTEM_TOTAL} max={MANUAL_TOTAL} color={GREEN} locale={locale} />
+            </div>
+
+            {/* mode switch */}
+            <div className="flex flex-wrap gap-2 border-t border-[var(--color-line)] px-5 py-4 md:px-7">
+              <ModeBtn on={mode === "manual"} tone={AMBER} onClick={() => reset("manual")}>{t.modeManual}</ModeBtn>
+              <ModeBtn on={mode === "system"} tone={GREEN} onClick={() => reset("system")}>{t.modeSystem}</ModeBtn>
+              <button
+                onClick={() => reset(mode)}
+                className="rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-slate)] transition-colors hover:text-[var(--color-ink)]"
+              >
+                ↻ {t.restart}
+              </button>
+            </div>
+          </div>
+        </Reveal>
+
+        <p className="mt-5 max-w-[62ch] text-sm text-[var(--color-mute)]">{t.closing}</p>
+      </div>
+    </section>
+  );
+}
+
+function ModeBtn({ on, tone, onClick, children }: { on: boolean; tone: string; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      aria-pressed={on}
+      className="rounded-full border px-4 py-2 text-sm font-semibold transition-all"
+      style={
+        on
+          ? { background: tone, borderColor: "transparent", color: "#fff", boxShadow: `0 10px 26px -10px ${tone}` }
+          : { borderColor: "var(--color-line)", color: "var(--color-slate)", background: "#fff" }
+      }
+    >
+      {children}
+    </button>
+  );
+}
+
+function Bar({ label, value, max, color, locale }: { label: string; value: number; max: number; color: string; locale: Locale }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="w-24 shrink-0 text-[0.78rem] font-semibold text-[var(--color-slate)] sm:w-28">{label}</span>
+      <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--color-line)]">
+        <motion.span
+          className="block h-full rounded-full"
+          style={{ background: color }}
+          initial={{ width: 0 }}
+          whileInView={{ width: `${(value / max) * 100}%` }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        />
+      </div>
+      <span className="w-16 shrink-0 text-right text-[0.82rem] font-bold" style={{ color }}>
+        {fmt(value, locale)}
+      </span>
+    </div>
+  );
+}

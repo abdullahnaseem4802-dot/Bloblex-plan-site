@@ -337,3 +337,11 @@ html[data-splash] .sheen::after { animation-delay: 4s; }
     radial-gradient(45% 45% at 10% 90%, rgba(240,145,62,.10), transparent 60%),
     linear-gradient(180deg, #0a1628 0%, #060c18 100%);
 }
+
+/* the journey CTA when the system is waiting on a human decision */
+.bx-await { animation: awaitGlow 1.8s ease-in-out infinite; }
+@keyframes awaitGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(23,135,196,.55); }
+  50%      { box-shadow: 0 0 0 12px rgba(23,135,196,0); }
+}
+@media (prefers-reduced-motion: reduce) { .bx-await { animation: none; } }
