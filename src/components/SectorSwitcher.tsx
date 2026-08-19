@@ -1,18 +1,46 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import Reveal from "./Reveal";
 import BlobWithAccessory from "./BlobWithAccessory";
+import AppIcon, { type AppKey } from "./AppIcon";
 import { CONTENT, type Locale } from "@/content/site";
 import { SECTORS, SECTOR_UI } from "@/content/sectors";
+
+/* Client: "the logos and stuff are still low quality / doesn't fit / awkward".
+   Each module row now carries a real app tile instead of a bullet dot, cycling
+   through the set so a sector's system reads as a suite of products. */
+const MODULE_APPS: AppKey[] = ["orders", "inventory", "scheduling", "quality", "portal", "invoicing", "crm", "docs", "payroll"];
+const appFor = (i: number) => MODULE_APPS[i % MODULE_APPS.length];
 
 export default function SectorSwitcher({ locale }: { locale: Locale }) {
   const t = CONTENT[locale].sectors;
   const ui = SECTOR_UI[locale];
   const [active, setActive] = useState(SECTORS[0].id);
+  const [held, setHeld] = useState(false);   // the visitor picked one themselves
+  const boxRef = useRef<HTMLDivElement>(null);
   const idx = SECTORS.findIndex((s) => s.id === active);
+
+  /* Nobody should have to click to find out what this section does, so it
+     walks through the sectors on its own while it is on screen, and stands
+     still the moment the visitor chooses one. */
+  useEffect(() => {
+    const el = boxRef.current;
+    if (held || !el) return;
+    let id: ReturnType<typeof setInterval> | null = null;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !id) {
+        id = setInterval(() => setActive((cur) => {
+          const i = SECTORS.findIndex((x) => x.id === cur);
+          return SECTORS[(i + 1) % SECTORS.length].id;
+        }), 2600);
+      } else if (!e.isIntersecting && id) { clearInterval(id); id = null; }
+    }, { threshold: 0.3 });
+    io.observe(el);
+    return () => { if (id) clearInterval(id); io.disconnect(); };
+  }, [held]);
   const sector = SECTORS[idx] ?? SECTORS[0];
-  const cycle = (d: number) => setActive(SECTORS[(idx + d + SECTORS.length) % SECTORS.length].id);
+  const cycle = (d: number) => { setHeld(true); setActive(SECTORS[(idx + d + SECTORS.length) % SECTORS.length].id); };
   const mods = sector.modules[locale];
   const yFor = (i: number) => 12 + i * (76 / (mods.length - 1)); // spread module rows 12%..88%
 
@@ -26,7 +54,7 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
         </Reveal>
 
         <Reveal delay={100}>
-          <div className="mt-12 grid lg:grid-cols-[minmax(0,320px)_1fr] gap-8 items-stretch">
+          <div ref={boxRef} className="mt-12 grid lg:grid-cols-[minmax(0,320px)_1fr] gap-8 items-stretch">
             {/* Picker, the "Choisissez un secteur" menu, with obvious switch controls */}
             <div className="rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white shadow-[var(--shadow-soft)] overflow-hidden">
               <div className="px-4 py-3 bg-[var(--color-ink)] text-white flex items-center justify-between gap-2">
@@ -41,7 +69,7 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
                   const on = s.id === active;
                   return (
                     <li key={s.id}>
-                      <button role="option" aria-selected={on} onClick={() => setActive(s.id)}
+                      <button role="option" aria-selected={on} onClick={() => { setHeld(true); setActive(s.id); }}
                         className={`w-full text-left px-4 py-3 rounded-[var(--radius)] font-medium transition-colors ${on ? "bg-[var(--color-brand-50)] text-[var(--color-brand-700)]" : "text-[var(--color-ink-soft)] hover:bg-[var(--color-panel)]"}`}>
                         <span className="flex items-center justify-between">
                           {s.name[locale]}
@@ -75,10 +103,10 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
                   <motion.div
                     key={sector.id + m}
                     initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: i * 0.05 }}
-                    className="absolute -translate-y-1/2 flex items-center gap-2.5 rounded-[var(--radius)] border border-[var(--color-line)] bg-white px-3.5 py-2.5 text-sm font-semibold text-[var(--color-ink-soft)] shadow-[var(--shadow-soft)]"
+                    className="absolute -translate-y-1/2 flex items-center gap-3 rounded-[var(--radius)] border border-[var(--color-line)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-ink-soft)] shadow-[var(--shadow-soft)]"
                     style={{ left: "52%", right: "2%", top: `${yFor(i)}%` }}
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-brand-500)] shrink-0" />{m}
+                    <span className="shrink-0 rounded-[9px] shadow-[0_6px_16px_-8px_rgba(10,22,40,.5)]"><AppIcon app={appFor(i)} size={30} /></span>{m}
                   </motion.div>
                 ))}
               </div>
@@ -89,8 +117,8 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
                 <ul className="mt-4 grid grid-cols-1 gap-2.5">
                   {mods.map((m, i) => (
                     <motion.li key={sector.id + m} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: i * 0.05 }}
-                      className="flex items-center gap-2.5 rounded-[var(--radius)] border border-[var(--color-line)] bg-white px-3.5 py-2.5 text-sm font-semibold text-[var(--color-ink-soft)]">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-brand-500)] shrink-0" />{m}
+                      className="flex items-center gap-3 rounded-[var(--radius)] border border-[var(--color-line)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-ink-soft)]">
+                      <span className="shrink-0 rounded-[9px] shadow-[0_6px_16px_-8px_rgba(10,22,40,.5)]"><AppIcon app={appFor(i)} size={30} /></span>{m}
                     </motion.li>
                   ))}
                 </ul>

@@ -1,50 +1,30 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Reveal from "./Reveal";
+import { useScrub, useScrubValue } from "@/lib/scrub";
 import { type Locale } from "@/content/site";
 import { DAY_FEED, FEED_TOTAL, FEED_YOURS, FEED_UI } from "@/content/dayproof";
 
 const GREEN = "#0f9d63";
 const BLUE = "#1787c4";
 
-/** A day replayed line by line: sixteen things happen, three need you. */
+/** A day replayed line by line: sixteen things happen, three need you.
+ *  The feed advances with the scroll, so it only ever moves while the visitor
+ *  is looking at it, at whatever pace they read, and it needs no controls. */
 export default function DayFeed({ locale }: { locale: Locale }) {
   const t = FEED_UI[locale];
   const reduce = useReducedMotion();
 
-  const [shown, setShown] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [inView, setInView] = useState(false); // only ever runs while on screen
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
-
-  const clear = () => { if (timer.current) clearTimeout(timer.current); timer.current = null; };
-
-  /* only start once the section is actually on screen */
-  useEffect(() => {
-    const el = boxRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([e]) => {
-      setInView(e.isIntersecting);
-      if (e.isIntersecting) setPlaying(true);
-    }, { threshold: 0.3 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  useEffect(() => {
-    clear();
-    if (!playing || !inView) return;
-    if (shown >= FEED_TOTAL) { setPlaying(false); return; }
-    timer.current = setTimeout(() => setShown((n) => n + 1), reduce ? 120 : 950);
-    return clear;
-  }, [playing, inView, shown, reduce]);
+  const scrub = useScrub(boxRef, ["start 88%", "end 55%"]);
+  const p = useScrubValue(scrub);
+  const shown = Math.min(FEED_TOTAL, Math.round(p * FEED_TOTAL));
 
   /* Keep the newest line in view by scrolling the list itself. scrollIntoView
      would walk up and move the window too, which fought the visitor's own
-     scrolling while the feed was playing. */
+     scrolling. */
   useEffect(() => {
     const list = listRef.current;
     if (!list || shown === 0) return;
@@ -53,9 +33,6 @@ export default function DayFeed({ locale }: { locale: Locale }) {
     const target = last.offsetTop + last.offsetHeight - list.clientHeight;
     if (target > 0) list.scrollTo({ top: target, behavior: reduce ? "auto" : "smooth" });
   }, [shown, reduce]);
-
-  const step = useCallback(() => { setPlaying(false); setShown((n) => Math.min(n + 1, FEED_TOTAL)); }, []);
-  const restart = useCallback(() => { clear(); setShown(0); setPlaying(true); }, []);
 
   const doneCount = shown;
   const yoursCount = DAY_FEED.slice(0, shown).filter((i) => i.by === "you").length;
@@ -72,30 +49,8 @@ export default function DayFeed({ locale }: { locale: Locale }) {
 
         <Reveal delay={100}>
           <div ref={boxRef} className="mt-10 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white shadow-[var(--shadow-card)]">
-            {/* controls */}
-            <div className="flex flex-col items-stretch gap-3 border-b border-[var(--color-line)] px-5 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between md:px-7">
-              <div className="grid grid-cols-[1fr_1fr_auto] gap-2 sm:flex sm:flex-wrap">
-                <button
-                  onClick={() => setPlaying((p) => !p)}
-                  className="whitespace-nowrap rounded-full border border-[var(--color-line)] px-3 py-2 text-[0.78rem] font-semibold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-panel)] sm:px-4 sm:text-sm"
-                >
-                  {playing ? `❚❚ ${t.pause}` : `▶ ${t.play}`}
-                </button>
-                <button
-                  onClick={step}
-                  className="whitespace-nowrap rounded-full border border-[var(--color-line)] px-3 py-2 text-[0.78rem] font-semibold text-[var(--color-slate)] transition-colors hover:text-[var(--color-ink)] sm:px-4 sm:text-sm"
-                >
-                  ⏭ {t.oneLine}
-                </button>
-                <button
-                  onClick={restart}
-                  aria-label={t.restart}
-                  className="whitespace-nowrap rounded-full border border-[var(--color-line)] px-3 py-2 text-[0.78rem] font-semibold text-[var(--color-slate)] transition-colors hover:text-[var(--color-ink)] sm:px-4 sm:text-sm"
-                >
-                  ↻
-                </button>
-              </div>
-
+            {/* status only: the feed advances with the scroll, nothing to press */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--color-line)] px-5 py-4 md:px-7">
               <p className="text-sm font-medium text-[var(--color-slate)]">
                 <span className="font-bold" style={{ color: GREEN }}>{doneCount}</span> {t.doneLabel}
                 {" · "}

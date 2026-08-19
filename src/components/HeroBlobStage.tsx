@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AppTile, type AppKey } from "./AppIcon";
 
 const SIZE = 460;            // stage box, square
 const C = SIZE / 2;
@@ -12,6 +13,9 @@ const PAYOFF_MS = 2600;      // how long "One System" stays
 /** The hero act, as the client described it: the slime reaches out, grabs each
  *  bubble, pulls it inside itself, and once it has swallowed them all it
  *  produces one thing: your system. Then it starts over. */
+/* one made-up app per seat, matching the order of the labels in site.ts */
+const CHIP_APP: AppKey[] = ["automation", "ai", "portal", "estimating", "invoicing", "crm"];
+
 export default function HeroBlobStage({ chips, systemLabel }: { chips: string[]; systemLabel: string }) {
   const reduce = useReducedMotion();
   const [eaten, setEaten] = useState(0);        // how many are inside
@@ -114,7 +118,7 @@ export default function HeroBlobStage({ chips, systemLabel }: { chips: string[];
           return (
             <motion.span
               key={seat.label}
-              className="absolute whitespace-nowrap rounded-full border border-white/25 bg-white/12 px-2.5 py-1 text-[0.62rem] font-semibold text-white backdrop-blur-sm sm:px-3.5 sm:py-1.5 sm:text-[0.78rem]"
+              className="absolute"
               style={{ left: `${(seat.x / SIZE) * 100}%`, top: `${(seat.y / SIZE) * 100}%` }}
               initial={false}
               animate={
@@ -133,7 +137,7 @@ export default function HeroBlobStage({ chips, systemLabel }: { chips: string[];
                 ease: hauled ? [0.6, 0, 0.3, 1] : "easeOut",
               }}
             >
-              {seat.label}
+              <AppTile app={CHIP_APP[i % CHIP_APP.length]} label={seat.label} size={38} dark />
             </motion.span>
           );
         })}

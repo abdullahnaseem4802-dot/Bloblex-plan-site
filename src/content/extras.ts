@@ -22,18 +22,21 @@ export const AUTOMATION_TASKS: { id: string; label: Record<Locale, string>; hour
 export const AUTOMATION_UI: Record<Locale, {
   kicker: string; title: string; lead: string;
   savedLabel: string; perWeek: string; perYear: string; automated: string; hint: string; cta: string;
+  byHand: string; handled: string;
 }> = {
   en: {
-    kicker: "Interactive, see it for yourself",
-    title: "Pick what you'd automate. Watch the time come back.",
-    lead: "Select the work you do by hand today. This is the time a connected Blobex system gives back to your team.",
+    kicker: "Your week, right now",
+    title: "This is the week your system hands back.",
+    lead: "Every one of these is done by hand today. Keep reading and watch them leave your week.",
+    byHand: "By hand today", handled: "Handled by the system",
     savedLabel: "Time saved", perWeek: "/ week", perYear: "≈ per year", automated: "automated", hint: "Rough estimates for illustration, your real numbers come from the discovery call.",
     cta: "Get my time back",
   },
   fr: {
-    kicker: "Interactif, voyez par vous-même",
-    title: "Choisissez ce que vous automatiseriez. Regardez le temps revenir.",
-    lead: "Sélectionnez le travail que vous faites à la main aujourd'hui. Voilà le temps qu'un système Blobex connecté redonne à votre équipe.",
+    kicker: "Ta semaine, en ce moment",
+    title: "Voilà la semaine que ton système te redonne.",
+    lead: "Chacune de ces tâches se fait à la main aujourd'hui. Continue à lire et regarde-les sortir de ta semaine.",
+    byHand: "À la main aujourd'hui", handled: "Fait par le système",
     savedLabel: "Temps récupéré", perWeek: "/ semaine", perYear: "≈ par année", automated: "automatisé", hint: "Estimations approximatives à titre indicatif, vos vrais chiffres viennent de l'appel découverte.",
     cta: "Récupérer mon temps",
   },

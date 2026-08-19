@@ -45,31 +45,8 @@ export function WhatWeBuild({ locale, bare }: Props) {
   );
 }
 
-export function Process({ locale, bare }: Props) {
-  const t = CONTENT[locale].process;
-  return (
-    <section id="process" className={`bg-[var(--color-panel)] border-y border-[var(--color-line)] ${bare ? "pt-16 pb-20 md:pt-20 md:pb-28" : "py-20 md:py-28"}`}>
-      <div className="container">
-        <SectionHead kicker={t.kicker} title={t.title} bare={bare} />
-        <ol className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 ${bare ? "" : "mt-14"}`}>
-          {t.steps.map((s, i) => (
-            <Reveal key={s} delay={i * 70}>
-              <li className="relative h-full overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-card)]">
-                <span className="absolute right-4 top-3 font-[family-name:var(--font-display)] text-4xl font-bold text-[var(--color-brand-50)]">
-                  {i + 1}
-                </span>
-                <div className="relative mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-ink)] text-sm font-bold text-white">
-                  {i + 1}
-                </div>
-                <p className="relative font-semibold tracking-[-0.01em] text-[var(--color-ink)]">{s}</p>
-              </li>
-            </Reveal>
-          ))}
-        </ol>
-      </div>
-    </section>
-  );
-}
+/* The process section lives in ProcessSpine, which scroll-draws it. */
+export { default as Process } from "./ProcessSpine";
 
 export function Pricing({ locale, bare }: Props) {
   const t = CONTENT[locale].pricing;

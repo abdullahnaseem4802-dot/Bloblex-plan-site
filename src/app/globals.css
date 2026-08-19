@@ -359,9 +359,20 @@ html[data-splash] .sheen::after { animation-delay: 4s; }
   .hero-stage-box { aspect-ratio: 1 / 1; }
 }
 
-@media (min-width: 1024px) {
-  .hero-stage-offset { transform: translate(96px, 14px); }
-  /* the hero has spare margin on the left, so the copy leans into it and
-     leaves a wider gap before the character */
-  .hero-copy-shift { transform: translateX(-64px); }
+/* The hero was nudged into place with fixed pixel offsets, which only ever
+   looked right on the screen they were measured on: on a wider or shorter
+   display the character drifted off centre. Both offsets are now proportional
+   to the viewport and clamped at both ends, so the composition holds from a
+   small laptop up to a wide desktop. */
+/* Between 1024 and 1280 the two columns are already tight, so nothing is
+   shifted: pushing the stage there hung the character off the right edge on
+   an iPad Pro in portrait. */
+@media (min-width: 1280px) {
+  .hero-stage-offset { transform: translate(clamp(20px, 4.4vw, 96px), clamp(0px, 1.2vh, 16px)); }
+  .hero-copy-shift   { transform: translateX(clamp(-64px, -3.2vw, -16px)); }
+}
+/* very wide screens have margin to spare, so nothing needs shifting at all */
+@media (min-width: 1800px) {
+  .hero-stage-offset { transform: translate(clamp(20px, 2.4vw, 72px), 0); }
+  .hero-copy-shift   { transform: translateX(-32px); }
 }

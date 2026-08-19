@@ -83,7 +83,6 @@ function Panel({
     setSwap(i);
     timer.current = setTimeout(() => setSwap(null), 1100);
   }
-  function reset() { setBroken(null); if (timer.current) clearTimeout(timer.current); setSwap(null); }
 
   const RED = "#e0554e", BLUE = "#29abe2", GREY = "#c3cbd8", GREEN = "#22b07d";
 
@@ -143,9 +142,6 @@ function Panel({
       <p className={`mt-3 text-sm font-medium ${down ? "text-red-600" : isFragile ? "text-[var(--color-mute)]" : "text-[var(--color-brand-700)]"}`}>
         {down ? ui.brokeNote : isFragile ? ui.instruction : ui.healNote}
       </p>
-      {isFragile && taken && broken !== null && (
-        <button onClick={reset} className="mt-2 text-sm font-semibold text-[var(--color-mute)] hover:text-[var(--color-ink)]">{ui.reset}</button>
-      )}
     </div>
   );
 }

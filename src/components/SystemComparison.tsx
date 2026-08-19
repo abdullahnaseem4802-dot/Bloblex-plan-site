@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import Reveal from "./Reveal";
-import ToolGlyph from "./ToolGlyph";
+import AppIcon from "./AppIcon";
 import { type Locale } from "@/content/site";
 import { COMPARISON, TOOLS, LOOSE, RING } from "@/content/comparison";
 
@@ -62,7 +62,7 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
                         className="-translate-x-1/2 -translate-y-1/2"
                         style={{ transform: `translate(-50%,-50%) rotate(${p.r}deg)` }}
                       >
-                        <ToolGlyph tool={tool} size={38} />
+                        <AppIcon app={tool} size={38} />
                       </div>
                     </motion.div>
                   );
@@ -134,7 +134,7 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
                       transition={{ duration: 0.45, delay: 0.05 * i, ease: [0.16, 1, 0.3, 1] }}
                     >
                       <div className="-translate-x-1/2 -translate-y-1/2">
-                        <ToolGlyph tool={tool} size={38} />
+                        <AppIcon app={tool} size={38} />
                       </div>
                     </motion.div>
                   );

@@ -13,10 +13,10 @@
    never "je".
    ================================================================= */
 import type { Locale } from "./site";
-import type { ToolKey } from "@/components/ToolGlyph";
+import type { AppKey } from "@/components/AppIcon";
 
 /** The same eight tools appear on both sides. Only the wiring changes. */
-export const TOOLS: ToolKey[] = [
+export const TOOLS: AppKey[] = [
   "sheet", "mail", "chat", "calendar",
   "money", "photos", "contacts", "quote",
 ];

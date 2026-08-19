@@ -30,7 +30,8 @@ type Dict = {
   what: { kicker: string; title: string; lead: string; cards: { title: string; body: string }[] };
   time: { kicker: string; title: string; lead: string; soon: string };
   sectors: { kicker: string; title: string; lead: string; list: string[]; soon: string };
-  process: { kicker: string; title: string; steps: string[] };
+  process: { kicker: string; title: string; lead: string; lockAt: number; lockLabel: string;
+    steps: { name: string; what: string; get: string }[] };
   pricing: { kicker: string; title: string; lead: string };
   contact: {
     kicker: string; title: string; lead: string;
@@ -97,7 +98,17 @@ export const CONTENT: Record<Locale, Dict> = {
     process: {
       kicker: "How we work",
       title: "A clear process, with the price defined before we build.",
-      steps: ["Understand", "Measure", "Design", "Build", "Deploy", "Improve"],
+      lead: "Six steps. You know the scope, the price and the date before a line of code is written.",
+      lockAt: 2,
+      lockLabel: "Price and timeline locked here — before a line of code",
+      steps: [
+        { name: "Understand", what: "We sit with your team and watch how the work actually moves, not how it is supposed to.", get: "A written map of your operation" },
+        { name: "Measure", what: "We count what the manual steps really cost you in hours, so the decision is numbers and not opinion.", get: "The hours and the dollars at stake" },
+        { name: "Design", what: "We draw the system around the way you already work, and we agree on exactly what is being built.", get: "Fixed scope, fixed price, fixed date" },
+        { name: "Build", what: "We build in stages you can see and use, instead of disappearing for three months.", get: "Working software every two weeks" },
+        { name: "Deploy", what: "We move your people onto it and stay on the floor while it settles into the day.", get: "Your team running on it" },
+        { name: "Improve", what: "It is yours, so every piece can be pushed as far as you want, whenever you want.", get: "A system that keeps growing with you" },
+      ],
     },
     pricing: {
       kicker: "Pricing that protects you",
@@ -183,7 +194,17 @@ export const CONTENT: Record<Locale, Dict> = {
     process: {
       kicker: "Notre façon de travailler",
       title: "Un processus clair, avec le prix défini avant de bâtir.",
-      steps: ["Comprendre", "Mesurer", "Concevoir", "Bâtir", "Déployer", "Améliorer"],
+      lead: "Six étapes. Tu connais la portée, le prix et la date avant la première ligne de code.",
+      lockAt: 2,
+      lockLabel: "Prix et échéancier bloqués ici — avant la première ligne de code",
+      steps: [
+        { name: "Comprendre", what: "On s'assoit avec ton monde et on regarde comment la job avance pour vrai, pas comment elle est supposée avancer.", get: "Une carte écrite de ton opération" },
+        { name: "Mesurer", what: "On compte ce que les étapes à la main te coûtent en heures. Des chiffres, pas des opinions.", get: "Les heures et les dollars en jeu" },
+        { name: "Concevoir", what: "On dessine le système autour de ta façon de travailler, et on s'entend sur exactement ce qui se bâtit.", get: "Portée fixe, prix fixe, date fixe" },
+        { name: "Bâtir", what: "On bâtit par étapes que tu vois et que tu utilises, au lieu de disparaître trois mois.", get: "Du logiciel qui roule aux deux semaines" },
+        { name: "Déployer", what: "On embarque ton monde dessus et on reste sur le plancher le temps que ça s'installe.", get: "Ton équipe qui roule dessus" },
+        { name: "Améliorer", what: "Il est à toi, donc chaque morceau peut être poussé aussi loin que tu veux, quand tu veux.", get: "Un système qui continue de grandir" },
+      ],
     },
     pricing: {
       kicker: "Une tarification qui vous protège",
