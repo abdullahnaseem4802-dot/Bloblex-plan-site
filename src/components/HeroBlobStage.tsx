@@ -160,7 +160,7 @@ export default function HeroBlobStage({ chips, systemLabel }: { chips: string[];
           }}
         >
           <motion.img
-            src="/img/brand/mark-ink-sm.png"
+            src="/img/brand/mascot-sm.webp"
             alt=""
             className="w-full drop-shadow-[0_26px_48px_rgba(41,171,226,.5)]"
             /* a swallow makes it squash, like something just went down */
