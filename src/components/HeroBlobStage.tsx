@@ -5,7 +5,7 @@ import { AppTile, type AppKey } from "./AppIcon";
 
 const SIZE = 460;            // stage box, square
 const C = SIZE / 2;
-const RX = 170, RY = 132;    // where the bubbles wait
+const RX = 178, RY = 162;    // where the bubbles wait
 const REACH_MS = 620;        // arm goes out and takes hold
 const PULL_MS = 640;         // arm hauls the bubble back in
 const PAYOFF_MS = 2600;      // how long "One System" stays
@@ -137,14 +137,16 @@ export default function HeroBlobStage({ chips, systemLabel }: { chips: string[];
                 ease: hauled ? [0.6, 0, 0.3, 1] : "easeOut",
               }}
             >
-              <AppTile app={CHIP_APP[i % CHIP_APP.length]} label={seat.label} size={38} dark />
+              <span className="block origin-center scale-[0.74] sm:scale-100">
+                <AppTile app={CHIP_APP[i % CHIP_APP.length]} label={seat.label} size={38} dark />
+              </span>
             </motion.span>
           );
         })}
 
         {/* the slime itself */}
         <motion.div
-          className="absolute left-1/2 top-1/2 w-[42%]"
+          className="absolute left-1/2 top-1/2 w-[47%] sm:w-[53%]"
           style={{ x: "-50%", y: "-50%" }}
           animate={
             reduce
