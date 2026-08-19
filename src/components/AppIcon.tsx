@@ -168,6 +168,36 @@ const SPEC: Record<AppKey, Spec> = {
   )},
 };
 
+
+/* Pick the icon from what the row actually says, in either language.
+   Cycling through the set by position put a clock beside "Pricing & catalog"
+   and a shield beside "CRM", which is what the client meant by the logos not
+   fitting. Most specific rules first. */
+const BY_KEYWORD: [RegExp, AppKey][] = [
+  [/invoic|factur|billing|commission/i,                              "invoicing"],
+  [/pricing|prix|catalog|payment|paiement/i,                         "money"],
+  [/payroll|paie/i,                                                "payroll"],
+  [/estimat|soumission|proposal|proposition|devis|quoting/i,         "estimating"],
+  [/inventor|inventaire|warehouse|entrep[oô]t|bom|nomenclature|stock/i, "inventory"],
+  [/quality|qualit[eé]/i,                                            "quality"],
+  [/portal|portail/i,                                                "portal"],
+  [/crm|lead|prospect|pipeline|listing|inscription/i,                "crm"],
+  [/schedul|ordonnanc|rendez-vous|visit|planning|dispatch|r[eé]partition|rout/i, "scheduling"],
+  [/order|commande|delivery|livraison|fleet|flotte|shipping/i,       "orders"],
+  [/document|dossier|fichier|file|record|e-sign|signature/i,       "docs"],
+  [/ai|ia|moteur|automation|automatis/i,                   "ai"],
+  [/messag|communication|intake|accueil|captation|follow|suivi/i,    "chat"],
+  [/project|projet|time|temps/i,                                     "calendar"],
+  [/report|rapport|analytic/i,                                       "sheet"],
+  [/photo|image|plan/i,                                            "photos"],
+];
+
+/** Best-matching icon for a module label; falls back to a neutral document. */
+export function appForLabel(label: string): AppKey {
+  for (const [re, key] of BY_KEYWORD) if (re.test(label)) return key;
+  return "docs";
+}
+
 /** The tile on its own. */
 export default function AppIcon({ app, size = 44 }: { app: AppKey; size?: number }) {
   const s = SPEC[app];

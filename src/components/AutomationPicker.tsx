@@ -49,16 +49,23 @@ export default function AutomationPicker({ locale }: { locale: Locale }) {
                 const m = moved[i];
                 return (
                   <li key={task.id} className="relative">
+                    {/* The row used to slide to the right, which pushed it out of
+                        the panel and under the counter card. It stays put now and
+                        the system "takes it over" as a fill sweeping across it. */}
                     <motion.div
-                      className="flex items-center justify-between gap-3 rounded-[var(--radius)] border bg-white px-4 py-2.5"
+                      className="relative flex items-center justify-between gap-3 overflow-hidden rounded-[var(--radius)] border bg-white px-4 py-2.5"
                       style={{
-                        x: `${m * 14}%`,
                         borderColor: m > 0.5 ? `${GREEN}66` : "var(--color-line)",
                         boxShadow: m > 0.5 ? `0 14px 34px -20px ${GREEN}` : "none",
-                        opacity: 0.45 + m * 0.55,
+                        opacity: 0.5 + m * 0.5,
                       }}
                     >
-                      <span className="flex items-center gap-2.5">
+                      <span
+                        aria-hidden
+                        className="pointer-events-none absolute inset-y-0 left-0"
+                        style={{ width: `${m * 100}%`, background: `linear-gradient(90deg, ${GREEN}14, ${GREEN}0e)` }}
+                      />
+                      <span className="relative flex items-center gap-2.5">
                         <span
                           className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[0.62rem] font-bold text-white"
                           style={{ background: m > 0.5 ? GREEN : "var(--color-line)" }}
@@ -71,7 +78,7 @@ export default function AutomationPicker({ locale }: { locale: Locale }) {
                         </span>
                       </span>
                       <span
-                        className="shrink-0 text-sm font-semibold tabular-nums"
+                        className="relative shrink-0 text-sm font-semibold tabular-nums"
                         style={{ color: m > 0.5 ? GREEN : AMBER, textDecoration: m > 0.9 ? "line-through" : "none" }}
                       >
                         {task.hoursPerWeek} h

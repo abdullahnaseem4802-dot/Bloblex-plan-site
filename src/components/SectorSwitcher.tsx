@@ -3,15 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import Reveal from "./Reveal";
 import BlobWithAccessory from "./BlobWithAccessory";
-import AppIcon, { type AppKey } from "./AppIcon";
+import AppIcon, { appForLabel } from "./AppIcon";
 import { CONTENT, type Locale } from "@/content/site";
 import { SECTORS, SECTOR_UI } from "@/content/sectors";
-
-/* Client: "the logos and stuff are still low quality / doesn't fit / awkward".
-   Each module row now carries a real app tile instead of a bullet dot, cycling
-   through the set so a sector's system reads as a suite of products. */
-const MODULE_APPS: AppKey[] = ["orders", "inventory", "scheduling", "quality", "portal", "invoicing", "crm", "docs", "payroll"];
-const appFor = (i: number) => MODULE_APPS[i % MODULE_APPS.length];
 
 export default function SectorSwitcher({ locale }: { locale: Locale }) {
   const t = CONTENT[locale].sectors;
@@ -117,7 +111,7 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
                     className="absolute -translate-y-1/2 flex items-center gap-3 rounded-[var(--radius)] border border-[var(--color-line)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-ink-soft)] shadow-[var(--shadow-soft)]"
                     style={{ left: "52%", right: "2%", top: `${yFor(i)}%` }}
                   >
-                    <span className="shrink-0 rounded-[9px] shadow-[0_6px_16px_-8px_rgba(10,22,40,.5)]"><AppIcon app={appFor(i)} size={30} /></span>{m}
+                    <span className="shrink-0 rounded-[9px] shadow-[0_6px_16px_-8px_rgba(10,22,40,.5)]"><AppIcon app={appForLabel(m)} size={30} /></span>{m}
                   </motion.div>
                 ))}
               </div>
@@ -129,7 +123,7 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
                   {mods.map((m, i) => (
                     <motion.li key={sector.id + m} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: i * 0.05 }}
                       className="flex items-center gap-3 rounded-[var(--radius)] border border-[var(--color-line)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-ink-soft)]">
-                      <span className="shrink-0 rounded-[9px] shadow-[0_6px_16px_-8px_rgba(10,22,40,.5)]"><AppIcon app={appFor(i)} size={30} /></span>{m}
+                      <span className="shrink-0 rounded-[9px] shadow-[0_6px_16px_-8px_rgba(10,22,40,.5)]"><AppIcon app={appForLabel(m)} size={30} /></span>{m}
                     </motion.li>
                   ))}
                 </ul>
