@@ -33,14 +33,12 @@ export default function ProcessSpine({ locale, bare }: { locale: Locale; bare?: 
         <div ref={ref} className="relative mt-12">
           {/* the spine */}
           <div className="absolute left-[19px] top-2 bottom-2 w-px bg-[var(--color-line)] md:left-0 md:right-0 md:top-[27px] md:bottom-auto md:h-px md:w-auto" />
+          {/* progress along the spine: a separate element per orientation, because
+              one shared element needs an inline height on phones that would then
+              override the horizontal rule on wider screens */}
           <motion.div
-            className="absolute left-[19px] top-2 w-px origin-top md:left-0 md:top-[27px] md:h-px md:w-full md:origin-left"
-            style={{
-              background: BRAND,
-              height: "calc(100% - 1rem)",
-              scaleY: p,
-              scaleX: 1,
-            }}
+            className="absolute left-[19px] top-2 w-px origin-top md:hidden"
+            style={{ background: BRAND, height: "calc(100% - 1rem)", scaleY: p }}
           />
           <motion.div
             className="absolute left-0 top-[27px] hidden h-px w-full origin-left md:block"
