@@ -92,6 +92,6 @@ export const SECTORS: Sector[] = [
 ];
 
 export const SECTOR_UI: Record<Locale, { picker: string; connected: string; hint: string; switchLabel: string; prev: string; next: string }> = {
-  en: { picker: "Choose a sector", connected: "The connected system", hint: "Switch the sector, the blob adapts, and so does the system.", switchLabel: "Switch sector", prev: "Previous sector", next: "Next sector" },
-  fr: { picker: "Choisissez un secteur", connected: "Le système connecté", hint: "Changez de secteur, le blob s'adapte, et le système aussi.", switchLabel: "Changer de secteur", prev: "Secteur précédent", next: "Secteur suivant" },
+  en: { picker: "Every sector, one by one", connected: "The connected system", hint: "Switch the sector, the blob adapts, and so does the system.", switchLabel: "Switch sector", prev: "Previous sector", next: "Next sector" },
+  fr: { picker: "Chaque secteur, un par un", connected: "Le système connecté", hint: "Changez de secteur, le blob s'adapte, et le système aussi.", switchLabel: "Changer de secteur", prev: "Secteur précédent", next: "Secteur suivant" },
 };

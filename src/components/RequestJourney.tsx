@@ -122,9 +122,13 @@ function Lane({
 
       {/* the race itself */}
       <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-[var(--color-line)]">
+        {/* width has to be set in style as well: without it the span renders at
+            its natural full width for one frame before motion takes over, which
+            read as the bar sweeping backwards on load */}
         <motion.span
           className="block h-full rounded-full"
-          style={{ background: tone }}
+          style={{ background: tone, width: 0 }}
+          initial={false}
           animate={{ width: `${pct}%` }}
           transition={{ duration: reduce ? 0 : 0.12, ease: "linear" }}
         />

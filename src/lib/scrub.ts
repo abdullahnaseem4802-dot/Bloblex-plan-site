@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useState, type RefObject } from "react";
 import { useScroll, useSpring, useReducedMotion, type MotionValue } from "motion/react";
 
 /* ---------------------------------------------------------------------------
@@ -19,6 +19,9 @@ import { useScroll, useSpring, useReducedMotion, type MotionValue } from "motion
    rather than mechanical.
 --------------------------------------------------------------------------- */
 
+/* Runs before the browser paints, so a corrected value never flashes. */
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 type ScrollOptions = NonNullable<Parameters<typeof useScroll>[0]>;
 type Offset = NonNullable<ScrollOptions["offset"]>;
 
@@ -29,19 +32,32 @@ export function useScrub(
 ): MotionValue<number> {
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref as RefObject<HTMLElement>, offset });
-  return useSpring(scrollYProgress, {
+  const smooth = useSpring(scrollYProgress, {
     stiffness: reduce ? 400 : 70,
     damping: reduce ? 60 : 22,
     mass: 0.35,
     restDelta: 0.0005,
   });
+
+  /* The first reading can be taken before the section has been laid out, and
+     springing away from that wrong value looks like the bar running backwards.
+     Snap to the truth once, after layout, instead of animating to it. */
+  useIsomorphicLayoutEffect(() => {
+    smooth.jump(scrollYProgress.get());
+    let alive = true;
+    /* and once more after layout has settled, in case fonts moved the section */
+    const r = requestAnimationFrame(() => { if (alive) smooth.jump(scrollYProgress.get()); });
+    return () => { alive = false; cancelAnimationFrame(r); };
+  }, [smooth, scrollYProgress]);
+
+  return smooth;
 }
 
 /** Reads a motion value into React state, for the places that need a number
  *  rather than a style (counters, step indexes, conditional copy). */
 export function useScrubValue(mv: MotionValue<number>, round = 3): number {
   const [v, setV] = useState(0);
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const f = 10 ** round;
     const set = (n: number) => setV(Math.round(n * f) / f);
     set(mv.get());

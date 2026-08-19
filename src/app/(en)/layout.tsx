@@ -16,6 +16,7 @@ export default function EnLayout({ children }: { children: React.ReactNode }) {
     <html lang="en" className={fontVars} suppressHydrationWarning>
       <head>
         <meta name="color-scheme" content="light" />
+        <script dangerouslySetInnerHTML={{ __html: "if('scrollRestoration' in history){history.scrollRestoration='manual';}" }} />
       </head>
       <body>
         <AmbientBackground />

@@ -16,6 +16,7 @@ export default function FrLayout({ children }: { children: React.ReactNode }) {
     <html lang="fr" className={fontVars} suppressHydrationWarning>
       <head>
         <meta name="color-scheme" content="light" />
+        <script dangerouslySetInnerHTML={{ __html: "if('scrollRestoration' in history){history.scrollRestoration='manual';}" }} />
       </head>
       <body>
         <AmbientBackground />

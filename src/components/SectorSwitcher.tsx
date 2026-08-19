@@ -33,7 +33,7 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
         id = setInterval(() => setActive((cur) => {
           const i = SECTORS.findIndex((x) => x.id === cur);
           return SECTORS[(i + 1) % SECTORS.length].id;
-        }), 2600);
+        }), 3600);
       } else if (!e.isIntersecting && id) { clearInterval(id); id = null; }
     }, { threshold: 0.3 });
     io.observe(el);
@@ -70,11 +70,22 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
                   return (
                     <li key={s.id}>
                       <button role="option" aria-selected={on} onClick={() => { setHeld(true); setActive(s.id); }}
-                        className={`w-full text-left px-4 py-3 rounded-[var(--radius)] font-medium transition-colors ${on ? "bg-[var(--color-brand-50)] text-[var(--color-brand-700)]" : "text-[var(--color-ink-soft)] hover:bg-[var(--color-panel)]"}`}>
+                        className={`relative w-full overflow-hidden text-left px-4 py-3 rounded-[var(--radius)] font-medium transition-colors ${on ? "bg-[var(--color-brand-50)] text-[var(--color-brand-700)]" : "text-[var(--color-ink-soft)] hover:bg-[var(--color-panel)]"}`}>
                         <span className="flex items-center justify-between">
                           {s.name[locale]}
                           {on && <span aria-hidden className="text-[var(--color-brand-500)]">→</span>}
                         </span>
+                        {/* the panel moves on by itself; this shows when */}
+                        {on && !held && (
+                          <motion.span
+                            key={s.id}
+                            aria-hidden
+                            className="absolute bottom-0 left-0 h-[2px] bg-[var(--color-brand-500)]"
+                            initial={{ width: "0%" }}
+                            animate={{ width: "100%" }}
+                            transition={{ duration: 3.6, ease: "linear" }}
+                          />
+                        )}
                       </button>
                     </li>
                   );
