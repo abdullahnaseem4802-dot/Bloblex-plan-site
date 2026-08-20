@@ -273,12 +273,12 @@ html[data-splash] .sheen::after { animation-delay: 4s; }
 }
 /* soft hand-off into the white page below */
 .hero-dark::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 5rem;
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3.5rem;
   pointer-events: none; z-index: 2;
   background: linear-gradient(180deg, transparent, #ffffff 100%);
 }
 @media (min-width: 640px) {
-  .hero-dark::after { height: 7rem; background: linear-gradient(180deg, transparent, #ffffff 96%); }
+  .hero-dark::after { height: 4.5rem; background: linear-gradient(180deg, transparent, #ffffff 96%); }
 }
 .hero-dark > * { position: relative; z-index: 1; }
 
