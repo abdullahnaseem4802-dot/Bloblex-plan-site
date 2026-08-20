@@ -278,7 +278,7 @@ html[data-splash] .sheen::after { animation-delay: 4s; }
   background: linear-gradient(180deg, transparent, #ffffff 100%);
 }
 @media (min-width: 640px) {
-  .hero-dark::after { height: 12rem; background: linear-gradient(180deg, transparent, #ffffff 96%); }
+  .hero-dark::after { height: 7rem; background: linear-gradient(180deg, transparent, #ffffff 96%); }
 }
 .hero-dark > * { position: relative; z-index: 1; }
 
