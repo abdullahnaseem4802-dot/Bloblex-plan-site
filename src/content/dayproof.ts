@@ -63,7 +63,7 @@ export const DAY_UI: Record<Locale, {
     system: "DONE", you: "YOU",
     dayStart: "06 h", dayEnd: "17 h",
     yoursHeading: "The 3 that need you",
-    autoHeading: "Everything else, handled",
+    autoHeading: "The 13 the system does",
     closing: "The other 13 happened while you were on a job site, on the phone, or having supper.",
   },
   fr: {
@@ -73,7 +73,7 @@ export const DAY_UI: Record<Locale, {
     system: "FAIT", you: "TOI",
     dayStart: "06 h", dayEnd: "17 h",
     yoursHeading: "Les 3 qui ont besoin de toi",
-    autoHeading: "Tout le reste, géré",
+    autoHeading: "Les 13 que le système fait",
     closing: "Les 13 autres se sont faites pendant que t'étais sur un chantier, au téléphone, ou en train de souper.",
   },
 };

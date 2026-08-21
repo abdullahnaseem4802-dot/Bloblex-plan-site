@@ -78,7 +78,7 @@ export default function DayFeed({ locale }: { locale: Locale }) {
           </div>
         </Reveal>
 
-        <p className="mt-6 max-w-[62ch] text-sm text-[var(--color-slate)]">{t.closing}</p>
+        <p className="mt-6 text-sm text-[var(--color-slate)]">{t.closing}</p>
       </div>
     </section>
   );
@@ -245,7 +245,7 @@ function Rail({
       ))}
 
       <motion.span
-        className="absolute bottom-0 left-0 text-[0.62rem] font-bold uppercase tracking-[0.18em] text-white/55"
+        className="absolute bottom-0 left-0 text-[0.62rem] font-bold uppercase tracking-[0.18em] text-white/60"
         initial={reduce ? false : { opacity: 0 }}
         animate={live || reduce ? { opacity: 1 } : undefined}
         transition={{ duration: 0.5, delay: reduce ? 0 : SWEEP }}
