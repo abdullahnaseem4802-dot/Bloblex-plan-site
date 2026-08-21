@@ -14,7 +14,7 @@ export default function AmbientBackground() {
       <span className="bx-orb bx-orb-1" />
       <span className="bx-orb bx-orb-2" />
       <span className="bx-orb bx-orb-3" />
-      {ready && <ParticleBackground boost={1.7} />}
+      {ready && <ParticleBackground boost={1.7} drift={0.05} />}
       <span className="bx-grain" />
     </div>
   );

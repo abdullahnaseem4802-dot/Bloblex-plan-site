@@ -1,4 +1,5 @@
 import Reveal from "./Reveal";
+import Parallax from "./Parallax";
 import { CONTENT, type Locale } from "@/content/site";
 
 /** Section heading. Pass `bare` when the page masthead already states the title. */
@@ -55,8 +56,12 @@ export function Pricing({ locale, bare }: Props) {
       <div className="container">
         <Reveal>
           <div className="relative overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-ink)] px-8 py-16 text-white md:px-16 md:py-20">
-            <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(41,171,226,.38),transparent_65%)]" />
-            <div className="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-[radial-gradient(circle,rgba(41,171,226,.18),transparent_65%)]" />
+            <Parallax speed={28} className="pointer-events-none absolute -right-20 -top-20 h-72 w-72">
+              <div className="h-full w-full rounded-full bg-[radial-gradient(circle,rgba(41,171,226,.38),transparent_65%)]" />
+            </Parallax>
+            <Parallax speed={-20} className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64">
+              <div className="h-full w-full rounded-full bg-[radial-gradient(circle,rgba(41,171,226,.18),transparent_65%)]" />
+            </Parallax>
             <div className="relative max-w-2xl">
               {!bare && (
                 <>

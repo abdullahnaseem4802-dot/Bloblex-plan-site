@@ -23,8 +23,30 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
      spoke by spoke, and only once it is whole does data start moving through
      it. The left side never resolves: it keeps twitching and its hand-offs
      keep dropping in and out, which is the whole argument. */
-  const scrub = useScrub(ref, ["start 88%", "end 62%"]);
-  const p = useScrubValue(scrub);
+  /* Tuned so the system is finished by the time the panel is properly in
+     front of the visitor, not after they have scrolled past it. */
+  const scrub = useScrub(ref, ["start 92%", "end 96%"]);
+  const raw = useScrubValue(scrub);
+
+  /* Belt and braces: once the panel is meaningfully on screen it finishes on
+     its own, so nobody can ever be looking at a half-built system because
+     their scroll happened to stop there. Whichever is further along wins, so
+     scrolling still drives it and scrolling back still unwinds it. */
+  const [auto, setAuto] = useState(0);
+  useEffect(() => {
+    if (!live || reduce) return;
+    const t0 = performance.now();
+    let f = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - t0) / 1100);
+      setAuto(t);
+      if (t < 1) f = requestAnimationFrame(tick);
+    };
+    f = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(f);
+  }, [live, reduce]);
+
+  const p = Math.max(raw, auto);
   const wire = (i: number) => (reduce ? 1 : ease(stagger(p, i, RING.length, 1.7)));
   const hub = reduce ? 1 : ease(Math.min(1, Math.max(0, (p - 0.62) / 0.3)));
   const flowing = p > 0.9;
@@ -35,7 +57,7 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
     if (!el) return;
     const io = new IntersectionObserver(([e]) => {
       if (e.isIntersecting) { setLive(true); io.disconnect(); }
-    }, { threshold: 0.25 });
+    }, { threshold: 0.45 });
     io.observe(el);
     return () => io.disconnect();
   }, []);

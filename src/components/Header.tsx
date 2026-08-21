@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import BrandLogo from "./BrandLogo";
+import MagneticLink from "./MagneticLink";
 import LanguageMenu from "./LanguageMenu";
 import { CONTENT, type Locale } from "@/content/site";
 import { NAV_ORDER, PAGES, pagePath, path, industryIdFromSlug } from "@/content/routes";
@@ -74,7 +75,7 @@ export default function Header({ locale, alt }: { locale: Locale; alt?: { en: st
 
         <div className="hidden shrink-0 xl:flex items-center gap-4">
           <LanguageMenu locale={locale} alt={alts} dark={overDark} />
-          <a href={pagePath(locale, "contact")} className="btn-primary whitespace-nowrap">{t.cta}</a>
+          <MagneticLink href={pagePath(locale, "contact")} className="btn-primary whitespace-nowrap">{t.cta}</MagneticLink>
         </div>
 
         <button

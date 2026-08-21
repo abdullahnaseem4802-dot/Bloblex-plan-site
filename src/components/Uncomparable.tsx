@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Reveal from "./Reveal";
+import Parallax from "./Parallax";
 import { type Locale } from "@/content/site";
 import { UNCOMPARABLE_UI } from "@/content/extras";
 
@@ -64,7 +65,9 @@ export default function Uncomparable({ locale }: { locale: Locale }) {
       <div className="container">
         <Reveal>
           <div className="relative overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-ink)] px-8 py-14 md:px-14 md:py-20 text-white">
-            <div className="absolute -left-24 -bottom-24 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(41,171,226,.4),transparent_65%)]" />
+            <Parallax speed={26} className="pointer-events-none absolute -left-24 -bottom-24 h-72 w-72">
+              <div className="h-full w-full rounded-full bg-[radial-gradient(circle,rgba(41,171,226,.4),transparent_65%)]" />
+            </Parallax>
             <div className="absolute right-6 top-6 text-xs font-bold uppercase tracking-[0.25em] text-[var(--color-brand-300)]">{ui.kicker}</div>
 
             <div className="relative max-w-2xl">

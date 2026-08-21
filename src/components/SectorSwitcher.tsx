@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import Reveal from "./Reveal";
+import Parallax from "./Parallax";
 import BlobWithAccessory from "./BlobWithAccessory";
 import AppIcon, { appForLabel } from "./AppIcon";
 import { CONTENT, type Locale } from "@/content/site";
@@ -89,7 +90,9 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
 
             {/* Stage, blob visually connected to its system modules */}
             <div className="relative rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-[var(--color-panel-2)] p-6 md:p-8 overflow-hidden">
-              <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(41,171,226,.14),transparent_65%)]" />
+              <Parallax speed={22} className="pointer-events-none absolute -right-16 -top-16 h-56 w-56">
+                <div className="h-full w-full rounded-full bg-[radial-gradient(circle,rgba(41,171,226,.14),transparent_65%)]" />
+              </Parallax>
               <p className="relative text-sm font-bold uppercase tracking-[0.14em] text-[var(--color-mute)] mb-4">
                 {ui.connected}, <span className="text-[var(--color-brand-600)]">{sector.name[locale]}</span>
               </p>
@@ -97,23 +100,55 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
               {/* desktop: hub + spokes */}
               <div className="relative hidden md:block h-[360px]">
                 <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
-                  {mods.map((_, i) => (
-                    <line key={i} x1="29" y1="50" x2="52" y2={yFor(i)} stroke="var(--color-brand-300)" strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
-                  ))}
+                  {/* keyed by seat, not by sector, so a spoke swings to its new
+                      angle when the industry changes instead of blinking out */}
+                  <AnimatePresence>
+                    {mods.map((_, i) => (
+                      <motion.line
+                        key={i}
+                        x1="29" y1="50" x2="52"
+                        stroke="var(--color-brand-300)" strokeWidth="1.4" vectorEffect="non-scaling-stroke"
+                        initial={{ y2: 50, opacity: 0 }}
+                        animate={{ y2: yFor(i), opacity: 1 }}
+                        exit={{ y2: 50, opacity: 0 }}
+                        transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                      />
+                    ))}
+                  </AnimatePresence>
                 </svg>
                 <div className="absolute left-[1%] top-1/2 -translate-y-1/2 w-[210px] h-[176px]">
                   <BlobWithAccessory accessory={sector.accessory} />
                 </div>
-                {mods.map((m, i) => (
-                  <motion.div
-                    key={sector.id + m}
-                    initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.3, delay: i * 0.05 }}
-                    className="absolute -translate-y-1/2 flex items-center gap-3 rounded-[var(--radius)] border border-[var(--color-line)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-ink-soft)] shadow-[var(--shadow-soft)]"
-                    style={{ left: "52%", right: "2%", top: `${yFor(i)}%` }}
-                  >
-                    <span className="shrink-0 rounded-[9px] shadow-[0_6px_16px_-8px_rgba(10,22,40,.5)]"><AppIcon app={appForLabel(m)} size={30} /></span>{m}
-                  </motion.div>
-                ))}
+                {/* The rows belong to the seat, not to the industry: switching
+                    sector slides each row to its new height and swaps what is
+                    written on it, rather than tearing the whole set down. */}
+                <AnimatePresence>
+                  {mods.map((m, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute -translate-y-1/2 flex items-center gap-3 rounded-[var(--radius)] border border-[var(--color-line)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-ink-soft)] shadow-[var(--shadow-soft)]"
+                      style={{ left: "52%", right: "2%" }}
+                      initial={{ opacity: 0, top: "50%", x: 10 }}
+                      animate={{ opacity: 1, top: `${yFor(i)}%`, x: 0 }}
+                      exit={{ opacity: 0, top: "50%", x: 10 }}
+                      transition={{ type: "spring", stiffness: 120, damping: 20, delay: i * 0.03 }}
+                    >
+                      <AnimatePresence mode="wait">
+                        <motion.span
+                          key={sector.id + m}
+                          className="flex min-w-0 items-center gap-3"
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          transition={{ duration: 0.22 }}
+                        >
+                          <span className="shrink-0 rounded-[9px] shadow-[0_6px_16px_-8px_rgba(10,22,40,.5)]"><AppIcon app={appForLabel(m)} size={30} /></span>
+                          <span className="truncate">{m}</span>
+                        </motion.span>
+                      </AnimatePresence>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               </div>
 
               {/* mobile: stacked */}
@@ -121,9 +156,20 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
                 <div className="mx-auto w-[200px] h-[168px]"><BlobWithAccessory accessory={sector.accessory} /></div>
                 <ul className="mt-4 grid grid-cols-1 gap-2.5">
                   {mods.map((m, i) => (
-                    <motion.li key={sector.id + m} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: i * 0.05 }}
+                    <motion.li key={i} layout
+                      transition={{ type: "spring", stiffness: 140, damping: 20 }}
                       className="flex items-center gap-3 rounded-[var(--radius)] border border-[var(--color-line)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-ink-soft)]">
-                      <span className="shrink-0 rounded-[9px] shadow-[0_6px_16px_-8px_rgba(10,22,40,.5)]"><AppIcon app={appForLabel(m)} size={30} /></span>{m}
+                      <AnimatePresence mode="wait">
+                        <motion.span
+                          key={sector.id + m}
+                          className="flex min-w-0 items-center gap-3"
+                          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+                          transition={{ duration: 0.22 }}
+                        >
+                          <span className="shrink-0 rounded-[9px] shadow-[0_6px_16px_-8px_rgba(10,22,40,.5)]"><AppIcon app={appForLabel(m)} size={30} /></span>
+                          <span className="truncate">{m}</span>
+                        </motion.span>
+                      </AnimatePresence>
                     </motion.li>
                   ))}
                 </ul>

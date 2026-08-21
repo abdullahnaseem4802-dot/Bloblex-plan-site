@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import Typewriter from "./Typewriter";
+import MagneticLink from "./MagneticLink";
 import ParticleBackground from "./ParticleBackground";
 import HeroAtmosphere from "./HeroAtmosphere";
 import HeroBlobStage from "./HeroBlobStage";
@@ -65,7 +66,7 @@ export default function Hero({ locale }: { locale: Locale }) {
             transition={{ duration: 0.7, delay: 0.22 }}
             className="mt-9 flex flex-wrap items-center gap-3"
           >
-            <a href={`${base}#contact`} className="btn-primary btn-shine text-base">{t.ctaPrimary}</a>
+            <MagneticLink href={`${base}#contact`} className="btn-primary btn-shine text-base">{t.ctaPrimary}</MagneticLink>
             <a href={`${base}#time`} className="rounded-full px-5 py-3 font-semibold text-white/85 transition-colors hover:text-white">
               {t.ctaSecondary} →
             </a>
