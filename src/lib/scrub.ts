@@ -84,17 +84,23 @@ export function ease(t: number): number {
 }
 
 /* ---------------------------------------------------------------------------
-   Small screens need a second way in.
+   Scrubbing needs a second way in.
 
-   Scrubbing works because a desktop section is short enough to travel fully
-   through the viewport while the visitor reads it. On a phone the same section
-   is two or three screens tall, so the scroll range only completes once the
-   panel has been pushed well past the top: the visitor sits in front of a
-   half-finished animation and has to scroll away to finish it.
+   Scroll-driven playback assumes the visitor keeps scrolling. Whenever they
+   stop - and they stop exactly where the section is interesting - the range
+   freezes wherever it happens to be, and they are left in front of a
+   half-finished animation that only finishes if they scroll away from it.
+   That is backwards: the reward for paying attention should not be an
+   unfinished picture.
 
-   So on small screens only, the section also plays itself once it is properly
-   in view. Callers take the higher of the two, which means scrolling still
-   drives it and scrolling back still unwinds it. Desktop is untouched.
+   So a section also plays itself once it is properly in view. Callers take the
+   higher of the two, so scrolling still drives it and still runs ahead of the
+   clock if the visitor is quick.
+
+   This was small-screen only at first, on the theory that a tall phone layout
+   was the whole problem. It is not: a desktop section whose range ends at
+   "end 45%" has the same failure, it just needs a slightly slower reader to
+   show up.
 --------------------------------------------------------------------------- */
 
 /** True on phones and small tablets. Follows the viewport if it changes. */
@@ -110,21 +116,20 @@ export function useSmallScreen(query = "(max-width: 1023px)"): boolean {
   return small;
 }
 
-/** 0 → 1 over `ms`, started once `ref` is `amount` visible. Small screens only;
- *  returns 0 forever on desktop so `Math.max(scrub, settle)` is a no-op there. */
+/** 0 → 1 over `ms`, started once `ref` is `amount` visible. */
 export function useSettle(
   ref: RefObject<HTMLElement | null>,
   ms = 1400,
   amount = 0.2,
 ): number {
-  const small = useSmallScreen();
   const reduce = useReducedMotion();
   const [p, setP] = useState(0);
 
   useEffect(() => {
     const el = ref.current;
-    if (!small || !el) { setP(0); return; }
-    if (reduce) { setP(1); return; }
+    /* reduced motion is answered by the return value, not by setting state
+       here, so the effect never writes synchronously */
+    if (!el || reduce) return;
 
     let raf = 0;
     let t0 = 0;
@@ -146,7 +151,7 @@ export function useSettle(
     );
     io.observe(el);
     return () => { io.disconnect(); cancelAnimationFrame(raf); };
-  }, [ref, ms, amount, small, reduce]);
+  }, [ref, ms, amount, reduce]);
 
-  return p;
+  return reduce ? 1 : p;
 }

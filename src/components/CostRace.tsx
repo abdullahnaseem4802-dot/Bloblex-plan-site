@@ -1,6 +1,6 @@
 "use client";
 import { useRef } from "react";
-import { motion, useTransform, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import Reveal from "./Reveal";
 import { useScrub, useScrubValue, useSettle, ease } from "@/lib/scrub";
 import { type Locale } from "@/content/site";
@@ -13,6 +13,9 @@ const BRAND = "#1787c4";
    Both start at zero, the client's own note. There is nothing to press: the
    further the visitor reads, the further both projects get, and scrolling back
    rewinds them, which is why there is no replay control anywhere here. */
+/** 0 → 1 across [a, b], flat outside it. */
+const ramp = (v: number, a: number, b: number) => Math.min(1, Math.max(0, (v - a) / (b - a)));
+
 export default function CostRace({ locale }: { locale: Locale }) {
   const t = COST_UI[locale];
   const reduce = useReducedMotion();
@@ -61,20 +64,23 @@ export default function CostRace({ locale }: { locale: Locale }) {
             />
           </div>
 
-          {/* the two lines the client wrote, arriving as the meters resolve */}
+          {/* The two lines the client wrote, arriving as the meters resolve.
+              These read from the merged progress, not the raw scroll value:
+              wired to the scroll alone they stayed invisible whenever the
+              panel finished by settling, leaving a gap where the payoff is. */}
           <div className="pointer-events-none mt-10 min-h-[92px] text-center">
-            <motion.p
-              className="text-xl font-semibold leading-tight tracking-[-0.02em] md:text-[1.7rem]"
-              style={{ color: RED, opacity: useTransform(scrub, [0.5, 0.62, 0.78, 0.86], [0, 1, 1, 0]) }}
+            <p
+              className="text-xl font-semibold leading-tight tracking-[-0.02em] transition-opacity duration-300 md:text-[1.7rem]"
+              style={{ color: RED, opacity: ramp(p, 0.5, 0.62) * (1 - ramp(p, 0.78, 0.86)) }}
             >
               {t.punchA}
-            </motion.p>
-            <motion.p
-              className="mt-[-2.1rem] text-xl font-semibold leading-tight tracking-[-0.02em] md:mt-[-2.6rem] md:text-[1.7rem]"
-              style={{ color: BRAND, opacity: useTransform(scrub, [0.82, 0.93], [0, 1]) }}
+            </p>
+            <p
+              className="mt-[-2.1rem] text-xl font-semibold leading-tight tracking-[-0.02em] transition-opacity duration-300 md:mt-[-2.6rem] md:text-[1.7rem]"
+              style={{ color: BRAND, opacity: ramp(p, 0.82, 0.93) }}
             >
               {t.punchB}
-            </motion.p>
+            </p>
           </div>
 
           <p className="mt-6 text-sm text-[var(--color-mute)]">{t.footnote}</p>

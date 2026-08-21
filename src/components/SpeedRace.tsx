@@ -2,7 +2,7 @@
 import { useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Reveal from "./Reveal";
-import { useScrub, useScrubValue, ease } from "@/lib/scrub";
+import { useScrub, useScrubValue, useSettle, ease } from "@/lib/scrub";
 import { type Locale } from "@/content/site";
 import { RACE_UI } from "@/content/dayproof";
 
@@ -16,7 +16,10 @@ export default function SpeedRace({ locale }: { locale: Locale }) {
   const t = RACE_UI[locale];
   const ref = useRef<HTMLDivElement>(null);
   const scrub = useScrub(ref, ["start 90%", "end 52%"]);
-  const p = useScrubValue(scrub);
+  const raw = useScrubValue(scrub);
+  /* stopping in front of it should not freeze it half-built */
+  const settle = useSettle(ref, 1600);
+  const p = Math.max(raw, settle);
 
   /* ours is away quickly; the other shop is still dialling */
   const ours = ease(Math.min(1, p / 0.45));

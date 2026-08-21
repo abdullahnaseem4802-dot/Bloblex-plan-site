@@ -2,7 +2,7 @@
 import { useRef } from "react";
 import { motion } from "motion/react";
 import Reveal from "./Reveal";
-import { useScrub, useScrubValue, stagger, ease } from "@/lib/scrub";
+import { useScrub, useScrubValue, useSettle, stagger, ease } from "@/lib/scrub";
 import { CONTENT, type Locale } from "@/content/site";
 
 const BRAND = "#29abe2";
@@ -18,7 +18,10 @@ export default function ProcessSpine({ locale, bare }: { locale: Locale; bare?: 
   const t = CONTENT[locale].process;
   const ref = useRef<HTMLDivElement>(null);
   const scrub = useScrub(ref, ["start 92%", "end 58%"]);
-  const p = useScrubValue(scrub);
+  const raw = useScrubValue(scrub);
+  /* stopping in front of it should not freeze it half-built */
+  const settle = useSettle(ref, 1800);
+  const p = Math.max(raw, settle);
   const n = t.steps.length;
 
   return (
