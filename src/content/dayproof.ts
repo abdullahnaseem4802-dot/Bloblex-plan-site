@@ -8,95 +8,65 @@
    ================================================================= */
 import type { Locale } from "./site";
 
-/* ---------------- 1. the day feed ---------------- */
-export type FeedItem = {
-  at: string;                       // clock time, shown as-is
+/* ---------------- 1. the day, at a glance ----------------
+   Not a log. Sixteen familiar jobs from a normal day, laid out as tiles.
+   Three of them are dark because they are the only three the owner touches.
+   The point has to land in two seconds, without reading a sentence.
+   ------------------------------------------------------- */
+export type DayJob = {
+  at: string;                       // clock time, tiny, for the arc of a day
   by: "system" | "you";
-  text: Record<Locale, string>;
+  icon: IconKey;
+  label: Record<Locale, string>;    // two or three familiar words, never a sentence
 };
 
-export const DAY_FEED: FeedItem[] = [
-  { at: "06 h 58", by: "system", text: {
-    en: "The AI answers, qualifies and creates the client record",
-    fr: "L'IA répond, qualifie et crée la fiche client" } },
-  { at: "07 h 01", by: "system", text: {
-    en: "Secure link texted out for the plans and the photos",
-    fr: "Lien sécurisé envoyé par texto pour les plans et les photos" } },
-  { at: "07 h 14", by: "system", text: {
-    en: "Plans received · read, symbols placed, 212 items counted",
-    fr: "Plans reçus · lus, symboles placés, 212 items comptés" } },
-  { at: "07 h 16", by: "system", text: {
-    en: "Estimate draft built from your own recipes",
-    fr: "Brouillon d'estimation monté à partir de tes recettes" } },
-  { at: "07 h 40", by: "you", text: {
-    en: "You approve the plan and adjust the estimate",
-    fr: "Tu valides le plan et tu ajustes l'estimation" } },
-  { at: "07 h 44", by: "system", text: {
-    en: "Quote laid out, explainer video generated",
-    fr: "Soumission mise en page, vidéo d'explication générée" } },
-  { at: "07 h 45", by: "you", text: {
-    en: "You approve the sending",
-    fr: "Tu approuves l'envoi" } },
-  { at: "07 h 45", by: "system", text: {
-    en: "Quote sent · open tracking switched on",
-    fr: "Soumission envoyée · suivi d'ouverture activé" } },
-  { at: "08 h 02", by: "system", text: {
-    en: "Client opened the quote twice · follow-up scheduled",
-    fr: "Client a ouvert la soumission 2 fois · relance programmée" } },
-  { at: "09 h 30", by: "system", text: {
-    en: "Supplier pricing received by email · extracted, pending",
-    fr: "Prix fournisseur reçu par courriel · extrait, en attente" } },
-  { at: "09 h 31", by: "you", text: {
-    en: "You approve the new price list",
-    fr: "Tu approuves la nouvelle liste de prix" } },
-  { at: "11 h 12", by: "system", text: {
-    en: "Quote signed · project queued for scheduling",
-    fr: "Soumission signée · projet entré dans la file de planification" } },
-  { at: "11 h 12", by: "system", text: {
-    en: "Work order generated and pushed to the crew's tablet",
-    fr: "Bon de travail généré et envoyé sur la tablette de l'équipe" } },
-  { at: "12 h 05", by: "system", text: {
-    en: "Deposit invoice generated and sent",
-    fr: "Facture d'acompte générée et envoyée" } },
-  { at: "16 h 40", by: "system", text: {
-    en: "Hours, photos and job-site materials synced",
-    fr: "Heures, photos et matériel du chantier synchronisés" } },
-  { at: "17 h 02", by: "system", text: {
-    en: "Day report ready · margin up to date",
-    fr: "Rapport de journée prêt · marge à jour" } },
+export type IconKey =
+  | "phone" | "photo" | "ruler" | "calc" | "check" | "doc" | "send"
+  | "eye" | "tag" | "pen" | "clip" | "receipt" | "clock" | "chart";
+
+export const DAY_JOBS: DayJob[] = [
+  { at: "06 h 58", by: "system", icon: "phone",   label: { en: "Call answered",     fr: "Appel répondu" } },
+  { at: "07 h 01", by: "system", icon: "photo",   label: { en: "Plans and photos",  fr: "Plans et photos" } },
+  { at: "07 h 14", by: "system", icon: "ruler",   label: { en: "Quantities counted",fr: "Quantités comptées" } },
+  { at: "07 h 16", by: "system", icon: "calc",    label: { en: "Estimate drafted",  fr: "Estimation montée" } },
+  { at: "07 h 40", by: "you",    icon: "check",   label: { en: "You check it",      fr: "Tu la vérifies" } },
+  { at: "07 h 44", by: "system", icon: "doc",     label: { en: "Quote built",       fr: "Soumission montée" } },
+  { at: "07 h 45", by: "you",    icon: "pen",     label: { en: "You send it",       fr: "Tu l'envoies" } },
+  { at: "07 h 45", by: "system", icon: "send",    label: { en: "Quote delivered",   fr: "Soumission livrée" } },
+  { at: "08 h 02", by: "system", icon: "eye",     label: { en: "Client opened it",  fr: "Client l'a ouverte" } },
+  { at: "09 h 30", by: "system", icon: "tag",     label: { en: "Supplier prices",   fr: "Prix fournisseurs" } },
+  { at: "09 h 31", by: "you",    icon: "check",   label: { en: "You approve prices",fr: "Tu approuves les prix" } },
+  { at: "11 h 12", by: "system", icon: "pen",     label: { en: "Contract signed",   fr: "Contrat signé" } },
+  { at: "11 h 12", by: "system", icon: "clip",    label: { en: "Work order sent",   fr: "Bon de travail envoyé" } },
+  { at: "12 h 05", by: "system", icon: "receipt", label: { en: "Deposit invoiced",  fr: "Acompte facturé" } },
+  { at: "16 h 40", by: "system", icon: "clock",   label: { en: "Hours and photos",  fr: "Heures et photos" } },
+  { at: "17 h 02", by: "system", icon: "chart",   label: { en: "Margin up to date", fr: "Marge à jour" } },
 ];
 
-export const FEED_TOTAL = DAY_FEED.length;                               // 16
-export const FEED_YOURS = DAY_FEED.filter((i) => i.by === "you").length; // 3
+export const JOBS_TOTAL = DAY_JOBS.length;                                // 16
+export const JOBS_YOURS = DAY_JOBS.filter((j) => j.by === "you").length;  // 3
+export const JOBS_AUTO = JOBS_TOTAL - JOBS_YOURS;                         // 13
 
-export const FEED_UI: Record<Locale, {
-  kicker: string; titleA: string; titleB: string;
-  pause: string; play: string; oneLine: string; restart: string;
-  doneLabel: string; yoursLabel: string;
+export const DAY_UI: Record<Locale, {
+  kicker: string;
+  titleA: string; titleB: string;
+  autoLabel: string; yoursLabel: string;
   system: string; you: string;
-  closingA: string; closingB: string; closingC: string;
+  closing: string;
 }> = {
   en: {
-    kicker: "Your day",
-    titleA: "This all got done",
-    titleB: "while you were on site",
-    pause: "Pause", play: "Play", oneLine: "One line", restart: "Restart",
-    doneLabel: "tasks done", yoursLabel: "from you",
-    system: "THE SYSTEM", you: "YOU",
-    closingA: "Sixteen things happen in the day.",
-    closingB: "Three need your signature.",
-    closingC: "The rest happened while you were on a job site, on the phone, or having supper.",
+    kicker: "A normal day",
+    titleA: "16 jobs a day.", titleB: "You touch 3.",
+    autoLabel: "run themselves", yoursLabel: "need your OK",
+    system: "DONE", you: "YOU",
+    closing: "The other 13 happened while you were on a job site, on the phone, or having supper.",
   },
   fr: {
-    kicker: "Ta journée",
-    titleA: "Tout ça s'est fait",
-    titleB: "pendant que t'étais sur la job",
-    pause: "Pause", play: "Jouer", oneLine: "Une ligne", restart: "Recommencer",
-    doneLabel: "tâches faites", yoursLabel: "de ta part",
-    system: "LE SYSTÈME", you: "TOI",
-    closingA: "Seize choses arrivent dans la journée.",
-    closingB: "Trois demandent ta signature.",
-    closingC: "Le reste s'est fait pendant que tu étais sur un chantier, au téléphone, ou en train de souper.",
+    kicker: "Une journée normale",
+    titleA: "16 jobs par jour.", titleB: "T'en touches 3.",
+    autoLabel: "se font tout seules", yoursLabel: "demandent ton OK",
+    system: "FAIT", you: "TOI",
+    closing: "Les 13 autres se sont faites pendant que t'étais sur un chantier, au téléphone, ou en train de souper.",
   },
 };
 
