@@ -276,6 +276,9 @@ export const ASSURANCES_UI: Record<Locale, {
 export const UNCOMPARABLE_UI: Record<Locale, {
   kicker: string; title: string; lead: string;
   placeholder: string; button: string; done: string; points: string[]; cta: string;
+  /* the live comparison the visitor's own number drives */
+  theirs: string; ours: string; saving: string; scope: string; timeline: string;
+  scopeValue: string; timelineTheirs: string; timelineOurs: string; note: string;
 }> = {
   en: {
     kicker: "The Uncomparable",
@@ -286,6 +289,15 @@ export const UNCOMPARABLE_UI: Record<Locale, {
     done: "Perfect, send it through the form below and we'll come back with a stronger offer.",
     points: ["Lower cost", "Higher quality", "Better timeline"],
     cta: "Send my quote",
+    theirs: "Their quote",
+    ours: "Blobex, estimated",
+    saving: "You keep",
+    scope: "Scope",
+    timeline: "Timeline",
+    scopeValue: "Fixed, written down before we start",
+    timelineTheirs: "Open-ended",
+    timelineOurs: "Agreed up front",
+    note: "An illustration, not an offer. Your real number comes from the discovery call, and it is fixed before a line of code is written.",
   },
   fr: {
     kicker: "L'Incomparable",
@@ -296,5 +308,14 @@ export const UNCOMPARABLE_UI: Record<Locale, {
     done: "Parfait, envoyez-la via le formulaire ci-dessous et on revient avec une offre plus forte.",
     points: ["Coût plus bas", "Qualité supérieure", "Meilleur échéancier"],
     cta: "Envoyer ma soumission",
+    theirs: "Leur soumission",
+    ours: "Blobex, estimé",
+    saving: "Tu gardes",
+    scope: "Portée",
+    timeline: "Échéancier",
+    scopeValue: "Fixe, écrite avant de commencer",
+    timelineTheirs: "Ouvert",
+    timelineOurs: "Convenu d'avance",
+    note: "Une illustration, pas une offre. Ton vrai chiffre vient de l'appel découverte, et il est fixé avant la première ligne de code.",
   },
 };

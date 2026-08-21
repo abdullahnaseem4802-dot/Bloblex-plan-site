@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import Reveal from "./Reveal";
+import { useScrub, useScrubValue, stagger, ease } from "@/lib/scrub";
 import AppIcon from "./AppIcon";
 import { type Locale } from "@/content/site";
 import { COMPARISON, TOOLS, LOOSE, RING } from "@/content/comparison";
@@ -17,6 +18,16 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const [live, setLive] = useState(false);
+
+  /* The right-hand system wires itself together as the section is scrolled,
+     spoke by spoke, and only once it is whole does data start moving through
+     it. The left side never resolves: it keeps twitching and its hand-offs
+     keep dropping in and out, which is the whole argument. */
+  const scrub = useScrub(ref, ["start 88%", "end 62%"]);
+  const p = useScrubValue(scrub);
+  const wire = (i: number) => (reduce ? 1 : ease(stagger(p, i, RING.length, 1.7)));
+  const hub = reduce ? 1 : ease(Math.min(1, Math.max(0, (p - 0.62) / 0.3)));
+  const flowing = p > 0.9;
 
   /* the picture only animates once it is actually on screen */
   useEffect(() => {
@@ -55,8 +66,24 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
                       className="absolute"
                       style={{ left: `${p.x}%`, top: `${p.y}%` }}
                       initial={reduce ? false : { opacity: 0, scale: 0.6 }}
-                      animate={live ? { opacity: 1, scale: 1 } : undefined}
-                      transition={{ duration: 0.45, delay: 0.05 * i, ease: [0.16, 1, 0.3, 1] }}
+                      animate={
+                        live
+                          ? reduce
+                            ? { opacity: 1, scale: 1 }
+                            : {
+                                opacity: 1, scale: 1,
+                                /* never settles: each one drifts on its own clock */
+                                x: [0, (i % 2 ? 1 : -1) * (3 + (i % 3)), 0],
+                                y: [0, (i % 3 ? -1 : 1) * (3 + (i % 2) * 2), 0],
+                              }
+                          : undefined
+                      }
+                      transition={{
+                        opacity: { duration: 0.45, delay: 0.05 * i, ease: [0.16, 1, 0.3, 1] },
+                        scale: { duration: 0.45, delay: 0.05 * i, ease: [0.16, 1, 0.3, 1] },
+                        x: { duration: 3.4 + (i % 4) * 0.7, repeat: Infinity, ease: "easeInOut" },
+                        y: { duration: 4.1 + (i % 3) * 0.6, repeat: Infinity, ease: "easeInOut" },
+                      }}
                     >
                       <div
                         className="-translate-x-1/2 -translate-y-1/2"
@@ -75,8 +102,9 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
                       x1={LOOSE[a].x} y1={LOOSE[a].y} x2={LOOSE[b].x} y2={LOOSE[b].y}
                       stroke={RED} strokeWidth="0.4" strokeDasharray="2 2.4" vectorEffect="non-scaling-stroke"
                       initial={reduce ? false : { opacity: 0 }}
-                      animate={live ? { opacity: 0.5 } : undefined}
-                      transition={{ duration: 0.5, delay: 0.5 + i * 0.08 }}
+                      /* the hand-offs keep dropping and coming back */
+                      animate={live ? (reduce ? { opacity: 0.5 } : { opacity: [0.08, 0.55, 0.12, 0.5, 0.08] }) : undefined}
+                      transition={{ duration: 3.2 + i * 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.5 + i * 0.08 }}
                     />
                   ))}
                 </svg>
@@ -116,9 +144,17 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
                       key={i}
                       x1={50} y1={50} x2={p.x} y2={p.y}
                       stroke={BRAND} strokeWidth="0.5" vectorEffect="non-scaling-stroke"
-                      initial={reduce ? false : { pathLength: 0, opacity: 0 }}
-                      animate={live ? { pathLength: 1, opacity: 0.55 } : undefined}
-                      transition={{ duration: 0.5, delay: 0.35 + i * 0.06, ease: "easeOut" }}
+                      style={{ pathLength: wire(i), opacity: wire(i) * 0.6 }}
+                    />
+                  ))}
+                  {/* once every spoke is wired, one packet runs each of them */}
+                  {flowing && !reduce && RING.map((q, i) => (
+                    <motion.circle
+                      key={"pk" + i}
+                      r="1.6" fill={BRAND}
+                      initial={{ cx: 50, cy: 50, opacity: 0 }}
+                      animate={{ cx: [50, q.x], cy: [50, q.y], opacity: [0, 1, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.34, ease: "easeInOut", repeatDelay: 1.4 }}
                     />
                   ))}
                 </svg>
@@ -129,9 +165,8 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
                       key={tool}
                       className="absolute"
                       style={{ left: `${p.x}%`, top: `${p.y}%` }}
-                      initial={reduce ? false : { opacity: 0, scale: 0.6 }}
-                      animate={live ? { opacity: 1, scale: 1 } : undefined}
-                      transition={{ duration: 0.45, delay: 0.05 * i, ease: [0.16, 1, 0.3, 1] }}
+                      animate={{ opacity: wire(i), scale: 0.62 + wire(i) * 0.38 }}
+                      transition={{ duration: 0 }}
                     >
                       <div className="-translate-x-1/2 -translate-y-1/2">
                         <AppIcon app={tool} size={38} />
@@ -142,9 +177,8 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
                 {/* the hub */}
                 <motion.div
                   className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white px-4 py-3 text-center shadow-[0_18px_44px_-14px_rgba(41,171,226,.75)]"
-                  initial={reduce ? false : { opacity: 0, scale: 0.7 }}
-                  animate={live ? { opacity: 1, scale: 1 } : undefined}
-                  transition={{ duration: 0.5, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                  animate={{ opacity: hub, scale: 0.72 + hub * 0.28 }}
+                  transition={{ duration: 0 }}
                 >
                   <p className="font-[family-name:var(--font-display)] text-[0.72rem] font-bold tracking-[0.1em]" style={{ color: BRAND }}>
                     {t.centerTitle}
