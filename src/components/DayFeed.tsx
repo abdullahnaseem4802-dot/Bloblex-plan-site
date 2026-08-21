@@ -31,6 +31,8 @@ export default function DayFeed({ locale }: { locale: Locale }) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const live = useInView(ref, { once: true, amount: 0.3 });
+  const onScreen = useInView(ref, { amount: 0.05 });
+  const idle = onScreen && live && !reduce;   // never animates to an empty room
   const pos = useMemo(() => layout(DAY_JOBS.length), []);
 
   /* each job wakes as the light reaches its own hour */
@@ -56,7 +58,12 @@ export default function DayFeed({ locale }: { locale: Locale }) {
             className="relative mt-9 overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-ink)] px-5 py-9 text-white sm:px-8 md:px-12 md:py-12"
           >
             {/* light pooling behind the working part of the day */}
-            <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-[26rem] w-[46rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(41,171,226,.2),transparent_68%)]" />
+            <motion.div
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[26rem] w-[46rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(41,171,226,.2),transparent_68%)]"
+              animate={idle ? { scale: [1, 1.07, 1], opacity: [0.85, 1, 0.85] } : { scale: 1, opacity: 1 }}
+              transition={idle ? { duration: 11, repeat: Infinity, ease: "easeInOut" } : { duration: 0.6 }}
+            />
 
             <div className="relative">
               <div className="flex flex-wrap items-end gap-x-10 gap-y-5">
@@ -67,12 +74,12 @@ export default function DayFeed({ locale }: { locale: Locale }) {
 
               {/* wide screens: the day, drawn */}
               <div className="mt-12 hidden lg:block">
-                <Rail t={t} pos={pos} yours={yours} auto={auto} live={live} reduce={!!reduce} at={at} locale={locale} />
+                <Rail t={t} pos={pos} yours={yours} auto={auto} live={live} reduce={!!reduce} idle={idle} at={at} locale={locale} />
               </div>
 
               {/* narrow screens: the same story, stacked */}
               <div className="mt-9 lg:hidden">
-                <Stacked t={t} yours={yours} auto={auto} live={live} reduce={!!reduce} locale={locale} />
+                <Stacked t={t} yours={yours} auto={auto} live={live} reduce={!!reduce} visible={idle} locale={locale} />
               </div>
             </div>
           </div>
@@ -132,10 +139,10 @@ function useCountUp(to: number, reduce: boolean, ms = 850) {
    mark on the rail with a drawn line. Annotating the day this way means the
    cards can never collide, however close together two of them happen to fall. */
 function Rail({
-  t, pos, yours, auto, live, reduce, at, locale,
+  t, pos, yours, auto, live, reduce, idle, at, locale,
 }: {
   t: (typeof DAY_UI)["en"]; pos: number[]; yours: Marked[]; auto: Marked[];
-  live: boolean; reduce: boolean; at: (i: number) => number; locale: Locale;
+  live: boolean; reduce: boolean; idle: boolean; at: (i: number) => number; locale: Locale;
 }) {
   return (
     <div className="relative h-[18.6rem] select-none">
@@ -154,7 +161,7 @@ function Rail({
             animate={live || reduce ? { opacity: 1, y: 0, scale: 1 } : undefined}
             transition={{ type: "spring", stiffness: 250, damping: 21, delay: at(j.i) }}
           >
-            <div className="rounded-[var(--radius)] border border-[var(--color-brand-400)]/45 bg-white/[0.07] p-3.5 shadow-[0_18px_44px_-18px_rgba(41,171,226,.85)] backdrop-blur-sm">
+            <Float on={idle} amp={5} secs={6.5} delay={k * 1.1} className="rounded-[var(--radius)] border border-[var(--color-brand-400)]/45 bg-white/[0.07] p-3.5 shadow-[0_18px_44px_-18px_rgba(41,171,226,.85)] backdrop-blur-sm">
               <div className="flex items-center gap-2">
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-[var(--color-brand-400)] text-white">
                   <Icon name={j.icon} />
@@ -163,7 +170,7 @@ function Rail({
               </div>
               <p className="mt-2.5 text-[0.9rem] font-semibold leading-snug text-white">{j.label[locale]}</p>
               <p className="mt-0.5 font-mono text-[0.64rem] text-white/40">{j.at}</p>
-            </div>
+            </Float>
           </motion.div>
         ))}
       </div>
@@ -206,6 +213,17 @@ function Rail({
         />
       )}
 
+      {/* long after the first sweep, a quiet light still walks the day */}
+      {idle && (
+        <motion.span
+          aria-hidden
+          className="absolute top-[11.9rem] z-[5] h-[3px] w-24 -translate-y-1/2 rounded-full bg-gradient-to-r from-transparent via-white/70 to-transparent blur-[1px]"
+          initial={{ left: "-8%", opacity: 0 }}
+          animate={{ left: "104%", opacity: [0, 0.9, 0.9, 0] }}
+          transition={{ duration: 4.5, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut", times: [0, 0.1, 0.85, 1] }}
+        />
+      )}
+
       {/* where the three land on the rail */}
       {yours.map((j) => (
         <motion.span
@@ -234,9 +252,11 @@ function Rail({
           transition={{ type: "spring", stiffness: 380, damping: 18, delay: at(j.i) }}
         >
           <span aria-hidden className="absolute bottom-full left-1/2 block h-[1.7rem] w-px -translate-x-1/2 bg-gradient-to-b from-[var(--color-brand-400)]/45 to-transparent" />
-          <span className="grid h-10 w-10 place-items-center rounded-full border border-[var(--color-brand-400)]/35 bg-[var(--color-brand-400)]/[0.14] text-[var(--color-brand-200)] shadow-[0_0_16px_-4px_rgba(69,189,236,.55)] transition-colors duration-200 group-hover:border-[var(--color-brand-300)] group-hover:bg-[var(--color-brand-400)]/30">
-            <Icon name={j.icon} />
-          </span>
+          <Float on={idle} amp={3.5} secs={4.4 + (j.i % 5) * 0.6} delay={(j.i % 7) * 0.42}>
+            <span className="grid h-10 w-10 place-items-center rounded-full border border-[var(--color-brand-400)]/35 bg-[var(--color-brand-400)]/[0.14] text-[var(--color-brand-200)] shadow-[0_0_16px_-4px_rgba(69,189,236,.55)] transition-colors duration-200 group-hover:border-[var(--color-brand-300)] group-hover:bg-[var(--color-brand-400)]/30">
+              <Icon name={j.icon} />
+            </span>
+          </Float>
           {/* the word is there for whoever wants it, never required */}
           <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 w-max max-w-[9rem] -translate-x-1/2 rounded-md bg-white/10 px-2 py-1 text-center text-[0.68rem] font-medium text-white/80 opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100">
             {j.label[locale]}
@@ -256,12 +276,15 @@ function Rail({
   );
 }
 
-/* ================= narrow: the same story, stacked ================= */
+/* ================= narrow: the same story, stacked =================
+   A wrapped run of pill-shaped chips came out ragged, every row a
+   different length. Fixed columns give the thirteen a shape, and the
+   three keep the raised treatment they have on the rail. */
 function Stacked({
-  t, yours, auto, live, reduce, locale,
+  t, yours, auto, live, reduce, visible, locale,
 }: {
   t: (typeof DAY_UI)["en"]; yours: Marked[]; auto: Marked[];
-  live: boolean; reduce: boolean; locale: Locale;
+  live: boolean; reduce: boolean; visible: boolean; locale: Locale;
 }) {
   return (
     <div>
@@ -273,35 +296,59 @@ function Stacked({
             initial={reduce ? false : { opacity: 0, y: 12 }}
             animate={live || reduce ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.45, delay: reduce ? 0 : k * 0.12, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-center gap-3 rounded-[var(--radius)] border border-[var(--color-brand-400)]/45 bg-white/[0.07] p-3.5 shadow-[0_16px_36px_-20px_rgba(41,171,226,.9)]"
+            className="rounded-[var(--radius)] border border-[var(--color-brand-400)]/45 bg-white/[0.07] shadow-[0_16px_36px_-20px_rgba(41,171,226,.9)]"
           >
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-[var(--color-brand-400)] text-white">
-              <Icon name={j.icon} />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-[0.9rem] font-semibold leading-snug text-white">{j.label[locale]}</span>
-              <span className="block font-mono text-[0.64rem] text-white/40">{j.at}</span>
-            </span>
+            <Float on={visible && !reduce} amp={3} secs={5} delay={k * 0.5} className="flex items-center gap-3 p-3.5">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[11px] bg-[var(--color-brand-400)] text-white shadow-[0_0_18px_-4px_rgba(69,189,236,.9)]">
+                <Icon name={j.icon} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[0.92rem] font-semibold leading-snug text-white">{j.label[locale]}</span>
+                <span className="block font-mono text-[0.64rem] text-white/40">{j.at}</span>
+              </span>
+              <span className="shrink-0 rounded-full bg-[var(--color-brand-400)]/20 px-2 py-[3px] text-[0.54rem] font-bold tracking-[0.14em] text-[var(--color-brand-200)]">
+                {t.you}
+              </span>
+            </Float>
           </motion.li>
         ))}
       </ul>
 
-      <p className="mb-3 mt-8 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white/35">{t.autoHeading}</p>
-      <ul className="flex flex-wrap gap-2">
+      <p className="mb-3 mt-8 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white/60">{t.autoHeading}</p>
+      <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {auto.map((j, k) => (
           <motion.li
             key={"a" + j.i}
-            initial={reduce ? false : { opacity: 0, scale: 0.7 }}
-            animate={live || reduce ? { opacity: 1, scale: 1 } : undefined}
-            transition={{ type: "spring", stiffness: 360, damping: 20, delay: reduce ? 0 : 0.4 + k * 0.05 }}
-            className="flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] py-1.5 pl-2 pr-3.5"
+            initial={reduce ? false : { opacity: 0, y: 8, scale: 0.9 }}
+            animate={live || reduce ? { opacity: 1, y: 0, scale: 1 } : undefined}
+            transition={{ type: "spring", stiffness: 320, damping: 22, delay: reduce ? 0 : 0.4 + k * 0.045 }}
+            className="flex min-w-0 items-center gap-2 rounded-[var(--radius)] border border-[var(--color-brand-400)]/25 bg-[var(--color-brand-400)]/[0.09] px-2.5 py-2.5"
           >
-            <span className="text-[var(--color-brand-300)]"><Icon name={j.icon} /></span>
-            <span className="text-[0.76rem] font-medium text-white/70">{j.label[locale]}</span>
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-[var(--color-brand-400)]/35 text-[var(--color-brand-200)]">
+              <Icon name={j.icon} />
+            </span>
+            {/* wraps rather than truncates: a half-word helps nobody */}
+            <span className="min-w-0 text-[0.72rem] font-medium leading-tight text-white/75">{j.label[locale]}</span>
           </motion.li>
         ))}
       </ul>
     </div>
+  );
+}
+
+/** A very small, very slow rise and fall. Only while the panel is actually
+ *  on screen, so nothing is animating to an empty room. */
+function Float({
+  on, amp, secs, delay, className, children,
+}: { on: boolean; amp: number; secs: number; delay: number; className?: string; children: React.ReactNode }) {
+  return (
+    <motion.div
+      className={className}
+      animate={on ? { y: [0, -amp, 0] } : { y: 0 }}
+      transition={on ? { duration: secs, repeat: Infinity, ease: "easeInOut", delay } : { duration: 0.4 }}
+    >
+      {children}
+    </motion.div>
   );
 }
 
