@@ -4,7 +4,6 @@ import { fontVars } from "@/lib/fonts";
 import { SITE } from "@/content/site";
 import AmbientBackground from "@/components/AmbientBackground";
 import ScrollProgress from "@/components/ScrollProgress";
-import PointerFlourish from "@/components/PointerFlourish";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.domain),
@@ -22,7 +21,6 @@ export default function FrLayout({ children }: { children: React.ReactNode }) {
       <body>
         <AmbientBackground />
         <ScrollProgress />
-        <PointerFlourish />
         <a href="#main" className="skip-link">Aller au contenu</a>
         {children}
       </body>
