@@ -3,7 +3,6 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import Typewriter from "./Typewriter";
 import MagneticLink from "./MagneticLink";
-import ParticleBackground from "./ParticleBackground";
 import HeroAtmosphere from "./HeroAtmosphere";
 import HeroBlobStage from "./HeroBlobStage";
 import { CONTENT, type Locale } from "@/content/site";
@@ -19,12 +18,6 @@ export default function Hero({ locale }: { locale: Locale }) {
 
   return (
     <section id="hero" className="hero-dark relative overflow-hidden pt-[132px] pb-16 sm:pb-20 md:pt-[148px] md:pb-24">
-      {/* .hero-dark > * forces position:relative;z-index:1 on every direct
-          child and outranks the utilities, so this layer states its own
-          placement inline to stay a full-bleed backdrop */}
-      <div className="overflow-hidden" style={{ position: "absolute", inset: 0, zIndex: 0 }} aria-hidden="true">
-        <ParticleBackground fixed={false} boost={1.7} />
-      </div>
       <HeroAtmosphere />
       <div className="container grid gap-4 sm:gap-10 lg:grid-cols-[1.05fr_1fr] lg:gap-6 items-center">
         {/* Copy */}

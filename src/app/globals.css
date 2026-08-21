@@ -395,5 +395,5 @@ html[data-intro] .bx-tw-ch { opacity: 0; }
 /* Opaque section bands hid the living backdrop, so the particle web only
    showed in a handful of places. They are now a hair translucent: the same
    colour to the eye, but the drifting web reads through the whole page. */
-.band-white { background: rgba(255,255,255,.70); }
-.band-panel { background: rgba(246,249,252,.66); }
+.band-white { background: #ffffff; }
+.band-panel { background: var(--color-panel, #f6f9fc); }
