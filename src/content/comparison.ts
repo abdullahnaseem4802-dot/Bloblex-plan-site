@@ -22,11 +22,14 @@ export const TOOLS: AppKey[] = [
 ];
 
 /** Scattered placement for the "right now" side, in % of the stage. */
+/* Kept inside 22..78 across and 20..78 down: an icon is centred on its point,
+   so anything nearer the edge than half an icon hangs out of the frame, which
+   is exactly what happened on a phone where the frame is barely 290px wide. */
 export const LOOSE: { x: number; y: number; r: number }[] = [
-  { x: 18, y: 16, r: -12 }, { x: 54, y: 10, r: 8 },
-  { x: 82, y: 22, r: 14 }, { x: 30, y: 40, r: 6 },
-  { x: 70, y: 48, r: -9 }, { x: 14, y: 66, r: 11 },
-  { x: 48, y: 74, r: -6 }, { x: 80, y: 76, r: 7 },
+  { x: 24, y: 20, r: -12 }, { x: 52, y: 22, r: 8 },
+  { x: 76, y: 21, r: 14 }, { x: 26, y: 49, r: 6 },
+  { x: 74, y: 50, r: -9 }, { x: 24, y: 77, r: 11 },
+  { x: 50, y: 76, r: -6 }, { x: 76, y: 77, r: 7 },
 ];
 
 /** Even ring for the "what we build" side. */

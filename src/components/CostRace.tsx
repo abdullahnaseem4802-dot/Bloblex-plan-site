@@ -2,7 +2,7 @@
 import { useRef } from "react";
 import { motion, useTransform, useReducedMotion } from "motion/react";
 import Reveal from "./Reveal";
-import { useScrub, useScrubValue, ease } from "@/lib/scrub";
+import { useScrub, useScrubValue, useSettle, ease } from "@/lib/scrub";
 import { type Locale } from "@/content/site";
 import { FIXED_PRICE, RIVAL_END, COST_UI, money } from "@/content/costrace";
 
@@ -18,7 +18,11 @@ export default function CostRace({ locale }: { locale: Locale }) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const scrub = useScrub(ref, ["start 90%", "end 48%"]);
-  const p = useScrubValue(scrub);
+  const raw = useScrubValue(scrub);
+  /* on a phone this panel is taller than the screen, so it also finishes on
+     its own once it is in view; whichever is further along wins */
+  const settle = useSettle(ref, 1500);
+  const p = Math.max(raw, settle);
 
   /* the hourly shop bills all the way through; we stop at the agreed number
      once the work is done, which happens sooner */

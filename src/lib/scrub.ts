@@ -82,3 +82,71 @@ export function stagger(p: number, index: number, count: number, share = 1.9): n
 export function ease(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
+
+/* ---------------------------------------------------------------------------
+   Small screens need a second way in.
+
+   Scrubbing works because a desktop section is short enough to travel fully
+   through the viewport while the visitor reads it. On a phone the same section
+   is two or three screens tall, so the scroll range only completes once the
+   panel has been pushed well past the top: the visitor sits in front of a
+   half-finished animation and has to scroll away to finish it.
+
+   So on small screens only, the section also plays itself once it is properly
+   in view. Callers take the higher of the two, which means scrolling still
+   drives it and scrolling back still unwinds it. Desktop is untouched.
+--------------------------------------------------------------------------- */
+
+/** True on phones and small tablets. Follows the viewport if it changes. */
+export function useSmallScreen(query = "(max-width: 1023px)"): boolean {
+  const [small, setSmall] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const sync = () => setSmall(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, [query]);
+  return small;
+}
+
+/** 0 → 1 over `ms`, started once `ref` is `amount` visible. Small screens only;
+ *  returns 0 forever on desktop so `Math.max(scrub, settle)` is a no-op there. */
+export function useSettle(
+  ref: RefObject<HTMLElement | null>,
+  ms = 1400,
+  amount = 0.2,
+): number {
+  const small = useSmallScreen();
+  const reduce = useReducedMotion();
+  const [p, setP] = useState(0);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!small || !el) { setP(0); return; }
+    if (reduce) { setP(1); return; }
+
+    let raf = 0;
+    let t0 = 0;
+    const step = (now: number) => {
+      if (!t0) t0 = now;
+      const k = Math.min(1, (now - t0) / ms);
+      setP(k);
+      if (k < 1) raf = requestAnimationFrame(step);
+    };
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        raf = requestAnimationFrame(step);
+      },
+      /* a tall panel never reaches a high ratio on a phone, so ask for a
+         modest slice of it and pull the viewport edges in instead */
+      { threshold: amount, rootMargin: "-10% 0px -10% 0px" },
+    );
+    io.observe(el);
+    return () => { io.disconnect(); cancelAnimationFrame(raf); };
+  }, [ref, ms, amount, small, reduce]);
+
+  return p;
+}

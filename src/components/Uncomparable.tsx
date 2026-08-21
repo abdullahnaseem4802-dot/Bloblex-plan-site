@@ -74,9 +74,17 @@ export default function Uncomparable({ locale }: { locale: Locale }) {
               <h2 className="text-3xl md:text-5xl font-semibold text-white">{ui.title}</h2>
               <p className="mt-5 text-lg text-white/80">{ui.lead}</p>
 
-              <div className="mt-8 flex flex-wrap gap-3">
+              {/* one pill per row looked like a list of three demands. Tighter
+                  type and padding fits all three across a phone; French runs
+                  longer and falls to a second row, which is fine. */}
+              <div className="mt-8 flex flex-wrap gap-2 sm:gap-3">
                 {ui.points.map((p) => (
-                  <span key={p} className="rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold">✓ {p}</span>
+                  <span
+                    key={p}
+                    className="whitespace-nowrap rounded-full border border-white/20 bg-white/5 px-2.5 py-1.5 text-[0.72rem] font-semibold sm:px-4 sm:py-2 sm:text-sm"
+                  >
+                    ✓ {p}
+                  </span>
                 ))}
               </div>
 

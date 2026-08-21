@@ -2,7 +2,7 @@
 import { useRef } from "react";
 import { motion } from "motion/react";
 import Reveal from "./Reveal";
-import { useScrub, useScrubValue, stagger, ease } from "@/lib/scrub";
+import { useScrub, useScrubValue, useSettle, stagger, ease } from "@/lib/scrub";
 import { type Locale } from "@/content/site";
 import { AUTOMATION_TASKS, AUTOMATION_UI } from "@/content/extras";
 
@@ -21,7 +21,9 @@ export default function AutomationPicker({ locale }: { locale: Locale }) {
   const t = AUTOMATION_UI[locale];
   const ref = useRef<HTMLDivElement>(null);
   const scrub = useScrub(ref, ["start 92%", "end 45%"]);
-  const p = useScrubValue(scrub);
+  const raw = useScrubValue(scrub);
+  const settle = useSettle(ref, 1700);
+  const p = Math.max(raw, settle);
 
   const moved = AUTOMATION_TASKS.map((_, i) => ease(stagger(p, i, AUTOMATION_TASKS.length, 2.2)));
   const hours = AUTOMATION_TASKS.reduce((a, task, i) => a + task.hoursPerWeek * moved[i], 0);

@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import Reveal from "./Reveal";
-import { useScrub, useScrubValue, stagger, ease } from "@/lib/scrub";
+import { useScrub, useScrubValue, useSmallScreen, stagger, ease } from "@/lib/scrub";
 import AppIcon from "./AppIcon";
 import { type Locale } from "@/content/site";
 import { COMPARISON, TOOLS, LOOSE, RING } from "@/content/comparison";
@@ -25,6 +25,7 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
      keep dropping in and out, which is the whole argument. */
   /* Tuned so the system is finished by the time the panel is properly in
      front of the visitor, not after they have scrolled past it. */
+  const small = useSmallScreen();
   const scrub = useScrub(ref, ["start 92%", "end 96%"]);
   const raw = useScrubValue(scrub);
 
@@ -95,8 +96,8 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
                             : {
                                 opacity: 1, scale: 1,
                                 /* never settles: each one drifts on its own clock */
-                                x: [0, (i % 2 ? 1 : -1) * (3 + (i % 3)), 0],
-                                y: [0, (i % 3 ? -1 : 1) * (3 + (i % 2) * 2), 0],
+                                x: [0, (i % 2 ? 1 : -1) * (1.5 + (i % 3) * 0.5), 0],
+                                y: [0, (i % 3 ? -1 : 1) * (1.5 + (i % 2)), 0],
                               }
                           : undefined
                       }
@@ -111,25 +112,11 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
                         className="-translate-x-1/2 -translate-y-1/2"
                         style={{ transform: `translate(-50%,-50%) rotate(${p.r}deg)` }}
                       >
-                        <AppIcon app={tool} size={38} />
+                        <AppIcon app={tool} size={small ? 30 : 38} />
                       </div>
                     </motion.div>
                   );
                 })}
-                {/* the broken hand-offs between them */}
-                <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
-                  {[[0, 3], [1, 4], [3, 6], [4, 7], [5, 6]].map(([a, b], i) => (
-                    <motion.line
-                      key={i}
-                      x1={LOOSE[a].x} y1={LOOSE[a].y} x2={LOOSE[b].x} y2={LOOSE[b].y}
-                      stroke={RED} strokeWidth="0.4" strokeDasharray="2 2.4" vectorEffect="non-scaling-stroke"
-                      initial={reduce ? false : { opacity: 0 }}
-                      /* the hand-offs keep dropping and coming back */
-                      animate={live ? (reduce ? { opacity: 0.5 } : { opacity: [0.08, 0.55, 0.12, 0.5, 0.08] }) : undefined}
-                      transition={{ duration: 3.2 + i * 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.5 + i * 0.08 }}
-                    />
-                  ))}
-                </svg>
               </>
             }
           />
@@ -191,7 +178,7 @@ export default function SystemComparison({ locale }: { locale: Locale }) {
                       transition={{ duration: 0 }}
                     >
                       <div className="-translate-x-1/2 -translate-y-1/2">
-                        <AppIcon app={tool} size={38} />
+                        <AppIcon app={tool} size={small ? 30 : 38} />
                       </div>
                     </motion.div>
                   );
@@ -242,7 +229,7 @@ function Panel({
       <p className="mt-1.5 text-xl font-semibold text-[var(--color-ink)] md:text-2xl">{side.headline}</p>
 
       {/* the picture carries the argument */}
-      <div className="relative mt-5 aspect-[4/3] w-full rounded-[var(--radius)] border border-[var(--color-line)] bg-[var(--color-panel)]/60">
+      <div className="relative mt-5 aspect-[4/3] w-full overflow-hidden rounded-[var(--radius)] border border-[var(--color-line)] bg-[var(--color-panel)]/60">
         {picture}
       </div>
       <p className="mt-2 text-center text-[0.72rem] font-medium text-[var(--color-mute)]">{side.caption}</p>

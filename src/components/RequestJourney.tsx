@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Reveal from "./Reveal";
 import { type Locale } from "@/content/site";
@@ -11,49 +11,20 @@ const BLUE = "#1787c4";
 
 /* Both columns run at once, on their own, as soon as the section is on screen.
    The client's note was that nobody will click through a simulator: it has to
-   land in about three seconds, side by side, with no interaction. */
-const TICK = 90;          // ms per frame of the race
-const MANUAL_PER_TICK = 7; // manual minutes consumed per frame
+   land in about three seconds, side by side, with no interaction.
+
+   Each lane now owns its own clock rather than sharing one timer. On a desktop
+   the two are side by side, come into view together and still race. On a phone
+   they are stacked a screen apart, and a shared timer meant the system lane had
+   already run to 12 min before it was ever scrolled to - the visitor saw a
+   finished bar and no animation at all. Owning the clock lets each lane start
+   when it is actually looked at. */
+const RUN_MS = 2600;       // the manual lane, end to end
+const SYSTEM_SHARE = 1 / 6; // the system finishes early and then waits, which is the point
 
 export default function RequestJourney({ locale }: { locale: Locale }) {
   const t = JOURNEY_UI[locale];
   const reduce = useReducedMotion();
-  const ref = useRef<HTMLDivElement>(null);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const [manualMin, setManualMin] = useState(0);
-  const [systemMin, setSystemMin] = useState(0);
-  const [runId, setRunId] = useState(0);
-
-  const stop = () => { if (timer.current) { clearInterval(timer.current); timer.current = null; } };
-  useEffect(() => stop, []);
-
-  const run = useCallback(() => {
-    stop();
-    if (reduce) { setManualMin(MANUAL_TOTAL); setSystemMin(SYSTEM_TOTAL); return; }
-    setManualMin(0); setSystemMin(0);
-    setRunId((n) => n + 1);
-    /* the system finishes early and then simply waits, which is the point */
-    const sysPerTick = SYSTEM_TOTAL / (MANUAL_TOTAL / MANUAL_PER_TICK / 6);
-    timer.current = setInterval(() => {
-      setManualMin((m) => (m + MANUAL_PER_TICK >= MANUAL_TOTAL ? (stop(), MANUAL_TOTAL) : m + MANUAL_PER_TICK));
-      setSystemMin((s) => Math.min(SYSTEM_TOTAL, s + sysPerTick));
-    }, TICK);
-  }, [reduce]);
-
-  /* only ever plays while the visitor is actually looking at it */
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { run(); io.disconnect(); } }, { threshold: 0.3 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [run]);
-
-  const manualPct = (manualMin / MANUAL_TOTAL) * 100;
-  const systemPct = (systemMin / SYSTEM_TOTAL) * 100;
-  const manualDone = Math.round((manualMin / MANUAL_TOTAL) * STEPS.length);
-  const systemDone = systemPct >= 99.5 ? STEPS.length : Math.round((systemPct / 100) * STEPS.length);
 
   return (
     <section id="time" className="border-y border-[var(--color-line)] band-panel py-20 md:py-28">
@@ -64,26 +35,17 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
           <p className="mt-5 max-w-[60ch] leading-relaxed text-[var(--color-slate)]">{t.lead}</p>
         </Reveal>
 
-        <div ref={ref} className="mt-10 grid gap-4 lg:grid-cols-2 lg:gap-5">
+        <div className="mt-10 grid gap-4 lg:grid-cols-2 lg:gap-5">
           <Lane
-            key={`m${runId}`}
             label={t.modeManual} tone={AMBER}
-            clock={fmt(Math.round(manualMin), locale)}
-            total={fmt(MANUAL_TOTAL, locale)}
-            pct={manualPct} done={manualDone} locale={locale}
-            sub={t.subManual}
-            finished={manualMin >= MANUAL_TOTAL}
-            finishNote={t.manualDone}
-            reduce={!!reduce}
+            total={MANUAL_TOTAL} runMs={RUN_MS}
+            locale={locale} sub={t.subManual}
+            finishNote={t.manualDone} reduce={!!reduce}
           />
           <Lane
-            key={`s${runId}`}
             label={t.modeSystem} tone={GREEN} highlight
-            clock={fmt(Math.round(systemMin), locale)}
-            total={fmt(SYSTEM_TOTAL, locale)}
-            pct={systemPct} done={systemDone} locale={locale}
-            sub={t.subSystem}
-            finished={systemPct >= 99.5}
+            total={SYSTEM_TOTAL} runMs={RUN_MS * SYSTEM_SHARE}
+            locale={locale} sub={t.subSystem}
             finishNote={t.systemDone(fmt(SYSTEM_TOTAL, locale), DECISION_COUNT)}
             chatter reduce={!!reduce}
           />
@@ -96,14 +58,46 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
 }
 
 function Lane({
-  label, tone, clock, total, pct, done, sub, finished, finishNote, chatter, highlight, locale, reduce,
+  label, tone, total, runMs, sub, finishNote, chatter, highlight, locale, reduce,
 }: {
-  label: string; tone: string; clock: string; total: string; pct: number; done: number;
-  sub: string; finished: boolean; finishNote: string; chatter?: boolean; highlight?: boolean;
+  label: string; tone: string; total: number; runMs: number;
+  sub: string; finishNote: string; chatter?: boolean; highlight?: boolean;
   locale: Locale; reduce: boolean;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [minutes, setMinutes] = useState(0);
+
+  /* starts the first time this lane is properly on screen, and only then */
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (reduce) { setMinutes(total); return; }
+    let raf = 0;
+    let t0 = 0;
+    const step = (now: number) => {
+      if (!t0) t0 = now;
+      const k = Math.min(1, (now - t0) / runMs);
+      setMinutes(total * k);
+      if (k < 1) raf = requestAnimationFrame(step);
+    };
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      raf = requestAnimationFrame(step);
+    }, { threshold: 0.25 });
+    io.observe(el);
+    return () => { io.disconnect(); cancelAnimationFrame(raf); };
+  }, [total, runMs, reduce]);
+
+  const pct = (minutes / total) * 100;
+  const finished = pct >= 99.5;
+  const done = finished ? STEPS.length : Math.round((pct / 100) * STEPS.length);
+  const clock = fmt(Math.round(minutes), locale);
+  const totalLabel = fmt(total, locale);
+
   return (
     <div
+      ref={ref}
       className="flex flex-col rounded-[var(--radius-lg)] border bg-white p-5 md:p-6"
       style={{
         borderColor: highlight ? `${tone}55` : "var(--color-line)",
@@ -122,15 +116,12 @@ function Lane({
 
       {/* the race itself */}
       <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-[var(--color-line)]">
-        {/* width has to be set in style as well: without it the span renders at
-            its natural full width for one frame before motion takes over, which
-            read as the bar sweeping backwards on load */}
-        <motion.span
+        {/* The clock now advances every frame, so the bar is driven straight
+            from it. Handing each frame to a 120ms tween made the bar chase a
+            target it never caught: it read 35% while the counter was at 98%. */}
+        <span
           className="block h-full rounded-full"
-          style={{ background: tone, width: 0 }}
-          initial={false}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: reduce ? 0 : 0.12, ease: "linear" }}
+          style={{ background: tone, width: `${pct}%` }}
         />
       </div>
 
@@ -165,7 +156,7 @@ function Lane({
             </motion.p>
           ) : (
             <motion.p key="run" initial={false} className="text-sm text-[var(--color-slate)]">
-              {chatter ? <Chatter locale={locale} tone={tone} /> : <span className="tabular-nums">{clock} / {total}</span>}
+              {chatter ? <Chatter locale={locale} tone={tone} /> : <span className="tabular-nums">{clock} / {totalLabel}</span>}
             </motion.p>
           )}
         </AnimatePresence>
