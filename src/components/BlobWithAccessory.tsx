@@ -72,36 +72,46 @@ function build(g: Grads): Record<AccessoryKey, React.ReactNode> {
   const line = { stroke: INK, strokeWidth: 2.4, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
 
   return {
-    /* ---------- worker with a shovel: construction ----------
-       The reference is the figure itself, no triangle around it. Dropping the
-       frame is what makes this work: a warning triangle narrows toward the
-       apex, so the pictogram inside it had almost no room and the limbs,
-       shovel and heap merged into one smudge. At full box width the pose is
-       legible. Gold hat, ink body, brand-blue heap: solid black would be the
-       only pure black object on the page. */
+    /* ---------- bricklayer: construction ----------
+       Matched to the reference pose: upright and mid-stride, not bent over a
+       shovel. Back leg stretched behind, front knee bent, rear arm swinging
+       back, front arm reaching out with a brick over a half-built wall. The
+       stride and the reach are what make a standing figure read as working. */
     helmet: (
-      <Companion scale={1.2}>
-        {/* the heap first, so the blade lands in it */}
-        <path d="M41 58 L55 26 L67 58 Z" fill={`url(#${g.brand})`} {...line} />
-        <path d="M31 58 L40 41 L49 58 Z" fill={`url(#${g.deep})`} {...line} />
+      <Companion scale={1.16}>
+        {/* the wall, still going up: the top course is short on purpose */}
+        <g {...line}>
+          <rect x="34" y="53.4" width="9.2" height="5.6" rx="1" fill={`url(#${g.brand})`} />
+          <rect x="44.2" y="53.4" width="9.2" height="5.6" rx="1" fill={`url(#${g.deep})`} />
+          <rect x="54.4" y="53.4" width="9.2" height="5.6" rx="1" fill={`url(#${g.brand})`} />
 
-        {/* legs, then torso, then the near arm on top */}
-        <path d="M27 36 L18 47 L15 58" fill="none" stroke={INK} strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M27 36 L34 45 L32 58" fill="none" stroke={INK} strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M20 25 L28 36" fill="none" stroke={INK} strokeWidth="11" strokeLinecap="round" />
-        <circle cx="19" cy="19" r="5.6" fill={INK} />
+          <rect x="38.6" y="46.8" width="9.2" height="5.6" rx="1" fill={`url(#${g.deep})`} />
+          <rect x="48.8" y="46.8" width="9.2" height="5.6" rx="1" fill={`url(#${g.brand})`} />
 
-        {/* hard hat: the brim only a little wider than the shell, or it is a
-            gold saucer again */}
-        <path d="M10 15 C10 2 28 2 28 15 Z" fill={`url(#${g.gold})`} {...line} />
-        <ellipse cx="19" cy="15" rx="11" ry="2.7" fill={`url(#${g.gold})`} {...line} />
-        <path d="M13.5 12 C14 7.5 16 5 18.5 4" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" opacity="0.6" />
+          <rect x="34" y="40.2" width="9.2" height="5.6" rx="1" fill={`url(#${g.brand})`} />
+          <rect x="44.2" y="40.2" width="9.2" height="5.6" rx="1" fill={`url(#${g.deep})`} />
+          <rect x="54.4" y="40.2" width="9.2" height="5.6" rx="1" fill={`url(#${g.brand})`} />
 
-        {/* shovel: handle from the far hand down into the heap */}
-        <path d="M11 28 L41 46" fill="none" stroke={INK} strokeWidth="4.6" strokeLinecap="round" />
-        <path d="M11 28 L41 46" fill="none" stroke={`url(#${g.steel})`} strokeWidth="2.4" strokeLinecap="round" />
-        <path d="M38 42 L50 49 L45 56 L34 48 Z" fill={`url(#${g.steel})`} {...line} />
-        <path d="M22 27 L39 38" fill="none" stroke={INK} strokeWidth="6.4" strokeLinecap="round" />
+          <rect x="38.6" y="33.6" width="9.2" height="5.6" rx="1" fill={`url(#${g.deep})`} />
+          <rect x="48.8" y="33.6" width="9.2" height="5.6" rx="1" fill={`url(#${g.brand})`} />
+        </g>
+
+        {/* legs: back one stretched behind, front knee bent */}
+        <path d="M22 37 L13 47 L7 56" fill="none" stroke={INK} strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M22 37 L27 46 L25 57" fill="none" stroke={INK} strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+
+        {/* rear arm swinging back, then the torso, then the reaching arm */}
+        <path d="M20 25 L11 33" fill="none" stroke={INK} strokeWidth="5.6" strokeLinecap="round" />
+        <path d="M19 21 L22 38" fill="none" stroke={INK} strokeWidth="11.5" strokeLinecap="round" />
+        <circle cx="19" cy="15" r="6" fill={INK} />
+        <path d="M21 25 L33 30" fill="none" stroke={INK} strokeWidth="5.6" strokeLinecap="round" />
+        <rect x="31.5" y="26.5" width="9" height="5.4" rx="1" fill={`url(#${g.gold})`} {...line} />
+
+        {/* hard hat, with the crest the reference shows */}
+        <path d="M10 14 C10 3 28 3 28 14 Z" fill={`url(#${g.gold})`} {...line} />
+        <path d="M16 4.6 C16 3 22 3 22 4.6 L22 14 L16 14 Z" fill="#e0940a" opacity="0.45" />
+        <ellipse cx="19" cy="14" rx="11" ry="2.7" fill={`url(#${g.gold})`} {...line} />
+        <path d="M13 11 C13.5 7 15.5 4.8 18 4" fill="none" stroke="#fff" strokeWidth="2.3" strokeLinecap="round" opacity="0.6" />
       </Companion>
     ),
 
