@@ -5,12 +5,12 @@ import type { AccessoryKey } from "@/content/sectors";
 
 /* One prop per industry, worn by the brand mark.
 
-   Two families, and nothing in between: helmet and glasses are WORN, sized to
-   the face and sitting on the crown; everything else is a COMPANION object
-   drawn in its own 64x64 box and set down beside the character on a common
-   baseline, with a contact shadow so it sits rather than floats. Earlier these
-   were scattered at nine different scales and anchors, which is what made them
-   read as clip art.
+   Every prop is a set-down object: drawn in its own 66x66 box, standing on a
+   common baseline with a contact shadow. Worn props were tried first and did
+   not survive review - a hat, glasses and a stethoscope sit on top of the
+   face, so they either hide an eye or hover above the crown, and no amount of
+   nudging fixes that. As objects they read as the industry's own sign, which
+   is what the reference pictograms do, and the character stays untouched.
 
    Every object is built the same way: an ink outline at 2.4, a lit face, a
    shaded underside, and one white highlight. That shared recipe is what makes
@@ -69,46 +69,47 @@ function build(g: Grads): Record<AccessoryKey, React.ReactNode> {
   const line = { stroke: INK, strokeWidth: 2.4, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
 
   return {
-    /* ---------- WORN: hard hat, sized to the crown ---------- */
+    /* ---------- hard hat, set down: construction ---------- */
     helmet: (
-      <g>
-        {/* A brim much wider than the crown is a straw hat. A hard hat's brim
-            is barely wider than the shell, and the front peak is the tell. */}
-        <path d="M101 71 C101 88 137 88 137 71 Z" fill="#e0940a" {...line} />
-        <path d="M88 71 C88 29 150 29 150 71 Z" fill={`url(#${g.gold})`} {...line} />
-        <path d="M112 32 C112 30 126 30 126 32 L126 71 L112 71 Z" fill="#fff" opacity="0.28" />
-        <path d="M98 67 C99 46 105 36 112 32" fill="none" stroke="#fff" strokeWidth="3.8" strokeLinecap="round" opacity="0.5" />
-        <ellipse cx="119" cy="74" rx="36" ry="7" fill="#e0940a" {...line} />
-        <ellipse cx="119" cy="71" rx="36" ry="7" fill={`url(#${g.gold})`} {...line} />
-      </g>
+      <Companion>
+        <ellipse cx="33" cy="49" rx="27" ry="7" fill="#e0940a" {...line} />
+        <path d="M11 46 C11 16 55 16 55 46 Z" fill={`url(#${g.gold})`} {...line} />
+        <path d="M26 19 C26 17 40 17 40 19 L40 46 L26 46 Z" fill="#fff" opacity="0.26" />
+        <path d="M18 42 C19 28 24 21 30 18" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinecap="round" opacity="0.5" />
+        <ellipse cx="33" cy="46" rx="27" ry="7" fill={`url(#${g.gold})`} {...line} />
+        <path d="M12 43 C20 47 46 47 54 43" fill="none" stroke="#e0940a" strokeWidth="1.8" opacity="0.5" />
+      </Companion>
     ),
 
-    /* ---------- WORN: safety glasses, on the eyes, not over the whole face ---------- */
+    /* ---------- factory: manufacturing ---------- */
     glasses: (
-      <g>
-        <path d="M100 86 L84 79" {...line} fill="none" />
-        <path d="M174 86 L189 80" {...line} fill="none" />
-        <rect x="99" y="79" width="30" height="28" rx="11" fill={`url(#${g.glass})`} {...line} />
-        <rect x="145" y="79" width="30" height="28" rx="11" fill={`url(#${g.glass})`} {...line} />
-        <path d="M129 89 h16" stroke={INK} strokeWidth="2.6" strokeLinecap="round" />
-        <path d="M105 101 L116 84" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" opacity="0.9" />
-        <path d="M151 101 L162 84" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" opacity="0.9" />
-      </g>
+      <Companion>
+        <rect x="44" y="18" width="15" height="41" rx="3" fill={`url(#${g.deep})`} {...line} />
+        <rect x="47.5" y="9" width="8" height="9" rx="2.5" fill={`url(#${g.steel})`} {...line} />
+        <path d="M4 59 V40 L18 30 V40 L32 30 V40 L46 30 V59 Z" fill={`url(#${g.brand})`} {...line} />
+        <g fill="#fff" opacity="0.9">
+          <rect x="9" y="45" width="7" height="7" rx="1.6" />
+          <rect x="23" y="45" width="7" height="7" rx="1.6" />
+          <rect x="37" y="45" width="7" height="7" rx="1.6" />
+          <rect x="48.5" y="26" width="6" height="6" rx="1.6" />
+          <rect x="48.5" y="38" width="6" height="6" rx="1.6" />
+        </g>
+        <path d="M7 42 L18 34" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" opacity="0.4" />
+      </Companion>
     ),
 
-    /* ---------- WORN: stethoscope, one clean symmetric drape ---------- */
+    /* ---------- first aid case: healthcare ---------- */
     stethoscope: (
-      <g fill="none" strokeLinecap="round">
-        <path d="M102 112 C102 150 172 150 172 112" stroke={INK} strokeWidth="9" />
-        <path d="M102 112 C102 150 172 150 172 112" stroke={`url(#${g.steel})`} strokeWidth="5" />
-        <path d="M137 140 L137 157" stroke={INK} strokeWidth="9" />
-        <path d="M137 140 L137 157" stroke={`url(#${g.steel})`} strokeWidth="5" />
-        <circle cx="102" cy="110" r="6" fill={`url(#${g.steel})`} stroke={INK} strokeWidth="2.4" />
-        <circle cx="172" cy="110" r="6" fill={`url(#${g.steel})`} stroke={INK} strokeWidth="2.4" />
-        <circle cx="137" cy="169" r="12.5" fill={`url(#${g.steel})`} stroke={INK} strokeWidth="2.4" />
-        <circle cx="137" cy="169" r="6" fill={`url(#${g.brand})`} stroke={INK} strokeWidth="1.6" />
-        <path d="M129 163 A10 10 0 0 1 137 159" stroke="#fff" strokeWidth="2.6" opacity="0.9" />
-      </g>
+      <Companion>
+        {/* the cross has to dominate, or at this size the case is just the
+            briefcase from professional services in another colour */}
+        <path d="M26 22 v-4 a4 4 0 0 1 4 -4 h6 a4 4 0 0 1 4 4 v4 Z" fill={`url(#${g.deep})`} {...line} />
+        <rect x="5" y="21" width="56" height="38" rx="8" fill="#f4f8fc" {...line} />
+        {/* one path, not two crossed rectangles: their outlines would run
+            straight through the middle of the cross */}
+        <path d="M27 27 H39 V34 H46 V46 H39 V53 H27 V46 H20 V34 H27 Z" fill={`url(#${g.brand})`} {...line} />
+        <path d="M11 27 C11 25 13 24 16 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity="0.9" />
+      </Companion>
     ),
 
     /* ---------- briefcase: professional services ---------- */
@@ -169,13 +170,18 @@ function build(g: Grads): Record<AccessoryKey, React.ReactNode> {
     /* ---------- cloche: hospitality ---------- */
     bell: (
       <Companion>
-        <path d="M9 50 C9 22 57 22 57 50 Z" fill={`url(#${g.brand})`} {...line} />
-        <path d="M9 50 C9 27 26 22 33 22 C23 27 19 36 19 50 Z" fill="#fff" opacity="0.28" />
-        {/* the stem starts inside the dome, or the knob floats off it */}
-        <rect x="29" y="22" width="8" height="10" rx="4" fill={`url(#${g.steel})`} {...line} />
-        <circle cx="33" cy="19" r="5.5" fill={`url(#${g.gold})`} {...line} />
-        <rect x="2" y="49" width="62" height="10" rx="5" fill={`url(#${g.steel})`} {...line} />
-        <path d="M16 38 C18 32 24 29 29 29" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity="0.75" fill="none" />
+        <rect x="10" y="11" width="46" height="5" rx="2.5" fill={`url(#${g.gold})`} {...line} />
+        <rect x="13" y="14" width="4.5" height="34" rx="2.2" fill={`url(#${g.gold})`} {...line} />
+        <rect x="48.5" y="14" width="4.5" height="34" rx="2.2" fill={`url(#${g.gold})`} {...line} />
+        <path d="M26 30 c0 -6 9 -6 9 0" fill="none" stroke={INK} strokeWidth="2.4" strokeLinecap="round" />
+        <rect x="19" y="29" width="23" height="18" rx="3.5" fill={`url(#${g.brand})`} {...line} />
+        <rect x="38" y="35" width="15" height="12" rx="3" fill={`url(#${g.deep})`} {...line} />
+        <rect x="6" y="46" width="54" height="6.5" rx="3.2" fill={`url(#${g.steel})`} {...line} />
+        <circle cx="17" cy="57" r="4.6" fill={INK} />
+        <circle cx="17" cy="57" r="1.8" fill={`url(#${g.steel})`} />
+        <circle cx="49" cy="57" r="4.6" fill={INK} />
+        <circle cx="49" cy="57" r="1.8" fill={`url(#${g.steel})`} />
+        <path d="M23 33 v10" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" opacity="0.45" />
       </Companion>
     ),
 
