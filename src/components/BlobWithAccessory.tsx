@@ -20,7 +20,7 @@ import type { AccessoryKey } from "@/content/sectors";
    x 34..206 and its baseline is y ~159. */
 
 const INK = "#0a1628";
-const COMPANION = { x: 150, y: 106, size: 66 };   // where a set-down object lives
+const COMPANION = { x: 157, y: 109, size: 66 };   // where a set-down object lives
 
 type Grads = { gold: string; brand: string; deep: string; steel: string; glass: string };
 
@@ -181,20 +181,26 @@ function build(g: Grads): Record<AccessoryKey, React.ReactNode> {
     ),
 
     /* ---------- cloche: hospitality ---------- */
+    /* ---------- cloche: hospitality ----------
+       The reference board is this shape over and over. A serving hand was
+       tried underneath and collapsed into a dark wedge at 55px, so the
+       platter carries it alone, with the steam that makes it read as service
+       rather than as a bell. Tall dome, narrow tray: a wide flat one reads
+       as a flying saucer. */
     bell: (
-      <Companion>
-        <rect x="10" y="11" width="46" height="5" rx="2.5" fill={`url(#${g.gold})`} {...line} />
-        <rect x="13" y="14" width="4.5" height="34" rx="2.2" fill={`url(#${g.gold})`} {...line} />
-        <rect x="48.5" y="14" width="4.5" height="34" rx="2.2" fill={`url(#${g.gold})`} {...line} />
-        <path d="M26 30 c0 -6 9 -6 9 0" fill="none" stroke={INK} strokeWidth="2.4" strokeLinecap="round" />
-        <rect x="19" y="29" width="23" height="18" rx="3.5" fill={`url(#${g.brand})`} {...line} />
-        <rect x="38" y="35" width="15" height="12" rx="3" fill={`url(#${g.deep})`} {...line} />
-        <rect x="6" y="46" width="54" height="6.5" rx="3.2" fill={`url(#${g.steel})`} {...line} />
-        <circle cx="17" cy="57" r="4.6" fill={INK} />
-        <circle cx="17" cy="57" r="1.8" fill={`url(#${g.steel})`} />
-        <circle cx="49" cy="57" r="4.6" fill={INK} />
-        <circle cx="49" cy="57" r="1.8" fill={`url(#${g.steel})`} />
-        <path d="M23 33 v10" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" opacity="0.45" />
+      <Companion scale={1.14}>
+        <g fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round" opacity="0.5">
+          <path d="M24 14 C20.5 10.5 27.5 8.5 24 5" />
+          <path d="M33 11 C29.5 7.5 36.5 5.5 33 2" />
+          <path d="M42 14 C38.5 10.5 45.5 8.5 42 5" />
+        </g>
+        <circle cx="33" cy="18" r="3.9" fill={`url(#${g.gold})`} {...line} />
+        <rect x="30.7" y="20" width="4.6" height="5" rx="2.3" fill={`url(#${g.steel})`} {...line} />
+        <path d="M16 43 C16 9 50 9 50 43 Z" fill={`url(#${g.brand})`} {...line} />
+        <path d="M16 43 C16 18 26 11 33 10 C25 16 22 28 22 43 Z" fill="#fff" opacity="0.24" />
+        <path d="M21 38 C21.5 27 25 20 29 17" fill="none" stroke="#fff" strokeWidth="2.8" strokeLinecap="round" opacity="0.8" />
+        <ellipse cx="33" cy="47" rx="25" ry="4.2" fill="#8ea6bd" {...line} />
+        <ellipse cx="33" cy="43.5" rx="25" ry="4.2" fill={`url(#${g.steel})`} {...line} />
       </Companion>
     ),
 
