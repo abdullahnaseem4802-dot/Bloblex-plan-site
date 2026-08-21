@@ -72,25 +72,36 @@ function build(g: Grads): Record<AccessoryKey, React.ReactNode> {
   const line = { stroke: INK, strokeWidth: 2.4, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
 
   return {
-    /* ---------- road works sign: construction ----------
-       The client's reference is the roadside warning triangle, not a hat.
-       Built as a real sign on a post so it stands on the same baseline as
-       every other prop. Border is brand blue rather than the regulation red,
-       which would be the only red on the whole site. */
+    /* ---------- worker with a shovel: construction ----------
+       The reference is the figure itself, no triangle around it. Dropping the
+       frame is what makes this work: a warning triangle narrows toward the
+       apex, so the pictogram inside it had almost no room and the limbs,
+       shovel and heap merged into one smudge. At full box width the pose is
+       legible. Gold hat, ink body, brand-blue heap: solid black would be the
+       only pure black object on the page. */
     helmet: (
-      <Companion scale={1.28}>
-        <rect x="30" y="46" width="6" height="13" rx="3" fill={`url(#${g.steel})`} {...line} />
-        <path d="M33 2 L64 50 H2 Z" fill={`url(#${g.brand})`} stroke={INK} strokeWidth="2.2" strokeLinejoin="round" />
-        <path d="M33 13 L54 45 H12 Z" fill="#ffffff" stroke={INK} strokeWidth="1.4" strokeLinejoin="round" />
-        {/* worker, then a heap kept clear of the blade so the two do not
-            merge into one dark mass at this size */}
-        <circle cx="23" cy="27" r="3.3" fill={INK} />
-        <path d="M23 30.5 L28.5 37" stroke={INK} strokeWidth="4" strokeLinecap="round" />
-        <path d="M28.5 37 L26.5 44" stroke={INK} strokeWidth="2.9" strokeLinecap="round" />
-        <path d="M28.5 37 L33.5 43.5" stroke={INK} strokeWidth="2.9" strokeLinecap="round" />
-        <path d="M24 31.5 L37 38" stroke={INK} strokeWidth="2" strokeLinecap="round" />
-        <path d="M36 36.5 L41.5 40 L39 42.5 L34.5 39.5 Z" fill={INK} />
-        <path d="M43 44 C44.5 39.5 49 39.5 50.5 44 Z" fill={INK} />
+      <Companion scale={1.2}>
+        {/* the heap first, so the blade lands in it */}
+        <path d="M41 58 L55 26 L67 58 Z" fill={`url(#${g.brand})`} {...line} />
+        <path d="M31 58 L40 41 L49 58 Z" fill={`url(#${g.deep})`} {...line} />
+
+        {/* legs, then torso, then the near arm on top */}
+        <path d="M27 36 L18 47 L15 58" fill="none" stroke={INK} strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M27 36 L34 45 L32 58" fill="none" stroke={INK} strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M20 25 L28 36" fill="none" stroke={INK} strokeWidth="11" strokeLinecap="round" />
+        <circle cx="19" cy="19" r="5.6" fill={INK} />
+
+        {/* hard hat: the brim only a little wider than the shell, or it is a
+            gold saucer again */}
+        <path d="M10 15 C10 2 28 2 28 15 Z" fill={`url(#${g.gold})`} {...line} />
+        <ellipse cx="19" cy="15" rx="11" ry="2.7" fill={`url(#${g.gold})`} {...line} />
+        <path d="M13.5 12 C14 7.5 16 5 18.5 4" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" opacity="0.6" />
+
+        {/* shovel: handle from the far hand down into the heap */}
+        <path d="M11 28 L41 46" fill="none" stroke={INK} strokeWidth="4.6" strokeLinecap="round" />
+        <path d="M11 28 L41 46" fill="none" stroke={`url(#${g.steel})`} strokeWidth="2.4" strokeLinecap="round" />
+        <path d="M38 42 L50 49 L45 56 L34 48 Z" fill={`url(#${g.steel})`} {...line} />
+        <path d="M22 27 L39 38" fill="none" stroke={INK} strokeWidth="6.4" strokeLinecap="round" />
       </Companion>
     ),
 
