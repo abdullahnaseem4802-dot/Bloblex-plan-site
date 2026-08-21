@@ -3,45 +3,69 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 export type Seg = { text: string; className?: string };
 
-/** Letter-by-letter headline, the way the portfolio does it: one character
- *  every `speed` ms behind a blinking caret, then `onDone` releases whatever
- *  is meant to follow.
+/** Letter-by-letter headline, the way the portfolio does it: characters land
+ *  on a clock behind a blinking caret, then `onDone` releases whatever is
+ *  meant to follow.
  *
- *  Every glyph is in the markup from the server, so the h1 is complete for
- *  crawlers and screen readers; typing only reveals what is already there.
- *  That also means no flash: the count is zeroed before the first paint. */
+ *  Two things it does differently, both deliberate:
+ *
+ *  - Every glyph is in the markup from the server, so the h1 is whole for
+ *    crawlers and screen readers; typing only reveals what is already there.
+ *    Whether this visit types at all is decided by the inline script in the
+ *    document head, which stamps `data-intro` on <html> before anything
+ *    paints — so neither the typed nor the static opening ever flashes.
+ *  - The clock is a rAF reading elapsed time, not one timer per character.
+ *    A timer chain pays a React render per letter and drifts far behind the
+ *    speed it was asked for.
+ */
 export default function Typewriter({
-  segments, speed = 50, startDelay = 300, onDone, className = "",
+  segments, speed = 26, startDelay = 120, onDone, className = "",
 }: {
   segments: Seg[]; speed?: number; startDelay?: number; onDone?: () => void; className?: string;
 }) {
-  /* -1 = "show everything": the server render, and the state a reduced-motion
-     visitor stays in */
+  /* -1 = "show everything": the server render, and where a visitor who is not
+     getting the intro stays */
   const [shown, setShown] = useState(-1);
+  const [running, setRunning] = useState(false);
   const done = useRef(false);
   const cb = useRef(onDone);
   cb.current = onDone;
 
   const total = segments.reduce((n, s) => n + s.text.length, 0) + (segments.length - 1);
 
+  const finish = () => {
+    if (done.current) return;
+    done.current = true;
+    cb.current?.();
+  };
+
   useLayoutEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      if (!done.current) { done.current = true; cb.current?.(); }
-      return;
-    }
+    const root = document.documentElement;
+    const play = root.hasAttribute("data-intro")
+      && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    /* claim it, so nothing else in this document replays the intro */
+    root.removeAttribute("data-intro");
+    if (!play) { finish(); return; }
     setShown(0);
+    setRunning(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (shown < 0) return;
-    if (shown >= total) {
-      if (!done.current) { done.current = true; cb.current?.(); }
-      return;
-    }
-    const wait = shown === 0 ? startDelay : speed;
-    const t = setTimeout(() => setShown((n) => n + 1), wait);
-    return () => clearTimeout(t);
-  }, [shown, total, speed, startDelay]);
+    if (!running) return;
+    let raf = 0;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const elapsed = now - t0 - startDelay;
+      const n = elapsed <= 0 ? 0 : Math.min(total, Math.floor(elapsed / speed));
+      setShown(n);
+      if (n >= total) { setRunning(false); finish(); return; }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [running, total, speed, startDelay]);
 
   let k = -1;
   const char = (ch: string, key: string) => {
@@ -51,9 +75,10 @@ export default function Typewriter({
     return (
       <span
         key={key}
-        className={`relative ${shown >= 0 && i === shown ? "bx-caret" : ""}`}
-        style={{ opacity: on ? 1 : 0 }}
-        suppressHydrationWarning
+        className={`bx-tw-ch relative ${shown >= 0 && i === shown ? "bx-caret" : ""}`}
+        /* only the hidden ones carry a style, so the pre-hydration CSS in
+           globals can hold every glyph back without being overridden */
+        style={on ? undefined : { opacity: 0 }}
       >
         {ch}
       </span>

@@ -377,6 +377,11 @@ html[data-splash] .sheen::after { animation-delay: 4s; }
   .hero-copy-shift   { transform: translateX(-32px); }
 }
 
+/* Held back before hydration when the head script has flagged an intro, so
+   the headline never flashes whole before it starts typing. React takes the
+   attribute off and drives the glyphs itself from its first layout effect. */
+html[data-intro] .bx-tw-ch { opacity: 0; }
+
 /* the typing caret, sitting on the glyph that is next in line */
 .bx-caret::before {
   content: ""; position: absolute; left: 0; top: 0.14em;
@@ -386,3 +391,9 @@ html[data-splash] .sheen::after { animation-delay: 4s; }
 }
 @keyframes caretBlink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .bx-caret::before { display: none; } }
+
+/* Opaque section bands hid the living backdrop, so the particle web only
+   showed in a handful of places. They are now a hair translucent: the same
+   colour to the eye, but the drifting web reads through the whole page. */
+.band-white { background: rgba(255,255,255,.70); }
+.band-panel { background: rgba(246,249,252,.66); }

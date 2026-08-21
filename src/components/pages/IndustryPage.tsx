@@ -44,7 +44,7 @@ export default function IndustryPage({ locale, id }: { locale: Locale; id: strin
       </section>
 
       {/* Pains vs outcomes */}
-      <section className="py-16 bg-[var(--color-panel)] border-y border-[var(--color-line)]">
+      <section className="py-16 band-panel border-y border-[var(--color-line)]">
         <div className="container grid md:grid-cols-2 gap-6">
           <Reveal>
             <div className="h-full rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white p-7">

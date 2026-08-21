@@ -1,4 +1,5 @@
 import BrandLogo from "./BrandLogo";
+import ParticleBackground from "./ParticleBackground";
 import { CONTENT, SITE, type Locale } from "@/content/site";
 import { NAV_ORDER, PAGES, pagePath } from "@/content/routes";
 
@@ -8,6 +9,7 @@ export default function Footer({ locale }: { locale: Locale }) {
 
   return (
     <footer className="bx-footer relative overflow-hidden text-white/70">
+      <ParticleBackground fixed={false} boost={1.7} />
       {/* drifting aura + oversized wordmark watermark */}
       <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-[radial-gradient(circle,rgba(41,171,226,.30),transparent_65%)] bx-footer-aura" />
       <div className="pointer-events-none absolute -left-24 bottom-[-6rem] h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(127,212,245,.18),transparent_65%)] bx-footer-aura2" />

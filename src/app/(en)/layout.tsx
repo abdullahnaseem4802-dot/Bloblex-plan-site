@@ -17,6 +17,11 @@ export default function EnLayout({ children }: { children: React.ReactNode }) {
       <head>
         <meta name="color-scheme" content="light" />
         <script dangerouslySetInnerHTML={{ __html: "if('scrollRestoration' in history){history.scrollRestoration='manual';}" }} />
+        {/* The hero intro plays when the site is opened or reloaded, and
+            stays still when the visitor lands on home from another page.
+            Stamped before paint, so neither opening ever flashes. */}
+        <script dangerouslySetInnerHTML={{ __html: "try{var n=performance.getEntriesByType('navigation')[0];var r=document.referrer;var internal=!!r&&new URL(r).origin===location.origin;if((n&&n.type==='reload')||!internal){document.documentElement.setAttribute('data-intro','');}}catch(e){}" }} />
+        <noscript><style>{".bx-tw-ch{opacity:1 !important}"}</style></noscript>
       </head>
       <body>
         <AmbientBackground />

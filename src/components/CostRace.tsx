@@ -31,7 +31,7 @@ export default function CostRace({ locale }: { locale: Locale }) {
   const done = p > 0.97;
 
   return (
-    <section id="cost" className="border-y border-[var(--color-line)] bg-white py-20 md:py-28">
+    <section id="cost" className="border-y border-[var(--color-line)] band-white py-20 md:py-28">
       <div className="container">
         <Reveal className="max-w-3xl">
           <p className="mb-4 text-[0.78rem] font-bold uppercase tracking-[0.2em] text-[var(--color-brand-600)]">{t.kicker}</p>

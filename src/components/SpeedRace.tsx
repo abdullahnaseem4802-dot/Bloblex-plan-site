@@ -24,7 +24,7 @@ export default function SpeedRace({ locale }: { locale: Locale }) {
   const booked = ours > 0.99;
 
   return (
-    <section id="speed" className="border-y border-[var(--color-line)] bg-[var(--color-panel)] py-20 md:py-28">
+    <section id="speed" className="border-y border-[var(--color-line)] band-panel py-20 md:py-28">
       <div className="container">
         <Reveal className="max-w-3xl">
           <p className="mb-4 text-[0.78rem] font-bold uppercase tracking-[0.2em] text-[var(--color-brand-600)]">{t.kicker}</p>

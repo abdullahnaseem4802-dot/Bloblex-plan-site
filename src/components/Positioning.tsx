@@ -6,7 +6,7 @@ import { POSITIONING_UI } from "@/content/extras";
 export default function Positioning({ locale }: { locale: Locale }) {
   const t = POSITIONING_UI[locale];
   return (
-    <section id="positioning" className="py-20 md:py-28 bg-[var(--color-panel)] border-y border-[var(--color-line)]">
+    <section id="positioning" className="py-20 md:py-28 band-panel border-y border-[var(--color-line)]">
       <div className="container">
         <Reveal className="max-w-3xl">
           <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-[var(--color-brand-600)]">{t.kicker}</p>

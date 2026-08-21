@@ -22,7 +22,7 @@ export default function ProcessSpine({ locale, bare }: { locale: Locale; bare?: 
   const n = t.steps.length;
 
   return (
-    <section id="process" className={`border-y border-[var(--color-line)] bg-[var(--color-panel)] ${bare ? "pt-16 pb-20 md:pt-20 md:pb-28" : "py-20 md:py-28"}`}>
+    <section id="process" className={`border-y border-[var(--color-line)] band-panel ${bare ? "pt-16 pb-20 md:pt-20 md:pb-28" : "py-20 md:py-28"}`}>
       <div className="container">
         <Reveal className="max-w-3xl">
           <p className="mb-4 text-[0.78rem] font-bold uppercase tracking-[0.2em] text-[var(--color-brand-600)]">{t.kicker}</p>

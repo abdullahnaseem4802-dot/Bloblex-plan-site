@@ -28,7 +28,7 @@ export default function AutomationPicker({ locale }: { locale: Locale }) {
   const count = moved.filter((m) => m > 0.99).length;
 
   return (
-    <section id="automate" className="border-y border-[var(--color-line)] bg-white py-20 md:py-28">
+    <section id="automate" className="border-y border-[var(--color-line)] band-white py-20 md:py-28">
       <div className="container">
         <Reveal className="max-w-3xl">
           <p className="mb-4 text-[0.78rem] font-bold uppercase tracking-[0.2em] text-[var(--color-brand-600)]">{t.kicker}</p>

@@ -56,7 +56,7 @@ export default function RequestJourney({ locale }: { locale: Locale }) {
   const systemDone = systemPct >= 99.5 ? STEPS.length : Math.round((systemPct / 100) * STEPS.length);
 
   return (
-    <section id="time" className="border-y border-[var(--color-line)] bg-[var(--color-panel)] py-20 md:py-28">
+    <section id="time" className="border-y border-[var(--color-line)] band-panel py-20 md:py-28">
       <div className="container">
         <Reveal className="max-w-3xl">
           <p className="mb-4 text-[0.78rem] font-bold uppercase tracking-[0.2em] text-[var(--color-brand-600)]">{t.kicker}</p>
