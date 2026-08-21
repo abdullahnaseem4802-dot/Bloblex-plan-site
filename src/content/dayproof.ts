@@ -21,7 +21,7 @@ export type DayJob = {
 };
 
 export type IconKey =
-  | "phone" | "photo" | "ruler" | "calc" | "check" | "doc" | "send"
+  | "phone" | "photo" | "ruler" | "calc" | "check" | "doc" | "send" | "mail"
   | "eye" | "tag" | "pen" | "clip" | "receipt" | "clock" | "chart";
 
 export const DAY_JOBS: DayJob[] = [
@@ -31,8 +31,8 @@ export const DAY_JOBS: DayJob[] = [
   { at: "07 h 16", by: "system", icon: "calc",    label: { en: "Estimate drafted",  fr: "Estimation montée" } },
   { at: "07 h 40", by: "you",    icon: "check",   label: { en: "You check it",      fr: "Tu la vérifies" } },
   { at: "07 h 44", by: "system", icon: "doc",     label: { en: "Quote built",       fr: "Soumission montée" } },
-  { at: "07 h 45", by: "you",    icon: "pen",     label: { en: "You send it",       fr: "Tu l'envoies" } },
-  { at: "07 h 45", by: "system", icon: "send",    label: { en: "Quote delivered",   fr: "Soumission livrée" } },
+  { at: "07 h 45", by: "you",    icon: "send",    label: { en: "You send it",       fr: "Tu l'envoies" } },
+  { at: "07 h 45", by: "system", icon: "mail",    label: { en: "Quote delivered",   fr: "Soumission livrée" } },
   { at: "08 h 02", by: "system", icon: "eye",     label: { en: "Client opened it",  fr: "Client l'a ouverte" } },
   { at: "09 h 30", by: "system", icon: "tag",     label: { en: "Supplier prices",   fr: "Prix fournisseurs" } },
   { at: "09 h 31", by: "you",    icon: "check",   label: { en: "You approve prices",fr: "Tu approuves les prix" } },

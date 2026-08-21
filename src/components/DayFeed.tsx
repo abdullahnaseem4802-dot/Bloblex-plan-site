@@ -138,7 +138,7 @@ function Rail({
   live: boolean; reduce: boolean; at: (i: number) => number; locale: Locale;
 }) {
   return (
-    <div className="relative h-[17.5rem] select-none">
+    <div className="relative h-[18.6rem] select-none">
       <span className="absolute left-0 top-0 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[var(--color-brand-300)]">
         {t.yoursHeading}
       </span>
@@ -233,8 +233,8 @@ function Rail({
           animate={live || reduce ? { opacity: 1, y: 0, scale: 1 } : undefined}
           transition={{ type: "spring", stiffness: 380, damping: 18, delay: at(j.i) }}
         >
-          <span aria-hidden className="absolute bottom-full left-1/2 block h-[1.7rem] w-px -translate-x-1/2 bg-gradient-to-b from-white/22 to-transparent" />
-          <span className="grid h-9 w-9 place-items-center rounded-full border border-white/12 bg-white/[0.06] text-[var(--color-brand-300)] transition-colors duration-200 group-hover:border-[var(--color-brand-400)]/60 group-hover:bg-[var(--color-brand-400)]/15">
+          <span aria-hidden className="absolute bottom-full left-1/2 block h-[1.7rem] w-px -translate-x-1/2 bg-gradient-to-b from-[var(--color-brand-400)]/45 to-transparent" />
+          <span className="grid h-10 w-10 place-items-center rounded-full border border-[var(--color-brand-400)]/35 bg-[var(--color-brand-400)]/[0.14] text-[var(--color-brand-200)] shadow-[0_0_16px_-4px_rgba(69,189,236,.55)] transition-colors duration-200 group-hover:border-[var(--color-brand-300)] group-hover:bg-[var(--color-brand-400)]/30">
             <Icon name={j.icon} />
           </span>
           {/* the word is there for whoever wants it, never required */}
@@ -245,7 +245,7 @@ function Rail({
       ))}
 
       <motion.span
-        className="absolute bottom-0 left-0 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white/35"
+        className="absolute bottom-0 left-0 text-[0.62rem] font-bold uppercase tracking-[0.18em] text-white/55"
         initial={reduce ? false : { opacity: 0 }}
         animate={live || reduce ? { opacity: 1 } : undefined}
         transition={{ duration: 0.5, delay: reduce ? 0 : SWEEP }}
@@ -336,6 +336,10 @@ function Icon({ name }: { name: IconKey }) {
         <path {...p} d="M14 3v5h5M9 13h6M9 17h4" />
       </>}
       {name === "send" && <path {...p} d="M21 3 3 10.5l7 2.5 2.5 7z M10 13 21 3" />}
+      {name === "mail" && <>
+        <rect {...p} x="3" y="5" width="18" height="14" rx="2" />
+        <path {...p} d="m3.5 7 8.5 6 8.5-6" />
+      </>}
       {name === "eye" && <>
         <path {...p} d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z" />
         <circle {...p} cx="12" cy="12" r="2.6" />
