@@ -72,46 +72,38 @@ function build(g: Grads): Record<AccessoryKey, React.ReactNode> {
   const line = { stroke: INK, strokeWidth: 2.4, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
 
   return {
-    /* ---------- bricklayer: construction ----------
-       Matched to the reference pose: upright and mid-stride, not bent over a
-       shovel. Back leg stretched behind, front knee bent, rear arm swinging
-       back, front arm reaching out with a brick over a half-built wall. The
-       stride and the reach are what make a standing figure read as working. */
+    /* ---------- tower crane over a rising building: construction ----------
+       The reference is the site, not a worker. Built tall on purpose: the
+       mast and jib give it a silhouette nothing else on the page has, which
+       is what makes it readable at this size. The jib starts well right of
+       centre so it never reaches across the character's face. */
     helmet: (
-      <Companion scale={1.16}>
-        {/* the wall, still going up: the top course is short on purpose */}
-        <g {...line}>
-          <rect x="34" y="53.4" width="9.2" height="5.6" rx="1" fill={`url(#${g.brand})`} />
-          <rect x="44.2" y="53.4" width="9.2" height="5.6" rx="1" fill={`url(#${g.deep})`} />
-          <rect x="54.4" y="53.4" width="9.2" height="5.6" rx="1" fill={`url(#${g.brand})`} />
-
-          <rect x="38.6" y="46.8" width="9.2" height="5.6" rx="1" fill={`url(#${g.deep})`} />
-          <rect x="48.8" y="46.8" width="9.2" height="5.6" rx="1" fill={`url(#${g.brand})`} />
-
-          <rect x="34" y="40.2" width="9.2" height="5.6" rx="1" fill={`url(#${g.brand})`} />
-          <rect x="44.2" y="40.2" width="9.2" height="5.6" rx="1" fill={`url(#${g.deep})`} />
-          <rect x="54.4" y="40.2" width="9.2" height="5.6" rx="1" fill={`url(#${g.brand})`} />
-
-          <rect x="38.6" y="33.6" width="9.2" height="5.6" rx="1" fill={`url(#${g.deep})`} />
-          <rect x="48.8" y="33.6" width="9.2" height="5.6" rx="1" fill={`url(#${g.brand})`} />
+      <Companion scale={1.15}>
+        {/* building: finished floors below, open slab and rebar on top */}
+        <g stroke={INK} strokeWidth="1.6" strokeLinejoin="round">
+          <path d="M11 21 v-4 M15 21 v-5 M19 21 v-4 M23 21 v-5 M27 21 v-4 M31 21 v-5 M35 21 v-4" strokeLinecap="round" />
+          <rect x="8" y="21" width="30" height="4" rx="0.8" fill={`url(#${g.deep})`} />
+          <rect x="8" y="25" width="30" height="34" rx="1" fill={`url(#${g.brand})`} />
         </g>
+        <g fill="#fff" opacity="0.9">
+          {[28, 36, 44, 52].map((y) =>
+            [11, 18, 25, 32].map((x) => <rect key={`${x}-${y}`} x={x} y={y} width="4.6" height="4.6" rx="0.8" />)
+          )}
+        </g>
+        <path d="M8 33.5 h30 M8 41.5 h30 M8 49.5 h30" stroke={INK} strokeWidth="1.2" opacity="0.55" />
 
-        {/* legs: back one stretched behind, front knee bent */}
-        <path d="M22 37 L13 47 L7 56" fill="none" stroke={INK} strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M22 37 L27 46 L25 57" fill="none" stroke={INK} strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+        {/* crane: mast, then the A-frame ties, jib and counterweight */}
+        <rect x="45" y="12" width="7.5" height="47" rx="1" fill={`url(#${g.steel})`} stroke={INK} strokeWidth="1.8" />
+        <path d="M45 22 h7.5 M45 32 h7.5 M45 42 h7.5 M45 52 h7.5" stroke={INK} strokeWidth="1.1" opacity="0.5" />
+        <path d="M48.7 3 L20 11 M48.7 3 L60 11" fill="none" stroke={INK} strokeWidth="1.6" strokeLinecap="round" />
+        <rect x="12" y="11" width="42" height="4.6" rx="1" fill={`url(#${g.deep})`} stroke={INK} strokeWidth="1.6" />
+        <path d="M14 15.6 L18 11 L22 15.6 L26 11 L30 15.6 L34 11 L38 15.6 L42 11" fill="none" stroke={INK} strokeWidth="1.1" opacity="0.55" />
+        <rect x="53" y="11" width="8.5" height="4.6" rx="1" fill={`url(#${g.deep})`} stroke={INK} strokeWidth="1.6" />
+        <rect x="54.2" y="16" width="7.2" height="9" rx="1" fill={INK} />
 
-        {/* rear arm swinging back, then the torso, then the reaching arm */}
-        <path d="M20 25 L11 33" fill="none" stroke={INK} strokeWidth="5.6" strokeLinecap="round" />
-        <path d="M19 21 L22 38" fill="none" stroke={INK} strokeWidth="11.5" strokeLinecap="round" />
-        <circle cx="19" cy="15" r="6" fill={INK} />
-        <path d="M21 25 L33 30" fill="none" stroke={INK} strokeWidth="5.6" strokeLinecap="round" />
-        <rect x="31.5" y="26.5" width="9" height="5.4" rx="1" fill={`url(#${g.gold})`} {...line} />
-
-        {/* hard hat, with the crest the reference shows */}
-        <path d="M10 14 C10 3 28 3 28 14 Z" fill={`url(#${g.gold})`} {...line} />
-        <path d="M16 4.6 C16 3 22 3 22 4.6 L22 14 L16 14 Z" fill="#e0940a" opacity="0.45" />
-        <ellipse cx="19" cy="14" rx="11" ry="2.7" fill={`url(#${g.gold})`} {...line} />
-        <path d="M13 11 C13.5 7 15.5 4.8 18 4" fill="none" stroke="#fff" strokeWidth="2.3" strokeLinecap="round" opacity="0.6" />
+        {/* hoist rope and hook, hanging over the open floor */}
+        <path d="M21 15.6 V27" stroke={INK} strokeWidth="1.3" />
+        <rect x="18.4" y="27" width="5.4" height="3.6" rx="1" fill={`url(#${g.gold})`} stroke={INK} strokeWidth="1.4" />
       </Companion>
     ),
 
