@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import ConstellationField from "./ConstellationField";
 
 /** A single living backdrop shared by every page. Because it is fixed and
  *  never unmounts between routes, the whole site reads as one continuous
@@ -13,6 +14,7 @@ export default function AmbientBackground() {
       <span className="bx-orb bx-orb-1" />
       <span className="bx-orb bx-orb-2" />
       <span className="bx-orb bx-orb-3" />
+      {ready && <ConstellationField parallax />}
       <span className="bx-grain" />
     </div>
   );

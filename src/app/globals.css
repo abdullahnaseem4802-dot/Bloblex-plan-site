@@ -376,3 +376,27 @@ html[data-splash] .sheen::after { animation-delay: 4s; }
   .hero-stage-offset { transform: translate(clamp(20px, 2.4vw, 72px), 0); }
   .hero-copy-shift   { transform: translateX(-32px); }
 }
+
+/* ---------- pointer flourishes ---------- */
+/* A halo that trails the cursor. It rides in the same negative layer as the
+   living backdrop, so it glows through the page instead of over the type. */
+.bx-aura {
+  position: fixed; top: 0; left: 0; z-index: -5;
+  width: 30rem; height: 30rem; border-radius: 9999px;
+  pointer-events: none; opacity: 0; transition: opacity .5s ease;
+  background: radial-gradient(circle, rgba(41,171,226,.20), rgba(41,171,226,.07) 42%, transparent 68%);
+}
+.bx-aura[data-on] { opacity: 1; }
+
+/* Light pools inside whichever card the cursor is over. Painted as a
+   background layer, so it sits above the card's fill and under its content. */
+.bx-lit {
+  background-image: radial-gradient(15rem 15rem at var(--bx-mx, 50%) var(--bx-my, 50%),
+                    rgba(41,171,226,.18), rgba(41,171,226,0) 70%);
+  border-color: rgba(41,171,226,.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bx-aura { display: none; }
+  .bx-lit { background-image: none; }
+}
