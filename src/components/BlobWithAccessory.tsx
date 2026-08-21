@@ -56,9 +56,12 @@ function Defs({ g }: { g: Grads }) {
 
 /** A set-down object: its own little stage, so each one is drawn to the same
  *  scale and lands in the same place. */
-function Companion({ children }: { children: React.ReactNode }) {
+function Companion({ scale = 1, children }: { scale?: number; children: React.ReactNode }) {
+  /* scaling about the baseline keeps every prop standing on the same line */
+  const base = COMPANION.y + 63;
+  const x = COMPANION.x + 33 - 33 * scale;
   return (
-    <g transform={`translate(${COMPANION.x} ${COMPANION.y})`}>
+    <g transform={`translate(${x} ${base - 63 * scale}) scale(${scale})`}>
       <ellipse cx="33" cy="63" rx="27" ry="4.5" fill={INK} opacity="0.13" />
       {children}
     </g>
@@ -69,15 +72,25 @@ function build(g: Grads): Record<AccessoryKey, React.ReactNode> {
   const line = { stroke: INK, strokeWidth: 2.4, strokeLinejoin: "round" as const, strokeLinecap: "round" as const };
 
   return {
-    /* ---------- hard hat, set down: construction ---------- */
+    /* ---------- road works sign: construction ----------
+       The client's reference is the roadside warning triangle, not a hat.
+       Built as a real sign on a post so it stands on the same baseline as
+       every other prop. Border is brand blue rather than the regulation red,
+       which would be the only red on the whole site. */
     helmet: (
-      <Companion>
-        <ellipse cx="33" cy="49" rx="27" ry="7" fill="#e0940a" {...line} />
-        <path d="M11 46 C11 16 55 16 55 46 Z" fill={`url(#${g.gold})`} {...line} />
-        <path d="M26 19 C26 17 40 17 40 19 L40 46 L26 46 Z" fill="#fff" opacity="0.26" />
-        <path d="M18 42 C19 28 24 21 30 18" fill="none" stroke="#fff" strokeWidth="3.4" strokeLinecap="round" opacity="0.5" />
-        <ellipse cx="33" cy="46" rx="27" ry="7" fill={`url(#${g.gold})`} {...line} />
-        <path d="M12 43 C20 47 46 47 54 43" fill="none" stroke="#e0940a" strokeWidth="1.8" opacity="0.5" />
+      <Companion scale={1.28}>
+        <rect x="30" y="46" width="6" height="13" rx="3" fill={`url(#${g.steel})`} {...line} />
+        <path d="M33 2 L64 50 H2 Z" fill={`url(#${g.brand})`} stroke={INK} strokeWidth="2.2" strokeLinejoin="round" />
+        <path d="M33 13 L54 45 H12 Z" fill="#ffffff" stroke={INK} strokeWidth="1.4" strokeLinejoin="round" />
+        {/* worker, then a heap kept clear of the blade so the two do not
+            merge into one dark mass at this size */}
+        <circle cx="23" cy="27" r="3.3" fill={INK} />
+        <path d="M23 30.5 L28.5 37" stroke={INK} strokeWidth="4" strokeLinecap="round" />
+        <path d="M28.5 37 L26.5 44" stroke={INK} strokeWidth="2.9" strokeLinecap="round" />
+        <path d="M28.5 37 L33.5 43.5" stroke={INK} strokeWidth="2.9" strokeLinecap="round" />
+        <path d="M24 31.5 L37 38" stroke={INK} strokeWidth="2" strokeLinecap="round" />
+        <path d="M36 36.5 L41.5 40 L39 42.5 L34.5 39.5 Z" fill={INK} />
+        <path d="M43 44 C44.5 39.5 49 39.5 50.5 44 Z" fill={INK} />
       </Companion>
     ),
 
