@@ -315,20 +315,19 @@ function Stacked({
       </ul>
 
       <p className="mb-3 mt-8 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white/60">{t.autoHeading}</p>
-      <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      {/* icons only, exactly as on the rail: thirteen labelled rows on a phone
+          is a wall of text, and the count is the whole point anyway */}
+      <ul className="grid grid-cols-5 gap-2.5 sm:grid-cols-7">
         {auto.map((j, k) => (
           <motion.li
             key={"a" + j.i}
-            initial={reduce ? false : { opacity: 0, y: 8, scale: 0.9 }}
-            animate={live || reduce ? { opacity: 1, y: 0, scale: 1 } : undefined}
-            transition={{ type: "spring", stiffness: 320, damping: 22, delay: reduce ? 0 : 0.4 + k * 0.045 }}
-            className="flex min-w-0 items-center gap-2 rounded-[var(--radius)] border border-[var(--color-brand-400)]/25 bg-[var(--color-brand-400)]/[0.09] px-2.5 py-2.5"
+            title={j.label[locale]}
+            initial={reduce ? false : { opacity: 0, scale: 0.6 }}
+            animate={live || reduce ? { opacity: 1, scale: 1 } : undefined}
+            transition={{ type: "spring", stiffness: 340, damping: 20, delay: reduce ? 0 : 0.35 + k * 0.05 }}
+            className="grid aspect-square place-items-center rounded-[14px] border border-[var(--color-brand-400)]/30 bg-[var(--color-brand-400)]/[0.12] text-[var(--color-brand-200)] shadow-[0_0_16px_-6px_rgba(69,189,236,.7)]"
           >
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-[var(--color-brand-400)]/35 text-[var(--color-brand-200)]">
-              <Icon name={j.icon} />
-            </span>
-            {/* wraps rather than truncates: a half-word helps nobody */}
-            <span className="min-w-0 text-[0.72rem] font-medium leading-tight text-white/75">{j.label[locale]}</span>
+            <Icon name={j.icon} />
           </motion.li>
         ))}
       </ul>

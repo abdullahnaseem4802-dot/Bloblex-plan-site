@@ -12,7 +12,10 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
   const t = CONTENT[locale].sectors;
   const ui = SECTOR_UI[locale];
   const [active, setActive] = useState(SECTORS[0].id);
-  const [held, setHeld] = useState(false);   // the visitor picked one themselves
+  /* Picking a sector used to stop the walk for good. It now only restarts the
+     clock, so the visitor gets a full beat on their choice and the section
+     keeps moving afterwards. */
+  const [beat, setBeat] = useState(0);
   const boxRef = useRef<HTMLDivElement>(null);
   const idx = SECTORS.findIndex((s) => s.id === active);
 
@@ -21,7 +24,7 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
      still the moment the visitor chooses one. */
   useEffect(() => {
     const el = boxRef.current;
-    if (held || !el) return;
+    if (!el) return;
     let id: ReturnType<typeof setInterval> | null = null;
     const io = new IntersectionObserver(([e]) => {
       if (e.isIntersecting && !id) {
@@ -33,9 +36,10 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
     }, { threshold: 0.3 });
     io.observe(el);
     return () => { if (id) clearInterval(id); io.disconnect(); };
-  }, [held]);
+  }, [beat]);
   const sector = SECTORS[idx] ?? SECTORS[0];
-  const cycle = (d: number) => { setHeld(true); setActive(SECTORS[(idx + d + SECTORS.length) % SECTORS.length].id); };
+  const pick = (id: string) => { setActive(id); setBeat((n) => n + 1); };
+  const cycle = (d: number) => pick(SECTORS[(idx + d + SECTORS.length) % SECTORS.length].id);
   const mods = sector.modules[locale];
   const yFor = (i: number) => 12 + i * (76 / (mods.length - 1)); // spread module rows 12%..88%
 
@@ -64,16 +68,16 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
                   const on = s.id === active;
                   return (
                     <li key={s.id}>
-                      <button role="option" aria-selected={on} onClick={() => { setHeld(true); setActive(s.id); }}
+                      <button role="option" aria-selected={on} onClick={() => pick(s.id)}
                         className={`relative w-full overflow-hidden text-left px-4 py-3 rounded-[var(--radius)] font-medium transition-colors ${on ? "bg-[var(--color-brand-50)] text-[var(--color-brand-700)]" : "text-[var(--color-ink-soft)] hover:bg-[var(--color-panel)]"}`}>
                         <span className="flex items-center justify-between">
                           {s.name[locale]}
                           {on && <span aria-hidden className="text-[var(--color-brand-500)]">→</span>}
                         </span>
                         {/* the panel moves on by itself; this shows when */}
-                        {on && !held && (
+                        {on && (
                           <motion.span
-                            key={s.id}
+                            key={s.id + beat}
                             aria-hidden
                             className="absolute bottom-0 left-0 h-[2px] bg-[var(--color-brand-500)]"
                             initial={{ width: "0%" }}
