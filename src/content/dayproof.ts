@@ -52,6 +52,8 @@ export const DAY_UI: Record<Locale, {
   titleA: string; titleB: string;
   autoLabel: string; yoursLabel: string;
   system: string; you: string;
+  dayStart: string; dayEnd: string;
+  yoursHeading: string; autoHeading: string;
   closing: string;
 }> = {
   en: {
@@ -59,6 +61,9 @@ export const DAY_UI: Record<Locale, {
     titleA: "16 jobs a day.", titleB: "You touch 3.",
     autoLabel: "run themselves", yoursLabel: "need your OK",
     system: "DONE", you: "YOU",
+    dayStart: "06 h", dayEnd: "17 h",
+    yoursHeading: "The 3 that need you",
+    autoHeading: "Everything else, handled",
     closing: "The other 13 happened while you were on a job site, on the phone, or having supper.",
   },
   fr: {
@@ -66,6 +71,9 @@ export const DAY_UI: Record<Locale, {
     titleA: "16 jobs par jour.", titleB: "T'en touches 3.",
     autoLabel: "se font tout seules", yoursLabel: "demandent ton OK",
     system: "FAIT", you: "TOI",
+    dayStart: "06 h", dayEnd: "17 h",
+    yoursHeading: "Les 3 qui ont besoin de toi",
+    autoHeading: "Tout le reste, géré",
     closing: "Les 13 autres se sont faites pendant que t'étais sur un chantier, au téléphone, ou en train de souper.",
   },
 };
