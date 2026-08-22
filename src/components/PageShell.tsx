@@ -18,14 +18,18 @@ export default function PageShell({
 
 /** Premium page masthead: soft brand wash, eyebrow chip, oversized headline.
  *
- *  This used to be one 48rem-wide column stacked kicker / headline / lead, on a
- *  136px top pad. On a laptop that filled the whole first screen with three
- *  sentences and left the right half of it blank - the visitor opened the page,
- *  saw a title, and had to scroll before there was anything to actually look at.
+ *  Three attempts at this block, and the shape that works is the plain one.
  *
- *  The headline and the lead now sit side by side from lg up, so the empty half
- *  carries the lead instead of nothing, the headline stays on two lines, and the
- *  block as a whole is roughly 150px shorter. The first cards clear the fold. */
+ *  It began as a 48rem column on a 136px top pad, which filled the whole first
+ *  screen with three sentences and left the right half of it empty. Putting the
+ *  lead in that empty half fixed the height but read as two unrelated columns.
+ *
+ *  What it wanted all along was simply to be allowed to use the width: the
+ *  headline runs the full row and wraps onto a second one only when it truly
+ *  needs to, then the lead runs its own rows underneath. Nothing is beside
+ *  anything, nothing is boxed into a third of the page, and the headline gets
+ *  short enough on its own that the block stays about as tight as the
+ *  side-by-side version was. */
 export function PageHero({ kicker, title, lead }: { kicker: string; title: string; lead: string }) {
   return (
     <section className="relative grid-bg overflow-hidden border-b border-[var(--color-line)] pt-[116px] pb-12 md:pb-14">
@@ -34,12 +38,10 @@ export function PageHero({ kicker, title, lead }: { kicker: string; title: strin
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-brand-500)]" />
           {kicker}
         </p>
-        <div className="grid gap-x-12 gap-y-5 lg:grid-cols-[minmax(0,1.72fr)_minmax(0,1fr)] lg:items-end">
-          <h1 className="max-w-3xl text-[2.4rem] leading-[1.06] sm:text-[2.9rem] lg:max-w-none lg:text-[2.95rem] font-semibold tracking-[-0.035em] text-[var(--color-ink)]">
-            {title}
-          </h1>
-          <p className="max-w-[58ch] text-lg leading-relaxed text-[var(--color-slate)] lg:pb-1.5">{lead}</p>
-        </div>
+        <h1 className="text-[2.4rem] leading-[1.06] sm:text-[2.9rem] lg:text-[3.15rem] font-semibold tracking-[-0.035em] text-[var(--color-ink)] text-pretty">
+          {title}
+        </h1>
+        <p className="mt-5 max-w-[86ch] text-lg leading-relaxed text-[var(--color-slate)]">{lead}</p>
       </div>
     </section>
   );

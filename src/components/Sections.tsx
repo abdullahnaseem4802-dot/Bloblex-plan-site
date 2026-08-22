@@ -28,10 +28,22 @@ export function WhatWeBuild({ locale, bare }: Props) {
     <section id="what" className={bare ? "pt-16 pb-20 md:pt-20 md:pb-28" : "py-20 md:py-28"}>
       <div className="container">
         <SectionHead kicker={t.kicker} title={t.title} lead={t.lead} bare={bare} />
-        <div className={`grid md:grid-cols-3 gap-6 ${bare ? "" : "mt-14"}`}>
+        {/* The card already had `h-full`, but the Reveal wrapper around it was
+            the actual grid item and did not stretch, so the third card - the one
+            with the longest body - sat a line taller than the other two and the
+            row looked bent. The wrapper stretches now.
+
+            The drift is deliberately in phase across all three: staggering it
+            looks livelier in the abstract, but it leaves the three cards at
+            three different heights at every instant, which is the exact thing
+            that was being complained about. In phase, the row floats as one
+            piece and never stops being a row. */}
+        <div className={`grid gap-6 md:grid-cols-3 ${bare ? "" : "mt-14"}`}>
           {t.cards.map((c, i) => (
-            <Reveal key={c.title} delay={i * 90}>
-              <article className="group h-full rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white p-8 shadow-[var(--shadow-soft)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-card)]">
+            <Reveal key={c.title} className="h-full" delay={i * 90}>
+              <article
+                className="bx-card-drift group flex h-full flex-col rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white p-8 shadow-[var(--shadow-soft)] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1.5 hover:border-[var(--color-brand-200)] hover:shadow-[var(--shadow-card)]"
+              >
                 <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-[var(--radius)] bg-[var(--color-brand-50)] font-[family-name:var(--font-display)] text-lg font-bold text-[var(--color-brand-600)] transition-colors group-hover:bg-[var(--color-brand-500)] group-hover:text-white">
                   {String(i + 1).padStart(2, "0")}
                 </div>

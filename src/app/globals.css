@@ -113,6 +113,22 @@ html[data-splash] { overflow: hidden; }
 .reveal.in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce){ .reveal { opacity: 1; transform: none; } }
 
+/* A very slow rise and fall on the feature cards. Small enough that nobody
+   catches it moving, big enough that the row is not three dead rectangles.
+   The hover lift is a transform too, and a running animation always beats a
+   class transform, so hover drops the animation entirely and lets the lift
+   take over - the transform transition makes the hand-off smooth. */
+@keyframes cardDrift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+.bx-card-drift { animation: cardDrift 7s ease-in-out infinite; }
+.bx-card-drift:hover { animation: none; }
+@media (prefers-reduced-motion: reduce) { .bx-card-drift { animation: none; } }
+
+/* Headings wrap "pretty": the browser is allowed to pull a word down from an
+   earlier line rather than leave the last line holding one word on its own.
+   "More clients shouldn't mean more / chaos." was the case that prompted this,
+   but a stranded last word looks like a mistake wherever it happens. */
+h1, h2, h3 { text-wrap: pretty; }
+
 /* ---------- buttons & fields ---------- */
 .btn-primary {
   display: inline-flex; align-items: center; gap: .5rem;
