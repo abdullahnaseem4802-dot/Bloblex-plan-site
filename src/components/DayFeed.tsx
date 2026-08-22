@@ -14,29 +14,48 @@ import { DAY_JOBS, JOBS_YOURS, JOBS_AUTO, DAY_UI, type IconKey, type DayJob } fr
 
 const SWEEP = 1.6;          // seconds for the light to cross the whole day
 const RAIL_PAD = 3;         // % kept clear at each end of the rail
-const CARD_W = 17;          // card width as a % of the rail, so the maths below
-const CARD_GAP = 18;        // holds at every desktop width
+const CARD_W = 15;          // card width, as a % of the rail
+const CARD_GAP = 17;        // smallest allowed distance between two card centres
+const YOURS_ROOM = 2.4;     // see layout(): how much wider the gaps beside a card are
 
-/** The jobs sit at an even rhythm rather than at true clock positions: a real
- *  day is bunched into the morning, which reads as a pile-up rather than as a
- *  day. The clock times still ride on the cards, so nothing is misstated. */
-function layout(n: number) {
+/** Where each job sits along the rail, as a % of its width.
+ *
+ *  The jobs sit at a rhythm rather than at true clock positions: a real day is
+ *  bunched into the morning, which reads as a pile-up rather than as a day. The
+ *  clock times still ride on the cards, so nothing is misstated.
+ *
+ *  The rhythm is not quite even, though. A flat one puts the three marks that
+ *  carry cards 12% and 25% apart, and a card is 15% wide - so the first two
+ *  cards had nowhere to stand without either touching each other or sliding off
+ *  their own mark and dragging a crooked leader line behind them. The gaps on
+ *  either side of a card-carrying job are simply made wider, which buys the row
+ *  its elbow room out of the fourteen places where nobody is looking. */
+function layout(jobs: { by: string }[]): number[] {
+  const weights = jobs.slice(1).map((_, k) => {
+    /* the gap between job k and job k+1 */
+    const beside = jobs[k].by === "you" || jobs[k + 1].by === "you";
+    return beside ? YOURS_ROOM : 1;
+  });
+  const total = weights.reduce((a, b) => a + b, 0);
   const span = 100 - RAIL_PAD * 2;
-  return Array.from({ length: n }, (_, i) => RAIL_PAD + (span * i) / (n - 1));
+  const out = [RAIL_PAD];
+  weights.forEach((w) => out.push(out[out.length - 1] + (span * w) / total));
+  return out;
 }
 
 /** Where the three cards sit, in % of the rail.
  *
- *  These used to be pinned at 14 / 50 / 86 - spread evenly for the look of it,
- *  with no relation to the marks they point at. The marks fall at roughly
- *  28 / 41 / 66, so every leader line had to cross a hundred-odd pixels
- *  sideways inside a 35px band: three near-horizontal streaks that read as
- *  stray rules rather than as anything joining a card to a dot.
+ *  These were pinned at 14 / 50 / 86 once - spread evenly for the look of it,
+ *  with no relation to the marks they point at - and every leader line had to
+ *  cross a hundred-odd pixels sideways to reach its dot: three near-horizontal
+ *  streaks that read as stray rules rather than as anything joining a card to a
+ *  mark.
  *
- *  So each card now wants to sit directly over its own mark, and is only
- *  pushed aside far enough to keep the cards from touching each other or
- *  running off either end. Two of the three end up dead over their dot and
- *  the leaders become short, obvious drops. */
+ *  Each card wants to stand directly over its own mark, and is pushed aside
+ *  only if it would touch its neighbour or run off an end. With the rhythm
+ *  above none of them has to be, so all three leaders come out as the same
+ *  plain vertical drop - which is the point: three lines of three different
+ *  shapes looks like a mistake, however correct each one is. */
 function cardSlots(marks: number[]): number[] {
   const half = CARD_W / 2;
   const out = marks.slice();
@@ -57,10 +76,12 @@ export default function DayFeed({ locale }: { locale: Locale }) {
   const t = DAY_UI[locale];
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-  const live = useInView(ref, { once: true, amount: 0.3 });
+  /* 0.3 fired while the panel was still clipping the bottom of the screen,
+     so the whole entrance was over before it was in front of anyone. */
+  const live = useInView(ref, { once: true, amount: 0.55 });
   const onScreen = useInView(ref, { amount: 0.05 });
   const idle = onScreen && live && !reduce;   // never animates to an empty room
-  const pos = useMemo(() => layout(DAY_JOBS.length), []);
+  const pos = useMemo(() => layout(DAY_JOBS), []);
 
   /* each job wakes as the light reaches its own hour */
   const at = (i: number) => (reduce ? 0 : 0.25 + (pos[i] / 100) * SWEEP);
@@ -179,53 +200,84 @@ function Rail({
         {t.yoursHeading}
       </span>
 
-      {/* the three that are yours, bottom-aligned so the row reads as a row.
-          They no longer drift: a card on the end of a leader line that breathes
-          up and down opens and closes a gap where the line meets it, which is
-          most of what made the joins look broken. The ambient movement in this
-          panel lives on the light and on the thirteen icons instead. */}
+      {/* The three that are yours, bottom-aligned so the row reads as a row.
+          15% wide against a 19.3% pitch leaves a real gutter between them - at
+          17% against the old 12.5% pitch they were shoulder to shoulder, and
+          two of the three had been shoved off their own mark to fit.
+
+          They do not drift. A card on the end of a leader line that breathes up
+          and down opens and closes the gap where the line meets it, which is
+          most of what made the joins look broken. Their movement is a slow
+          sheen crossing the glass instead, which moves nothing. */}
       <div className="absolute inset-x-0 top-[1.5rem] h-[8.6rem]">
         {yours.map((j, k) => (
           <motion.div
             key={"y" + j.i}
-            className="absolute bottom-0 w-[17%] -translate-x-1/2 rounded-[var(--radius)] border border-[var(--color-brand-400)]/45 bg-white/[0.07] p-3.5 shadow-[0_18px_44px_-18px_rgba(41,171,226,.85)] backdrop-blur-sm"
-            style={{ left: `${slots[k]}%` }}
-            initial={reduce ? false : { opacity: 0, y: 18, scale: 0.92 }}
+            /* fixed height, not auto: "You approve prices" wraps to two lines
+               where the other two labels do not, and a bottom-aligned row of
+               cards with one of them standing a line taller reads as a card
+               out of place rather than as a longer sentence */
+            className="bx-glint absolute bottom-0 flex h-[7rem] w-[15%] -translate-x-1/2 flex-col overflow-hidden rounded-[var(--radius)] border border-[var(--color-brand-400)]/45 bg-white/[0.07] p-3.5 shadow-[0_18px_44px_-18px_rgba(41,171,226,.85)] backdrop-blur-sm"
+            /* the ::after sheen reads this delay through `animation-delay:
+               inherit`, so the three cards catch the light one after another */
+            style={{ left: `${slots[k]}%`, animationDelay: `${k * 2.6}s` }}
+            initial={reduce ? false : { opacity: 0, y: 22, scale: 0.9 }}
             animate={live || reduce ? { opacity: 1, y: 0, scale: 1 } : undefined}
-            transition={{ type: "spring", stiffness: 250, damping: 21, delay: at(j.i) }}
+            transition={{ type: "spring", stiffness: 230, damping: 20, delay: at(j.i) }}
           >
             <div className="flex items-center gap-2">
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-[var(--color-brand-400)] text-white">
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-[var(--color-brand-400)] text-white shadow-[0_0_16px_-2px_rgba(69,189,236,.9)]">
                 <Icon name={j.icon} />
               </span>
               <span className="text-[0.56rem] font-bold tracking-[0.16em] text-[var(--color-brand-300)]">{t.you}</span>
             </div>
-            <p className="mt-2.5 text-[0.9rem] font-semibold leading-snug text-white">{j.label[locale]}</p>
-            <p className="mt-0.5 font-mono text-[0.64rem] text-white/40">{j.at}</p>
+            <p className="mt-2 flex-1 text-[0.86rem] font-semibold leading-snug text-white">{j.label[locale]}</p>
+            <p className="font-mono text-[0.64rem] text-white/40">{j.at}</p>
           </motion.div>
         ))}
       </div>
 
-      {/* each card reaches down to its own moment in the day. The band is deep
-          enough now (3.6rem, was 2.2rem) that a leader is a drop rather than a
-          sideways dash, and the curve leaves the card and meets the rail
-          vertically at both ends so the join is unmistakable. */}
+      {/* Each card reaches down to its own moment in the day.
+          All three are now the same plain vertical drop. They were not before:
+          the cards that had been pushed off their mark dragged a curve behind
+          them, so the middle one looked like a different kind of line to the
+          other two, which reads as a mistake however correct it is.
+          A light runs down each one on a loop, so the connection is something
+          you watch rather than something you have to trace. */}
       <svg
         className="absolute inset-x-0 top-[10.1rem] h-[3.6rem] w-full overflow-visible"
         viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"
       >
-        {yours.map((j, k) => (
-          <motion.path
-            key={"l" + j.i}
-            d={`M ${slots[k]} 0 C ${slots[k]} 46, ${pos[j.i]} 54, ${pos[j.i]} 100`}
-            fill="none" stroke="var(--color-brand-300)" strokeWidth="1.5"
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-            initial={reduce ? false : { pathLength: 0, opacity: 0 }}
-            animate={live || reduce ? { pathLength: 1, opacity: 1 } : undefined}
-            transition={{ duration: 0.45, delay: at(j.i) + 0.1, ease: "easeOut" }}
-          />
-        ))}
+        {yours.map((j, k) => {
+          const d = `M ${slots[k]} 0 C ${slots[k]} 46, ${pos[j.i]} 54, ${pos[j.i]} 100`;
+          return (
+            <g key={"l" + j.i}>
+              <motion.path
+                d={d}
+                fill="none" stroke="var(--color-brand-300)" strokeWidth="1.5"
+                strokeLinecap="round" strokeOpacity={0.55}
+                vectorEffect="non-scaling-stroke"
+                initial={reduce ? false : { pathLength: 0, opacity: 0 }}
+                animate={live || reduce ? { pathLength: 1, opacity: 1 } : undefined}
+                transition={{ duration: 0.5, delay: at(j.i) + 0.1, ease: "easeOut" }}
+              />
+              {idle && (
+                <motion.path
+                  d={d} pathLength={100}
+                  fill="none" stroke="#ffffff" strokeWidth="2"
+                  strokeLinecap="round" strokeDasharray="14 86"
+                  vectorEffect="non-scaling-stroke"
+                  initial={{ strokeDashoffset: 100, opacity: 0 }}
+                  animate={{ strokeDashoffset: [100, -14], opacity: [0, 0.9, 0.9, 0] }}
+                  transition={{
+                    duration: 1.5, repeat: Infinity, repeatDelay: 2.6,
+                    delay: k * 0.45, ease: "easeInOut", times: [0, 0.15, 0.8, 1],
+                  }}
+                />
+              )}
+            </g>
+          );
+        })}
       </svg>
 
       {/* the rail: the day, lit as it goes */}
@@ -258,17 +310,26 @@ function Rail({
         />
       )}
 
-      {/* where the three land on the rail */}
-      {yours.map((j) => (
-        <motion.span
-          key={"p" + j.i}
-          aria-hidden
-          className="absolute top-[13.7rem] z-10 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[var(--color-brand-300)] bg-[var(--color-ink)] shadow-[0_0_14px_rgba(69,189,236,.9)]"
-          style={{ left: `${pos[j.i]}%` }}
-          initial={reduce ? false : { scale: 0 }}
-          animate={live || reduce ? { scale: 1 } : undefined}
-          transition={{ type: "spring", stiffness: 420, damping: 15, delay: at(j.i) + 0.2 }}
-        />
+      {/* Where the three land on the rail. A halo breathes out of each mark on
+          its own beat, so the points the cards hang from are the live part of
+          the picture rather than three static pinpricks. */}
+      {yours.map((j, k) => (
+        <span key={"p" + j.i} aria-hidden className="absolute top-[13.7rem] z-10" style={{ left: `${pos[j.i]}%` }}>
+          {idle && (
+            <motion.span
+              className="absolute left-0 top-0 block h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[var(--color-brand-300)]"
+              initial={{ scale: 1, opacity: 0 }}
+              animate={{ scale: [1, 2.9], opacity: [0.7, 0] }}
+              transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 1.5, delay: k * 0.45, ease: "easeOut" }}
+            />
+          )}
+          <motion.span
+            className="relative block h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[var(--color-brand-300)] bg-[var(--color-ink)] shadow-[0_0_14px_rgba(69,189,236,.9)]"
+            initial={reduce ? false : { scale: 0 }}
+            animate={live || reduce ? { scale: 1 } : undefined}
+            transition={{ type: "spring", stiffness: 420, damping: 15, delay: at(j.i) + 0.2 }}
+          />
+        </span>
       ))}
 
       {/* the hours, quietly */}
@@ -287,7 +348,7 @@ function Rail({
         >
           <span aria-hidden className="absolute bottom-full left-1/2 block h-[1.7rem] w-px -translate-x-1/2 bg-gradient-to-b from-[var(--color-brand-400)]/45 to-transparent" />
           <Float on={idle} amp={3.5} secs={4.4 + (j.i % 5) * 0.6} delay={(j.i % 7) * 0.42}>
-            <span className="grid h-10 w-10 place-items-center rounded-full border border-[var(--color-brand-400)]/35 bg-[var(--color-brand-400)]/[0.14] text-[var(--color-brand-200)] shadow-[0_0_16px_-4px_rgba(69,189,236,.55)] transition-colors duration-200 group-hover:border-[var(--color-brand-300)] group-hover:bg-[var(--color-brand-400)]/30">
+            <span className="grid h-8 w-8 place-items-center rounded-full border border-[var(--color-brand-400)]/35 xl:h-10 xl:w-10 bg-[var(--color-brand-400)]/[0.14] text-[var(--color-brand-200)] shadow-[0_0_16px_-4px_rgba(69,189,236,.55)] transition-colors duration-200 group-hover:border-[var(--color-brand-300)] group-hover:bg-[var(--color-brand-400)]/30">
               <Icon name={j.icon} />
             </span>
           </Float>
