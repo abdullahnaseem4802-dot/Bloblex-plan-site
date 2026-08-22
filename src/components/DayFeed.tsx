@@ -127,7 +127,7 @@ export default function DayFeed({ locale }: { locale: Locale }) {
 
               {/* narrow screens: the same story, stacked */}
               <div className="mt-9 lg:hidden">
-                <Stacked t={t} yours={yours} auto={auto} live={live} reduce={!!reduce} visible={idle} locale={locale} />
+                <Stacked t={t} marked={marked} live={live} reduce={!!reduce} visible={idle} locale={locale} />
               </div>
             </div>
           </div>
@@ -371,62 +371,190 @@ function Rail({
   );
 }
 
-/* ================= narrow: the same story, stacked =================
-   A wrapped run of pill-shaped chips came out ragged, every row a
-   different length. Fixed columns give the thirteen a shape, and the
-   three keep the raised treatment they have on the rail. */
+/* ================= narrow: the same rail, stood on end =================
+
+   A phone used to get a different picture entirely: three cards in a list,
+   then a five-across grid of thirteen icons underneath, with no rail, no
+   order, and nothing joining the two halves. It answered the same question,
+   but it did not look like the same answer.
+
+   This is the wide rail turned a quarter turn. Same lit line, same three
+   cards hanging off it on short arms, same thirteen icons standing on it,
+   same order - the day still runs start to finish, it just runs downwards.
+   Every effect the wide one has comes with it: the line lights as it goes,
+   a light walks it long after, a halo breathes out of each mark, a spark
+   runs down each arm, and a sheen crosses each card.
+
+   The thirteen are grouped into their runs rather than given a row each. On
+   the wide rail they already cluster into fours and threes between the
+   marks, and sixteen rows down a phone is a very long way to say "the system
+   did a pile of things while you were out". */
+type Run = { kind: "auto"; jobs: Marked[] } | { kind: "you"; job: Marked };
+
+function runs(jobs: Marked[]): Run[] {
+  const out: Run[] = [];
+  jobs.forEach((j) => {
+    if (j.by === "you") { out.push({ kind: "you", job: j }); return; }
+    const last = out[out.length - 1];
+    if (last && last.kind === "auto") last.jobs.push(j);
+    else out.push({ kind: "auto", jobs: [j] });
+  });
+  return out;
+}
+
+const RAIL_X = "1.35rem";   // where the vertical line lives, and every node centre
+const ARM = "1.6rem";       // rail to card
+
 function Stacked({
-  t, yours, auto, live, reduce, visible, locale,
+  t, marked, live, reduce, visible, locale,
 }: {
-  t: (typeof DAY_UI)["en"]; yours: Marked[]; auto: Marked[];
+  t: (typeof DAY_UI)["en"]; marked: Marked[];
   live: boolean; reduce: boolean; visible: boolean; locale: Locale;
 }) {
-  return (
-    <div>
-      <p className="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[var(--color-brand-300)]">{t.yoursHeading}</p>
-      <ul className="grid gap-2.5 sm:grid-cols-3">
-        {yours.map((j, k) => (
-          <motion.li
-            key={"y" + j.i}
-            initial={reduce ? false : { opacity: 0, y: 12 }}
-            animate={live || reduce ? { opacity: 1, y: 0 } : undefined}
-            transition={{ duration: 0.45, delay: reduce ? 0 : k * 0.12, ease: [0.16, 1, 0.3, 1] }}
-            className="rounded-[var(--radius)] border border-[var(--color-brand-400)]/45 bg-white/[0.07] shadow-[0_16px_36px_-20px_rgba(41,171,226,.9)]"
-          >
-            <Float on={visible && !reduce} amp={3} secs={5} delay={k * 0.5} className="flex items-center gap-3 p-3.5">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[11px] bg-[var(--color-brand-400)] text-white shadow-[0_0_18px_-4px_rgba(69,189,236,.9)]">
-                <Icon name={j.icon} />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[0.92rem] font-semibold leading-snug text-white">{j.label[locale]}</span>
-                <span className="block font-mono text-[0.64rem] text-white/40">{j.at}</span>
-              </span>
-              <span className="shrink-0 rounded-full bg-[var(--color-brand-400)]/20 px-2 py-[3px] text-[0.54rem] font-bold tracking-[0.14em] text-[var(--color-brand-200)]">
-                {t.you}
-              </span>
-            </Float>
-          </motion.li>
-        ))}
-      </ul>
+  const rows = useMemo(() => runs(marked), [marked]);
+  /* the line lights over the same 1.6s it takes on the wide rail */
+  const at = (k: number) => (reduce ? 0 : 0.3 + (k / rows.length) * SWEEP);
+  let seen = 0;   // "you" rows so far, so their halos beat out of step
 
-      <p className="mb-3 mt-8 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-white/60">{t.autoHeading}</p>
-      {/* icons only, exactly as on the rail: thirteen labelled rows on a phone
-          is a wall of text, and the count is the whole point anyway */}
-      <ul className="grid grid-cols-5 gap-2.5 sm:grid-cols-7">
-        {auto.map((j, k) => (
-          <motion.li
-            key={"a" + j.i}
-            title={j.label[locale]}
-            initial={reduce ? false : { opacity: 0, scale: 0.6 }}
-            animate={live || reduce ? { opacity: 1, scale: 1 } : undefined}
-            transition={{ type: "spring", stiffness: 340, damping: 20, delay: reduce ? 0 : 0.35 + k * 0.05 }}
-            className="grid aspect-square place-items-center rounded-[14px] border border-[var(--color-brand-400)]/30 bg-[var(--color-brand-400)]/[0.12] text-[var(--color-brand-200)] shadow-[0_0_16px_-6px_rgba(69,189,236,.7)]"
-          >
-            <Icon name={j.icon} />
-          </motion.li>
-        ))}
-      </ul>
+  return (
+    <div className="relative select-none">
+      <p className="mb-3 font-mono text-[0.64rem] text-white/30" style={{ paddingLeft: `calc(${RAIL_X} + ${ARM})` }}>
+        {t.dayStart}
+      </p>
+
+      <ol className="relative">
+        {/* the day, unlit */}
+        <span aria-hidden className="absolute bottom-3 top-3 w-px bg-white/12" style={{ left: RAIL_X }} />
+        {/* the day, lit as it goes */}
+        <motion.span
+          aria-hidden
+          className="absolute top-3 w-[2px] origin-top rounded-full bg-gradient-to-b from-[var(--color-brand-500)] via-[var(--color-brand-300)] to-[var(--color-brand-500)] shadow-[0_0_18px_rgba(69,189,236,.55)]"
+          style={{ left: `calc(${RAIL_X} - 0.5px)`, height: "calc(100% - 1.5rem)" }}
+          initial={reduce ? false : { scaleY: 0 }}
+          animate={live || reduce ? { scaleY: 1 } : undefined}
+          transition={{ duration: reduce ? 0 : SWEEP + 0.25, ease: [0.33, 0, 0.15, 1], delay: 0.3 }}
+        />
+        {/* and long after the first pass, a quiet light still walks it */}
+        {visible && (
+          <motion.span
+            aria-hidden
+            className="absolute z-[5] h-20 w-[3px] -translate-x-1/2 rounded-full bg-gradient-to-b from-transparent via-white/70 to-transparent blur-[1px]"
+            style={{ left: RAIL_X }}
+            initial={{ top: "-8%", opacity: 0 }}
+            animate={{ top: "102%", opacity: [0, 0.9, 0.9, 0] }}
+            transition={{ duration: 5, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut", times: [0, 0.1, 0.85, 1] }}
+          />
+        )}
+
+        {rows.map((row, k) =>
+          row.kind === "you" ? (
+            <YouRow
+              key={"y" + row.job.i} t={t} job={row.job} locale={locale}
+              live={live} reduce={reduce} visible={visible}
+              delay={at(k)} beat={seen++}
+            />
+          ) : (
+            <AutoRow
+              key={"a" + row.jobs[0].i} jobs={row.jobs} locale={locale}
+              live={live} reduce={reduce} delay={at(k)}
+            />
+          )
+        )}
+      </ol>
+
+      <p className="mt-3 font-mono text-[0.64rem] text-white/30" style={{ paddingLeft: `calc(${RAIL_X} + ${ARM})` }}>
+        {t.dayEnd}
+      </p>
     </div>
+  );
+}
+
+/** One run of things the system did, standing on the rail. */
+function AutoRow({
+  jobs, locale, live, reduce, delay,
+}: { jobs: Marked[]; locale: Locale; live: boolean; reduce: boolean; delay: number }) {
+  return (
+    <li className="relative flex flex-wrap items-center gap-2 py-2" style={{ paddingLeft: `calc(${RAIL_X} - 1.0625rem)` }}>
+      {jobs.map((j, n) => (
+        <motion.span
+          key={j.i}
+          title={j.label[locale]}
+          className="grid h-[2.125rem] w-[2.125rem] shrink-0 place-items-center rounded-full border border-[var(--color-brand-400)]/35 bg-[var(--color-brand-400)]/[0.14] text-[var(--color-brand-200)] shadow-[0_0_16px_-4px_rgba(69,189,236,.55)]"
+          initial={reduce ? false : { opacity: 0, scale: 0.55 }}
+          animate={live || reduce ? { opacity: 1, scale: 1 } : undefined}
+          transition={{ type: "spring", stiffness: 380, damping: 18, delay: delay + n * 0.06 }}
+        >
+          <Icon name={j.icon} />
+        </motion.span>
+      ))}
+    </li>
+  );
+}
+
+/** One of the three, hanging off the rail on a short arm. */
+function YouRow({
+  t, job, locale, live, reduce, visible, delay, beat,
+}: {
+  t: (typeof DAY_UI)["en"]; job: Marked; locale: Locale;
+  live: boolean; reduce: boolean; visible: boolean; delay: number; beat: number;
+}) {
+  return (
+    <li className="relative py-2.5" style={{ paddingLeft: `calc(${RAIL_X} + ${ARM})` }}>
+      {/* the mark on the rail, breathing */}
+      <span aria-hidden className="absolute top-1/2 z-10" style={{ left: RAIL_X }}>
+        {visible && (
+          <motion.span
+            className="absolute left-0 top-0 block h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[var(--color-brand-300)]"
+            initial={{ scale: 1, opacity: 0 }}
+            animate={{ scale: [1, 2.9], opacity: [0.7, 0] }}
+            transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 1.5, delay: beat * 0.45, ease: "easeOut" }}
+          />
+        )}
+        <motion.span
+          className="relative block h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[var(--color-brand-300)] bg-[var(--color-ink)] shadow-[0_0_14px_rgba(69,189,236,.9)]"
+          initial={reduce ? false : { scale: 0 }}
+          animate={live || reduce ? { scale: 1 } : undefined}
+          transition={{ type: "spring", stiffness: 420, damping: 15, delay: delay + 0.15 }}
+        />
+      </span>
+
+      {/* the arm out to the card, with a spark running along it */}
+      <span aria-hidden className="absolute top-1/2 h-px overflow-hidden" style={{ left: RAIL_X, width: ARM }}>
+        <motion.span
+          className="absolute inset-0 block origin-left bg-[var(--color-brand-300)]/55"
+          initial={reduce ? false : { scaleX: 0 }}
+          animate={live || reduce ? { scaleX: 1 } : undefined}
+          transition={{ duration: 0.4, delay: delay + 0.2, ease: "easeOut" }}
+        />
+        {visible && (
+          <motion.span
+            className="absolute top-0 block h-px w-2.5 bg-white"
+            initial={{ left: "-40%", opacity: 0 }}
+            animate={{ left: "110%", opacity: [0, 1, 1, 0] }}
+            transition={{ duration: 1.1, repeat: Infinity, repeatDelay: 3, delay: beat * 0.45, ease: "easeInOut", times: [0, 0.2, 0.75, 1] }}
+          />
+        )}
+      </span>
+
+      <motion.div
+        className="bx-glint relative flex items-center gap-3 overflow-hidden rounded-[var(--radius)] border border-[var(--color-brand-400)]/45 bg-white/[0.07] p-3 shadow-[0_16px_36px_-20px_rgba(41,171,226,.9)] backdrop-blur-sm"
+        style={{ animationDelay: `${beat * 2.6}s` }}
+        initial={reduce ? false : { opacity: 0, x: 18 }}
+        animate={live || reduce ? { opacity: 1, x: 0 } : undefined}
+        transition={{ type: "spring", stiffness: 240, damping: 21, delay }}
+      >
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[11px] bg-[var(--color-brand-400)] text-white shadow-[0_0_18px_-4px_rgba(69,189,236,.9)]">
+          <Icon name={job.icon} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[0.92rem] font-semibold leading-snug text-white">{job.label[locale]}</span>
+          <span className="block font-mono text-[0.64rem] text-white/40">{job.at}</span>
+        </span>
+        <span className="shrink-0 rounded-full bg-[var(--color-brand-400)]/20 px-2 py-[3px] text-[0.54rem] font-bold tracking-[0.14em] text-[var(--color-brand-200)]">
+          {t.you}
+        </span>
+      </motion.div>
+    </li>
   );
 }
 
