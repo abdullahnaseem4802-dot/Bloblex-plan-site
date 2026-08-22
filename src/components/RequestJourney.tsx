@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Reveal from "./Reveal";
+import { whenCentred } from "@/lib/scrub";
 import { type Locale } from "@/content/site";
 import { STEPS, MANUAL_TOTAL, SYSTEM_TOTAL, DECISION_COUNT, SYSTEM_CHATTER, JOURNEY_UI, fmt } from "@/content/journey";
 
@@ -75,7 +76,10 @@ function Lane({
   const ref = useRef<HTMLDivElement>(null);
   const [minutes, setMinutes] = useState(0);
 
-  /* starts the first time this lane is properly on screen, and only then */
+  /* Starts when this lane reaches the middle of the screen, and only then.
+     Asking for a share of the lane instead (it was 0.25) fires the moment its
+     top edge clears the bottom of the window: the clock runs while the reader
+     is still scrolling towards it, and they arrive at a finished bar. */
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -88,13 +92,8 @@ function Lane({
       setMinutes(total * k);
       if (k < 1) raf = requestAnimationFrame(step);
     };
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return;
-      io.disconnect();
-      raf = requestAnimationFrame(step);
-    }, { threshold: 0.25 });
-    io.observe(el);
-    return () => { io.disconnect(); cancelAnimationFrame(raf); };
+    const stop = whenCentred(el, 0.4, () => { raf = requestAnimationFrame(step); });
+    return () => { stop(); cancelAnimationFrame(raf); };
   }, [total, runMs, reduce]);
 
   const pct = (minutes / total) * 100;

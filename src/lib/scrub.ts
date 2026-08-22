@@ -116,11 +116,43 @@ export function useSmallScreen(query = "(max-width: 1023px)"): boolean {
   return small;
 }
 
-/** 0 → 1 over `ms`, started once `ref` is `amount` visible. */
+/* ---------------------------------------------------------------------------
+   "In front of the reader" is not the same as "on screen".
+
+   Asking for a share of the ELEMENT is the trap. A tall panel reaches 20% of
+   itself the moment its top edge clears the bottom of the window - the reader
+   has seen a strip of white and nothing else, but the clock has started, and
+   by the time they have actually scrolled to it the animation is over and
+   sitting at 100%. Raising that share does not fix it either: a panel taller
+   than the window can never reach a high ratio at all, so the animation would
+   simply never fire on a phone.
+
+   What matters is where the element is on the screen, not how much of it is
+   showing. So the window is shrunk to a band across its middle and the answer
+   is a plain yes/no: has this element reached the middle of the screen? A tall
+   panel and a short one both trigger at the point the reader is looking at
+   them, and both start from zero when they do.
+--------------------------------------------------------------------------- */
+
+/** Fires the moment `ref` reaches the middle `1 - 2 * band` of the screen. */
+function whenCentred(el: Element, band: number, run: () => void): () => void {
+  const io = new IntersectionObserver(
+    ([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      run();
+    },
+    { threshold: 0, rootMargin: `-${Math.round(band * 100)}% 0px -${Math.round(band * 100)}% 0px` },
+  );
+  io.observe(el);
+  return () => io.disconnect();
+}
+
+/** 0 → 1 over `ms`, started once `ref` reaches the middle of the screen. */
 export function useSettle(
   ref: RefObject<HTMLElement | null>,
   ms = 1400,
-  amount = 0.2,
+  band = 0.4,
 ): number {
   const reduce = useReducedMotion();
   const [p, setP] = useState(0);
@@ -139,19 +171,11 @@ export function useSettle(
       setP(k);
       if (k < 1) raf = requestAnimationFrame(step);
     };
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (!e.isIntersecting) return;
-        io.disconnect();
-        raf = requestAnimationFrame(step);
-      },
-      /* a tall panel never reaches a high ratio on a phone, so ask for a
-         modest slice of it and pull the viewport edges in instead */
-      { threshold: amount, rootMargin: "-10% 0px -10% 0px" },
-    );
-    io.observe(el);
-    return () => { io.disconnect(); cancelAnimationFrame(raf); };
-  }, [ref, ms, amount, reduce]);
+    const stop = whenCentred(el, band, () => { raf = requestAnimationFrame(step); });
+    return () => { stop(); cancelAnimationFrame(raf); };
+  }, [ref, ms, band, reduce]);
 
   return reduce ? 1 : p;
 }
+
+export { whenCentred };

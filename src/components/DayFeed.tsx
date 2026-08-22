@@ -385,23 +385,12 @@ function Rail({
    a light walks it long after, a halo breathes out of each mark, a spark
    runs down each arm, and a sheen crosses each card.
 
-   The thirteen are grouped into their runs rather than given a row each. On
-   the wide rail they already cluster into fours and threes between the
-   marks, and sixteen rows down a phone is a very long way to say "the system
-   did a pile of things while you were out". */
-type Run = { kind: "auto"; jobs: Marked[] } | { kind: "you"; job: Marked };
-
-function runs(jobs: Marked[]): Run[] {
-  const out: Run[] = [];
-  jobs.forEach((j) => {
-    if (j.by === "you") { out.push({ kind: "you", job: j }); return; }
-    const last = out[out.length - 1];
-    if (last && last.kind === "auto") last.jobs.push(j);
-    else out.push({ kind: "auto", jobs: [j] });
-  });
-  return out;
-}
-
+   The thirteen were grouped into their runs at first, laid out sideways from
+   the rail to keep the block short. That put the line through the first icon
+   of each run with the others trailing off to the right, which reads as icons
+   spilling over the rail rather than as icons standing on it. They get a row
+   each now, every one of them threaded on the line - the same single file the
+   wide rail has, just running down instead of across. */
 const RAIL_X = "1.35rem";   // where the vertical line lives, and every node centre
 const ARM = "1.6rem";       // rail to card
 
@@ -411,9 +400,8 @@ function Stacked({
   t: (typeof DAY_UI)["en"]; marked: Marked[];
   live: boolean; reduce: boolean; visible: boolean; locale: Locale;
 }) {
-  const rows = useMemo(() => runs(marked), [marked]);
   /* the line lights over the same 1.6s it takes on the wide rail */
-  const at = (k: number) => (reduce ? 0 : 0.3 + (k / rows.length) * SWEEP);
+  const at = (k: number) => (reduce ? 0 : 0.3 + (k / marked.length) * SWEEP);
   let seen = 0;   // "you" rows so far, so their halos beat out of step
 
   return (
@@ -446,16 +434,16 @@ function Stacked({
           />
         )}
 
-        {rows.map((row, k) =>
-          row.kind === "you" ? (
+        {marked.map((j, k) =>
+          j.by === "you" ? (
             <YouRow
-              key={"y" + row.job.i} t={t} job={row.job} locale={locale}
+              key={"y" + j.i} t={t} job={j} locale={locale}
               live={live} reduce={reduce} visible={visible}
               delay={at(k)} beat={seen++}
             />
           ) : (
             <AutoRow
-              key={"a" + row.jobs[0].i} jobs={row.jobs} locale={locale}
+              key={"a" + j.i} job={j} locale={locale}
               live={live} reduce={reduce} delay={at(k)}
             />
           )
@@ -469,24 +457,21 @@ function Stacked({
   );
 }
 
-/** One run of things the system did, standing on the rail. */
+/** One thing the system did, threaded on the rail. */
 function AutoRow({
-  jobs, locale, live, reduce, delay,
-}: { jobs: Marked[]; locale: Locale; live: boolean; reduce: boolean; delay: number }) {
+  job, locale, live, reduce, delay,
+}: { job: Marked; locale: Locale; live: boolean; reduce: boolean; delay: number }) {
   return (
-    <li className="relative flex flex-wrap items-center gap-2 py-2" style={{ paddingLeft: `calc(${RAIL_X} - 1.0625rem)` }}>
-      {jobs.map((j, n) => (
-        <motion.span
-          key={j.i}
-          title={j.label[locale]}
-          className="grid h-[2.125rem] w-[2.125rem] shrink-0 place-items-center rounded-full border border-[var(--color-brand-400)]/35 bg-[var(--color-brand-400)]/[0.14] text-[var(--color-brand-200)] shadow-[0_0_16px_-4px_rgba(69,189,236,.55)]"
-          initial={reduce ? false : { opacity: 0, scale: 0.55 }}
-          animate={live || reduce ? { opacity: 1, scale: 1 } : undefined}
-          transition={{ type: "spring", stiffness: 380, damping: 18, delay: delay + n * 0.06 }}
-        >
-          <Icon name={j.icon} />
-        </motion.span>
-      ))}
+    <li className="relative h-[2.7rem]" title={job.label[locale]}>
+      <motion.span
+        className="absolute top-1/2 grid h-8 w-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-[var(--color-brand-400)]/35 bg-[var(--color-brand-400)]/[0.14] text-[var(--color-brand-200)] shadow-[0_0_16px_-4px_rgba(69,189,236,.55)]"
+        style={{ left: RAIL_X }}
+        initial={reduce ? false : { opacity: 0, scale: 0.55 }}
+        animate={live || reduce ? { opacity: 1, scale: 1 } : undefined}
+        transition={{ type: "spring", stiffness: 380, damping: 18, delay }}
+      >
+        <Icon name={job.icon} />
+      </motion.span>
     </li>
   );
 }
