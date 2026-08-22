@@ -25,20 +25,12 @@ function crumbs(locale: Locale, key: PageKey) {
     { name: PAGES[key].nav[locale], href: pagePath(locale, key) },
   ];
 }
-function CtaBand({ locale }: { locale: Locale }) {
-  const isEn = locale === "en";
-  return (
-    <section className="py-16">
-      <div className="container">
-        <div className="rounded-[var(--radius-xl)] bg-[var(--color-ink)] text-white px-8 py-12 md:px-14 md:py-16 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <h2 className="text-2xl md:text-3xl font-semibold text-white max-w-xl">{isEn ? "Tell us what slows you down." : "Dites-nous ce qui vous ralentit."}</h2>
-          <a href={pagePath(locale, "contact")} className="btn-primary shrink-0">{isEn ? "Start a project" : "Démarrer un projet"}</a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
+/* There used to be a "Tell us what slows you down. / Start a project" band at
+   the foot of What we build, Industries, Process and Pricing. The same header
+   sits pinned to the top of every one of those pages with the same button in
+   it, so the band was the fourth or fifth time a visitor had been shown the
+   same call on the same screen. The Contact page is where that sentence
+   belongs, and it is still the headline there. */
 export function WhatWeBuildPage({ locale }: { locale: Locale }) {
   const h = PAGE_HERO.whatWeBuild[locale];
   return (
@@ -49,7 +41,6 @@ export function WhatWeBuildPage({ locale }: { locale: Locale }) {
       <SystemComparison locale={locale} />
       <WhyCustom locale={locale} />
       <AutomationPicker locale={locale} />
-      <CtaBand locale={locale} />
     </PageShell>
   );
 }
@@ -81,8 +72,7 @@ export function IndustriesPage({ locale }: { locale: Locale }) {
           </ul>
         </div>
       </section>
-      <SectorSwitcher locale={locale} />
-      <CtaBand locale={locale} />
+      <SectorSwitcher locale={locale} bare />
     </PageShell>
   );
 }
@@ -94,7 +84,6 @@ export function ProcessPage({ locale }: { locale: Locale }) {
       <Breadcrumbs items={crumbs(locale, "process")} />
       <PageHero {...h} />
       <Process locale={locale} bare />
-      <CtaBand locale={locale} />
     </PageShell>
   );
 }
@@ -108,7 +97,6 @@ export function PricingPage({ locale }: { locale: Locale }) {
       <CostRace locale={locale} />
       <Assurances locale={locale} />
       <Uncomparable locale={locale} />
-      <CtaBand locale={locale} />
     </PageShell>
   );
 }

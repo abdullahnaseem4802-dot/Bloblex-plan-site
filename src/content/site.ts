@@ -48,7 +48,7 @@ type Dict = {
 export const CONTENT: Record<Locale, Dict> = {
   en: {
     meta: {
-      title: "Custom Software & Systems That Run Your Business | Blobex, Granby QC",
+      title: "Blobex · Custom Software & Systems That Run Your Business, Granby QC",
       description:
         "We build custom software, internal platforms, automation and client portals designed around how your business actually works. A system that fits your operations, not another software expense.",
       ogTitle: "Blobex: Custom Systems That Run Your Business",
@@ -125,7 +125,7 @@ export const CONTENT: Record<Locale, Dict> = {
       hint: "We reply from Granby, Quebec, usually within one business day.",
       ok: "Thank you, your request was sent. We'll be in touch shortly.",
       err: "Something went wrong. Please try again or email us directly.",
-      reasonLabel: "Reason for contacting Blobex",
+      reasonLabel: "Subject",
       reasons: ["Request more information", "Launch or discuss a new project", "Analyze an operational or automation opportunity", "Improve or replace an existing system"],
       errName: "Please enter your full name.",
       errEmail: "Please enter a valid email address.",
@@ -144,7 +144,7 @@ export const CONTENT: Record<Locale, Dict> = {
 
   fr: {
     meta: {
-      title: "Logiciels sur mesure qui font rouler votre entreprise | Blobex, Granby QC",
+      title: "Blobex · Logiciels sur mesure qui font rouler votre entreprise, Granby QC",
       description:
         "On conçoit des logiciels sur mesure, des plateformes internes, de l'automatisation et des portails clients bâtis autour du fonctionnement réel de votre entreprise. Un système qui s'adapte à vos opérations, pas une dépense logicielle de plus.",
       ogTitle: "Blobex : des systèmes sur mesure qui font rouler votre entreprise",
@@ -221,7 +221,7 @@ export const CONTENT: Record<Locale, Dict> = {
       hint: "Nous répondons depuis Granby, au Québec, généralement en un jour ouvrable.",
       ok: "Merci, votre demande a été envoyée. Nous vous contacterons sous peu.",
       err: "Une erreur est survenue. Réessayez ou écrivez-nous directement.",
-      reasonLabel: "Raison du contact",
+      reasonLabel: "Sujet",
       reasons: ["Obtenir plus d'information", "Lancer ou discuter d'un nouveau projet", "Analyser une opportunité d'automatisation", "Améliorer ou remplacer un système existant"],
       errName: "Veuillez entrer votre nom complet.",
       errEmail: "Veuillez entrer une adresse courriel valide.",

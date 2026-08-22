@@ -27,13 +27,19 @@ export default function ProcessSpine({ locale, bare }: { locale: Locale; bare?: 
   return (
     <section id="process" className={`border-y border-[var(--color-line)] band-panel ${bare ? "pt-16 pb-20 md:pt-20 md:pb-28" : "py-20 md:py-28"}`}>
       <div className="container">
-        <Reveal className="max-w-3xl">
-          <p className="mb-4 text-[0.78rem] font-bold uppercase tracking-[0.2em] text-[var(--color-brand-600)]">{t.kicker}</p>
-          <h2 className="text-3xl font-semibold leading-[1.06] tracking-[-0.03em] md:text-[3rem]">{t.title}</h2>
-          <p className="mt-5 max-w-[60ch] leading-relaxed text-[var(--color-slate)]">{t.lead}</p>
-        </Reveal>
+        {/* `bare` means the page masthead directly above already carries this
+            exact kicker and headline. It was only shortening the padding, so
+            the /process page opened with the same sentence twice and pushed the
+            six steps clean off the first screen. */}
+        {!bare && (
+          <Reveal className="max-w-3xl">
+            <p className="mb-4 text-[0.78rem] font-bold uppercase tracking-[0.2em] text-[var(--color-brand-600)]">{t.kicker}</p>
+            <h2 className="text-3xl font-semibold leading-[1.06] tracking-[-0.03em] md:text-[3rem]">{t.title}</h2>
+            <p className="mt-5 max-w-[60ch] leading-relaxed text-[var(--color-slate)]">{t.lead}</p>
+          </Reveal>
+        )}
 
-        <div ref={ref} className="relative mt-12">
+        <div ref={ref} className={bare ? "relative" : "relative mt-12"}>
           {/* the spine */}
           <div className="absolute left-[19px] top-2 bottom-2 w-px bg-[var(--color-line)] md:left-0 md:right-0 md:top-[27px] md:bottom-auto md:h-px md:w-auto" />
           {/* progress along the spine: a separate element per orientation, because
@@ -48,37 +54,59 @@ export default function ProcessSpine({ locale, bare }: { locale: Locale; bare?: 
             style={{ background: BRAND, scaleX: p }}
           />
 
-          <ol className="relative grid gap-8 md:grid-cols-6 md:gap-4">
+          {/* Four shared rows - node, name, description, outcome - and every
+              step is a subgrid spanning all four, so the six "→ you get" lines
+              start on one baseline no matter how many lines the paragraph above
+              each of them happens to run to. Wrapping the text in one animated
+              box could not do this: the box can be made the same height in every
+              column, but the outcome inside it still floats on however much
+              description sits above it. The animation moved onto the three
+              pieces instead. */}
+          <ol className="relative grid gap-8 md:grid-cols-6 md:grid-rows-[auto_auto_1fr_auto] md:gap-x-4 md:gap-y-0">
             {t.steps.map((s, i) => {
               const a = ease(stagger(p, i, n, 1.7));
-              const locked = i === t.lockAt;
+              const text = { opacity: 0.25 + a * 0.75, y: (1 - a) * 10 };
               return (
-                <li key={s.name} className="relative flex gap-4 md:block">
-                  {/* node */}
+                <li
+                  key={s.name}
+                  className="relative grid grid-cols-[2.5rem_1fr] gap-x-4 pb-2 md:row-span-4 md:grid-cols-1 md:grid-rows-subgrid md:gap-x-0 md:pb-0"
+                >
+                  {/* node. Step 6 used to be painted brand blue because it is the
+                      one where the price stops moving, but a single odd-coloured
+                      dot in a row of six reads as a bug, not as emphasis. The
+                      badge below says it in words instead. */}
                   <motion.span
                     className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-[family-name:var(--font-display)] text-sm font-bold"
                     style={{
-                      background: a > 0.15 ? (locked ? BRAND : INK) : "#ffffff",
+                      background: a > 0.15 ? INK : "#ffffff",
                       color: a > 0.15 ? "#fff" : "var(--color-mute)",
                       border: a > 0.15 ? "none" : "1px solid var(--color-line)",
-                      boxShadow: a > 0.15 ? `0 12px 28px -14px ${locked ? BRAND : INK}` : "none",
+                      boxShadow: a > 0.15 ? `0 12px 28px -14px ${INK}` : "none",
                       scale: 0.86 + a * 0.14,
                     }}
                   >
                     {i + 1}
                   </motion.span>
 
-                  <motion.div
-                    className="pb-2 md:mt-5"
-                    style={{ opacity: 0.25 + a * 0.75, y: (1 - a) * 10 }}
+                  <motion.p
+                    className="col-start-2 font-semibold tracking-[-0.01em] text-[var(--color-ink)] md:col-start-1 md:mt-5"
+                    style={text}
                   >
-                    <p className="font-semibold tracking-[-0.01em] text-[var(--color-ink)]">{s.name}</p>
-                    <p className="mt-1.5 text-sm leading-relaxed text-[var(--color-slate)]">{s.what}</p>
-                    <p className="mt-2.5 flex items-start gap-1.5 text-[0.78rem] font-semibold text-[var(--color-brand-700)]">
-                      <span aria-hidden="true">→</span>
-                      <span>{s.get}</span>
-                    </p>
-                  </motion.div>
+                    {s.name}
+                  </motion.p>
+                  <motion.p
+                    className="col-start-2 mt-1.5 text-sm leading-relaxed text-[var(--color-slate)] md:col-start-1"
+                    style={text}
+                  >
+                    {s.what}
+                  </motion.p>
+                  <motion.p
+                    className="col-start-2 mt-2.5 flex items-start gap-1.5 text-[0.78rem] font-semibold text-[var(--color-brand-700)] md:col-start-1 md:mt-3"
+                    style={text}
+                  >
+                    <span aria-hidden="true">→</span>
+                    <span>{s.get}</span>
+                  </motion.p>
                 </li>
               );
             })}

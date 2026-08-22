@@ -14,7 +14,8 @@ import { DAY_JOBS, JOBS_YOURS, JOBS_AUTO, DAY_UI, type IconKey, type DayJob } fr
 
 const SWEEP = 1.6;          // seconds for the light to cross the whole day
 const RAIL_PAD = 3;         // % kept clear at each end of the rail
-const CARD_SLOTS = [14, 50, 86];  // where the three cards sit, spread on purpose
+const CARD_W = 17;          // card width as a % of the rail, so the maths below
+const CARD_GAP = 18;        // holds at every desktop width
 
 /** The jobs sit at an even rhythm rather than at true clock positions: a real
  *  day is bunched into the morning, which reads as a pile-up rather than as a
@@ -22,6 +23,32 @@ const CARD_SLOTS = [14, 50, 86];  // where the three cards sit, spread on purpos
 function layout(n: number) {
   const span = 100 - RAIL_PAD * 2;
   return Array.from({ length: n }, (_, i) => RAIL_PAD + (span * i) / (n - 1));
+}
+
+/** Where the three cards sit, in % of the rail.
+ *
+ *  These used to be pinned at 14 / 50 / 86 - spread evenly for the look of it,
+ *  with no relation to the marks they point at. The marks fall at roughly
+ *  28 / 41 / 66, so every leader line had to cross a hundred-odd pixels
+ *  sideways inside a 35px band: three near-horizontal streaks that read as
+ *  stray rules rather than as anything joining a card to a dot.
+ *
+ *  So each card now wants to sit directly over its own mark, and is only
+ *  pushed aside far enough to keep the cards from touching each other or
+ *  running off either end. Two of the three end up dead over their dot and
+ *  the leaders become short, obvious drops. */
+function cardSlots(marks: number[]): number[] {
+  const half = CARD_W / 2;
+  const out = marks.slice();
+  for (let i = 0; i < out.length; i++) {
+    out[i] = Math.max(out[i], i === 0 ? half : out[i - 1] + CARD_GAP);
+  }
+  for (let i = out.length - 1; i >= 0; i--) {
+    const ceiling = i === out.length - 1 ? 100 - half : out[i + 1] - CARD_GAP;
+    out[i] = Math.min(out[i], ceiling);
+  }
+  /* if the row simply does not fit, the left clamp wins over the right one */
+  return out.map((v, i) => Math.max(v, i === 0 ? half : out[i - 1] + CARD_GAP));
 }
 
 type Marked = DayJob & { i: number };
@@ -144,60 +171,67 @@ function Rail({
   t: (typeof DAY_UI)["en"]; pos: number[]; yours: Marked[]; auto: Marked[];
   live: boolean; reduce: boolean; idle: boolean; at: (i: number) => number; locale: Locale;
 }) {
+  const slots = cardSlots(yours.map((j) => pos[j.i]));
+
   return (
-    <div className="relative h-[18.6rem] select-none">
+    <div className="relative h-[20.2rem] select-none">
       <span className="absolute left-0 top-0 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[var(--color-brand-300)]">
         {t.yoursHeading}
       </span>
 
-      {/* the three that are yours, bottom-aligned so the row reads as a row */}
-      <div className="absolute inset-x-0 top-[1.7rem] h-[8rem]">
+      {/* the three that are yours, bottom-aligned so the row reads as a row.
+          They no longer drift: a card on the end of a leader line that breathes
+          up and down opens and closes a gap where the line meets it, which is
+          most of what made the joins look broken. The ambient movement in this
+          panel lives on the light and on the thirteen icons instead. */}
+      <div className="absolute inset-x-0 top-[1.5rem] h-[8.6rem]">
         {yours.map((j, k) => (
           <motion.div
             key={"y" + j.i}
-            className="absolute bottom-0 w-[11.5rem] -translate-x-1/2"
-            style={{ left: `${CARD_SLOTS[k]}%` }}
+            className="absolute bottom-0 w-[17%] -translate-x-1/2 rounded-[var(--radius)] border border-[var(--color-brand-400)]/45 bg-white/[0.07] p-3.5 shadow-[0_18px_44px_-18px_rgba(41,171,226,.85)] backdrop-blur-sm"
+            style={{ left: `${slots[k]}%` }}
             initial={reduce ? false : { opacity: 0, y: 18, scale: 0.92 }}
             animate={live || reduce ? { opacity: 1, y: 0, scale: 1 } : undefined}
             transition={{ type: "spring", stiffness: 250, damping: 21, delay: at(j.i) }}
           >
-            <Float on={idle} amp={5} secs={6.5} delay={k * 1.1} className="rounded-[var(--radius)] border border-[var(--color-brand-400)]/45 bg-white/[0.07] p-3.5 shadow-[0_18px_44px_-18px_rgba(41,171,226,.85)] backdrop-blur-sm">
-              <div className="flex items-center gap-2">
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-[var(--color-brand-400)] text-white">
-                  <Icon name={j.icon} />
-                </span>
-                <span className="text-[0.56rem] font-bold tracking-[0.16em] text-[var(--color-brand-300)]">{t.you}</span>
-              </div>
-              <p className="mt-2.5 text-[0.9rem] font-semibold leading-snug text-white">{j.label[locale]}</p>
-              <p className="mt-0.5 font-mono text-[0.64rem] text-white/40">{j.at}</p>
-            </Float>
+            <div className="flex items-center gap-2">
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-[var(--color-brand-400)] text-white">
+                <Icon name={j.icon} />
+              </span>
+              <span className="text-[0.56rem] font-bold tracking-[0.16em] text-[var(--color-brand-300)]">{t.you}</span>
+            </div>
+            <p className="mt-2.5 text-[0.9rem] font-semibold leading-snug text-white">{j.label[locale]}</p>
+            <p className="mt-0.5 font-mono text-[0.64rem] text-white/40">{j.at}</p>
           </motion.div>
         ))}
       </div>
 
-      {/* each card reaches down to its own moment in the day */}
+      {/* each card reaches down to its own moment in the day. The band is deep
+          enough now (3.6rem, was 2.2rem) that a leader is a drop rather than a
+          sideways dash, and the curve leaves the card and meets the rail
+          vertically at both ends so the join is unmistakable. */}
       <svg
-        className="absolute inset-x-0 top-[9.7rem] h-[2.2rem] w-full overflow-visible"
+        className="absolute inset-x-0 top-[10.1rem] h-[3.6rem] w-full overflow-visible"
         viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"
       >
         {yours.map((j, k) => (
           <motion.path
             key={"l" + j.i}
-            d={`M ${CARD_SLOTS[k]} 0 L ${CARD_SLOTS[k]} 34 L ${pos[j.i]} 66 L ${pos[j.i]} 100`}
-            fill="none" stroke="var(--color-brand-400)" strokeWidth="1"
-            strokeLinecap="round" strokeLinejoin="round"
+            d={`M ${slots[k]} 0 C ${slots[k]} 46, ${pos[j.i]} 54, ${pos[j.i]} 100`}
+            fill="none" stroke="var(--color-brand-300)" strokeWidth="1.5"
+            strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
             initial={reduce ? false : { pathLength: 0, opacity: 0 }}
-            animate={live || reduce ? { pathLength: 1, opacity: 0.85 } : undefined}
+            animate={live || reduce ? { pathLength: 1, opacity: 1 } : undefined}
             transition={{ duration: 0.45, delay: at(j.i) + 0.1, ease: "easeOut" }}
           />
         ))}
       </svg>
 
       {/* the rail: the day, lit as it goes */}
-      <div className="absolute inset-x-0 top-[11.9rem] h-px bg-white/12" />
+      <div className="absolute inset-x-0 top-[13.7rem] h-px bg-white/12" />
       <motion.div
-        className="absolute inset-x-0 top-[11.85rem] h-[2px] rounded-full bg-gradient-to-r from-[var(--color-brand-500)] via-[var(--color-brand-300)] to-[var(--color-brand-500)] shadow-[0_0_18px_rgba(69,189,236,.55)]"
+        className="absolute inset-x-0 top-[13.65rem] h-[2px] rounded-full bg-gradient-to-r from-[var(--color-brand-500)] via-[var(--color-brand-300)] to-[var(--color-brand-500)] shadow-[0_0_18px_rgba(69,189,236,.55)]"
         style={{ transformOrigin: "left" }}
         initial={reduce ? false : { scaleX: 0 }}
         animate={live || reduce ? { scaleX: 1 } : undefined}
@@ -206,7 +240,7 @@ function Rail({
       {!reduce && (
         <motion.span
           aria-hidden
-          className="absolute top-[11.9rem] z-10 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_22px_8px_rgba(69,189,236,.7)]"
+          className="absolute top-[13.7rem] z-10 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_22px_8px_rgba(69,189,236,.7)]"
           initial={{ left: "0%", opacity: 0 }}
           animate={live ? { left: "100%", opacity: [0, 1, 1, 0] } : undefined}
           transition={{ duration: SWEEP + 0.25, ease: [0.33, 0, 0.15, 1], delay: 0.25, times: [0, 0.06, 0.9, 1] }}
@@ -217,7 +251,7 @@ function Rail({
       {idle && (
         <motion.span
           aria-hidden
-          className="absolute top-[11.9rem] z-[5] h-[3px] w-24 -translate-y-1/2 rounded-full bg-gradient-to-r from-transparent via-white/70 to-transparent blur-[1px]"
+          className="absolute top-[13.7rem] z-[5] h-[3px] w-24 -translate-y-1/2 rounded-full bg-gradient-to-r from-transparent via-white/70 to-transparent blur-[1px]"
           initial={{ left: "-8%", opacity: 0 }}
           animate={{ left: "104%", opacity: [0, 0.9, 0.9, 0] }}
           transition={{ duration: 4.5, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut", times: [0, 0.1, 0.85, 1] }}
@@ -229,7 +263,7 @@ function Rail({
         <motion.span
           key={"p" + j.i}
           aria-hidden
-          className="absolute top-[11.9rem] z-10 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[var(--color-brand-300)] bg-[var(--color-ink)] shadow-[0_0_14px_rgba(69,189,236,.9)]"
+          className="absolute top-[13.7rem] z-10 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[var(--color-brand-300)] bg-[var(--color-ink)] shadow-[0_0_14px_rgba(69,189,236,.9)]"
           style={{ left: `${pos[j.i]}%` }}
           initial={reduce ? false : { scale: 0 }}
           animate={live || reduce ? { scale: 1 } : undefined}
@@ -238,14 +272,14 @@ function Rail({
       ))}
 
       {/* the hours, quietly */}
-      <span className="absolute left-0 top-[12.5rem] font-mono text-[0.64rem] text-white/30">{t.dayStart}</span>
-      <span className="absolute right-0 top-[12.5rem] font-mono text-[0.64rem] text-white/30">{t.dayEnd}</span>
+      <span className="absolute left-0 top-[14.3rem] font-mono text-[0.64rem] text-white/30">{t.dayStart}</span>
+      <span className="absolute right-0 top-[14.3rem] font-mono text-[0.64rem] text-white/30">{t.dayEnd}</span>
 
       {/* the thirteen the system handles: icons only, nothing to read */}
       {auto.map((j) => (
         <motion.div
           key={"a" + j.i}
-          className="group absolute top-[13.6rem] -translate-x-1/2"
+          className="group absolute top-[15.4rem] -translate-x-1/2"
           style={{ left: `${pos[j.i]}%` }}
           initial={reduce ? false : { opacity: 0, y: -8, scale: 0.6 }}
           animate={live || reduce ? { opacity: 1, y: 0, scale: 1 } : undefined}

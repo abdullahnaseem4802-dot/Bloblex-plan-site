@@ -13,7 +13,7 @@ const digits = (s: string) => s.replace(/\D/g, "");
 
 function Label({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) {
   return (
-    <label htmlFor={htmlFor} className="mb-2 block text-[0.82rem] font-semibold tracking-wide text-[var(--color-ink)]">
+    <label htmlFor={htmlFor} className="mb-1.5 block text-[0.82rem] font-semibold tracking-wide text-[var(--color-ink)]">
       {children}
     </label>
   );
@@ -92,42 +92,40 @@ export default function ContactForm({ locale }: { locale: Locale }) {
   }
 
   const inputCls = (bad: boolean) =>
-    `w-full rounded-[var(--radius)] border bg-white px-4 py-3 text-[var(--color-ink)] outline-none transition-all placeholder:text-[var(--color-mute)] ${
+    `w-full rounded-[var(--radius)] border bg-white px-4 py-2.5 text-[var(--color-ink)] outline-none transition-all placeholder:text-[var(--color-mute)] ${
       bad
         ? "border-red-400 ring-4 ring-red-100"
         : "border-[var(--color-line)] focus:border-[var(--color-brand-400)] focus:ring-4 focus:ring-[rgba(41,171,226,.12)]"
     }`;
 
   return (
-    <form onSubmit={onSubmit} noValidate className="grid gap-6">
-      <div>
-        <Label htmlFor="reason">{t.reasonLabel}</Label>
-        <select
-          id="reason" value={reason} onChange={(e) => setReason(e.target.value)}
-          className={`${inputCls(false)} cursor-pointer appearance-none bg-[url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5l5-5' stroke='%238a94a8' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")] bg-[position:right_1rem_center] bg-no-repeat pr-10`}
-        >
-          {t.reasons.map((r) => <option key={r} value={r}>{r}</option>)}
-        </select>
-      </div>
+    /* Four rows: who you are, how to call you, what it is about, and the ask.
+       Name and email share the first row - they are the two fields nobody has
+       to think about, and stacking them one per row was what pushed the Send
+       button below the fold on a laptop. The subject moved from the top to the
+       third row for the same reason it is not first on any email client: it is
+       the easiest field to answer once you know what you are writing. */
+    <form onSubmit={onSubmit} noValidate className="grid gap-4">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <Label htmlFor="name">{t.name}</Label>
+          <input
+            id="name" name="name" autoComplete="name" placeholder={t.namePlaceholder}
+            value={v.name} onChange={(e) => set("name", e.target.value)} onBlur={() => blur("name")}
+            aria-invalid={show("name")} className={inputCls(show("name"))}
+          />
+          <Err show={show("name")} msg={errors.name} />
+        </div>
 
-      <div>
-        <Label htmlFor="name">{t.name}</Label>
-        <input
-          id="name" name="name" autoComplete="name" placeholder={t.namePlaceholder}
-          value={v.name} onChange={(e) => set("name", e.target.value)} onBlur={() => blur("name")}
-          aria-invalid={show("name")} className={inputCls(show("name"))}
-        />
-        <Err show={show("name")} msg={errors.name} />
-      </div>
-
-      <div>
-        <Label htmlFor="email">{t.emailL}</Label>
-        <input
-          id="email" name="email" type="email" inputMode="email" autoComplete="email" placeholder={t.emailPlaceholder}
-          value={v.email} onChange={(e) => set("email", e.target.value)} onBlur={() => blur("email")}
-          aria-invalid={show("email")} className={inputCls(show("email"))}
-        />
-        <Err show={show("email")} msg={errors.email} />
+        <div>
+          <Label htmlFor="email">{t.emailL}</Label>
+          <input
+            id="email" name="email" type="email" inputMode="email" autoComplete="email" placeholder={t.emailPlaceholder}
+            value={v.email} onChange={(e) => set("email", e.target.value)} onBlur={() => blur("email")}
+            aria-invalid={show("email")} className={inputCls(show("email"))}
+          />
+          <Err show={show("email")} msg={errors.email} />
+        </div>
       </div>
 
       <div>
@@ -141,16 +139,26 @@ export default function ContactForm({ locale }: { locale: Locale }) {
       </div>
 
       <div>
+        <Label htmlFor="reason">{t.reasonLabel}</Label>
+        <select
+          id="reason" value={reason} onChange={(e) => setReason(e.target.value)}
+          className={`${inputCls(false)} cursor-pointer appearance-none bg-[url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5l5-5' stroke='%238a94a8' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")] bg-[position:right_1rem_center] bg-no-repeat pr-10`}
+        >
+          {t.reasons.map((r) => <option key={r} value={r}>{r}</option>)}
+        </select>
+      </div>
+
+      <div>
         <Label htmlFor="message">{t.message}</Label>
         <textarea
-          id="message" name="message" rows={5} placeholder={t.messagePlaceholder}
+          id="message" name="message" rows={3} placeholder={t.messagePlaceholder}
           value={v.message} onChange={(e) => set("message", e.target.value)} onBlur={() => blur("message")}
           aria-invalid={show("message")} className={`${inputCls(show("message"))} resize-y leading-relaxed`}
         />
         <Err show={show("message")} msg={errors.message} />
       </div>
 
-      <button type="submit" disabled={status === "sending"} className="btn-primary w-full justify-center py-3.5 text-base disabled:opacity-60">
+      <button type="submit" disabled={status === "sending"} className="btn-primary mt-1 w-full justify-center py-3 text-base disabled:opacity-60">
         {status === "sending" ? t.sending : t.send}
       </button>
 

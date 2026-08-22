@@ -2,17 +2,25 @@
 import { useRef } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import Reveal from "./Reveal";
-import { useScrub, useScrubValue, useSettle, ease } from "@/lib/scrub";
+import { useSettle, ease } from "@/lib/scrub";
 import { type Locale } from "@/content/site";
 import { FIXED_PRICE, RIVAL_END, COST_UI, money } from "@/content/costrace";
 
 const RED = "#d2544c";
 const BRAND = "#1787c4";
 
-/* Two meters running the same job, driven entirely by scroll.
-   Both start at zero, the client's own note. There is nothing to press: the
-   further the visitor reads, the further both projects get, and scrolling back
-   rewinds them, which is why there is no replay control anywhere here. */
+/* Two meters running the same job. Both start at zero, the client's own note.
+   There is nothing to press.
+
+   This used to take the higher of the scroll position and a self-playing clock,
+   which broke the "start at zero" rule outright: a visitor who scrolled down at
+   any speed arrived with the scroll range already spent, so the meters were sat
+   at 100% before the panel had finished entering the screen. There was never an
+   animation to see, only its result.
+
+   So the clock alone drives it now, started the moment the panel is properly in
+   view. Whoever arrives, however they got here, sees $0 and watches the two
+   numbers separate. Same on a phone. */
 /** 0 → 1 across [a, b], flat outside it. */
 const ramp = (v: number, a: number, b: number) => Math.min(1, Math.max(0, (v - a) / (b - a)));
 
@@ -20,12 +28,9 @@ export default function CostRace({ locale }: { locale: Locale }) {
   const t = COST_UI[locale];
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-  const scrub = useScrub(ref, ["start 90%", "end 48%"]);
-  const raw = useScrubValue(scrub);
-  /* on a phone this panel is taller than the screen, so it also finishes on
-     its own once it is in view; whichever is further along wins */
-  const settle = useSettle(ref, 1500);
-  const p = Math.max(raw, settle);
+  /* 2.2s: long enough that the rival meter visibly keeps climbing after ours
+     has stopped, which is the whole comparison */
+  const p = useSettle(ref, 2200);
 
   /* the hourly shop bills all the way through; we stop at the agreed number
      once the work is done, which happens sooner */

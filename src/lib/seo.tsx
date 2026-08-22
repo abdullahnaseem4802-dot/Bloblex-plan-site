@@ -21,9 +21,22 @@ function metaFor(opts: { locale: Locale; title: string; description: string; enP
     },
     twitter: { card: "summary_large_image", title, description },
     robots: { index: true, follow: true },
-    icons: { icon: "/img/icon-512.png", apple: "/img/icon-180.png" },
+    icons: ICONS,
   };
 }
+
+/* The tab icon was a single 512px file, which every browser then squeezed down
+   to 16px on its own - the thin circuit lines mush and the mark reads as a
+   smudge. Naming the small sizes lets it pick the one that was drawn for the
+   job. */
+const ICONS: Metadata["icons"] = {
+  icon: [
+    { url: "/img/icon-32.png", sizes: "32x32", type: "image/png" },
+    { url: "/img/icon-48.png", sizes: "48x48", type: "image/png" },
+    { url: "/img/icon-512.png", sizes: "512x512", type: "image/png" },
+  ],
+  apple: [{ url: "/img/icon-180.png", sizes: "180x180", type: "image/png" }],
+};
 
 /** Metadata for a standalone page (What we build, Process, etc.). */
 export function buildPageMetadata(locale: Locale, key: PageKey): Metadata {
@@ -80,7 +93,7 @@ export function buildMetadata(locale: Locale): Metadata {
     },
     twitter: { card: "summary_large_image", title: c.ogTitle, description: c.ogDescription },
     robots: { index: true, follow: true },
-    icons: { icon: "/img/icon-512.png", apple: "/img/icon-180.png" },
+    icons: ICONS,
   };
 }
 

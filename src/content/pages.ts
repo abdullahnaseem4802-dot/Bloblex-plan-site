@@ -127,12 +127,12 @@ export function industryMeta(id: string, locale: Locale) {
   const name = industryName(id, locale);
   return locale === "en"
     ? {
-        title: `${name} Software. Custom Systems Built Around Your Operations | Blobex`,
+        title: `Blobex · ${name} Software. Custom Systems Built Around Your Operations`,
         description: `Blobex builds custom ${name.toLowerCase()} software: automation, client portals, AI estimating and the connected tools your ${name.toLowerCase()} business runs on. Granby, Quebec.`,
         h1: `Custom software for ${name.toLowerCase()}.`,
       }
     : {
-        title: `Logiciel ${name}. Systèmes sur mesure bâtis autour de vos opérations | Blobex`,
+        title: `Blobex · Logiciel ${name}. Systèmes sur mesure bâtis autour de vos opérations`,
         description: `Blobex conçoit des logiciels sur mesure pour le secteur ${name.toLowerCase()} : automatisation, portails clients, estimation IA et les outils connectés dont votre entreprise a besoin. Granby, Québec.`,
         h1: `Logiciel sur mesure pour le secteur ${name.toLowerCase()}.`,
       };
@@ -144,28 +144,28 @@ type Meta = { title: string; description: string };
 
 export const PAGE_META: Record<string, Record<Locale, Meta>> = {
   whatWeBuild: {
-    en: { title: "What We Build. Custom Software, Platforms & Automation | Blobex", description: "Custom software, internal platforms, automation, client portals and AI tools built around how your business actually works. See what Blobex builds." },
-    fr: { title: "Ce qu'on bâtit. Logiciels, plateformes et automatisation sur mesure | Blobex", description: "Logiciels sur mesure, plateformes internes, automatisation, portails clients et outils IA bâtis autour du fonctionnement réel de votre entreprise." },
+    en: { title: "Blobex · What We Build. Custom Software, Platforms & Automation", description: "Custom software, internal platforms, automation, client portals and AI tools built around how your business actually works. See what Blobex builds." },
+    fr: { title: "Blobex · Ce qu'on bâtit. Logiciels, plateformes et automatisation sur mesure", description: "Logiciels sur mesure, plateformes internes, automatisation, portails clients et outils IA bâtis autour du fonctionnement réel de votre entreprise." },
   },
   industries: {
-    en: { title: "Industries. Custom Systems for Your Field | Blobex", description: "Construction, manufacturing, healthcare, logistics and more. See the connected system Blobex can build for your industry." },
-    fr: { title: "Secteurs. Des systèmes sur mesure pour votre domaine | Blobex", description: "Construction, manufacturier, santé, logistique et plus. Découvrez le système connecté que Blobex peut bâtir pour votre secteur." },
+    en: { title: "Blobex · Industries. Custom Systems for Your Field", description: "Construction, manufacturing, healthcare, logistics and more. See the connected system Blobex can build for your industry." },
+    fr: { title: "Blobex · Secteurs. Des systèmes sur mesure pour votre domaine", description: "Construction, manufacturier, santé, logistique et plus. Découvrez le système connecté que Blobex peut bâtir pour votre secteur." },
   },
   process: {
-    en: { title: "Our Process. Understand, Design, Build, Improve | Blobex", description: "A clear process with a fixed scope, timeline and price defined before development. See how Blobex works." },
-    fr: { title: "Notre processus. Comprendre, concevoir, bâtir, améliorer | Blobex", description: "Un processus clair, avec une portée, un échéancier et un prix fixes définis avant le développement. Découvrez comment Blobex travaille." },
+    en: { title: "Blobex · Our Process. Understand, Design, Build, Improve", description: "A clear process with a fixed scope, timeline and price defined before development. See how Blobex works." },
+    fr: { title: "Blobex · Notre processus. Comprendre, concevoir, bâtir, améliorer", description: "Un processus clair, avec une portée, un échéancier et un prix fixes définis avant le développement. Découvrez comment Blobex travaille." },
   },
   pricing: {
-    en: { title: "Pricing. Fixed Scope, Fixed Price | Blobex", description: "Project-based pricing: scope, deliverables and price are defined before development. No hourly meter running." },
-    fr: { title: "Tarification. Portée fixe, prix fixe | Blobex", description: "Tarification par projet : la portée, les livrables et le prix sont définis avant le développement. Pas de compteur à l'heure." },
+    en: { title: "Blobex · Pricing. Fixed Scope, Fixed Price", description: "Project-based pricing: scope, deliverables and price are defined before development. No hourly meter running." },
+    fr: { title: "Blobex · Tarification. Portée fixe, prix fixe", description: "Tarification par projet : la portée, les livrables et le prix sont définis avant le développement. Pas de compteur à l'heure." },
   },
   contact: {
-    en: { title: "Contact Blobex. Start a Project | Granby, Quebec", description: "Tell us what slows you down. Short, low-friction contact form, the start of a useful business conversation." },
-    fr: { title: "Contacter Blobex. Démarrer un projet | Granby, Québec", description: "Dites-nous ce qui vous ralentit. Formulaire court et sans friction, le début d'une vraie conversation d'affaires." },
+    en: { title: "Blobex · Contact. Start a Project in Granby, Quebec", description: "Tell us what slows you down. Short, low-friction contact form, the start of a useful business conversation." },
+    fr: { title: "Blobex · Contact. Démarrer un projet à Granby, Québec", description: "Dites-nous ce qui vous ralentit. Formulaire court et sans friction, le début d'une vraie conversation d'affaires." },
   },
   about: {
-    en: { title: "About Blobex. Custom Software in Granby, Quebec", description: "We study how your business operates and build the custom software around it. Learn about our approach, ownership and process." },
-    fr: { title: "À propos de Blobex. Logiciels sur mesure à Granby, Québec", description: "On étudie le fonctionnement de votre entreprise et on bâtit le logiciel sur mesure autour. Découvrez notre approche, la propriété et le processus." },
+    en: { title: "Blobex · About. Custom Software in Granby, Quebec", description: "We study how your business operates and build the custom software around it. Learn about our approach, ownership and process." },
+    fr: { title: "Blobex · À propos. Logiciels sur mesure à Granby, Québec", description: "On étudie le fonctionnement de votre entreprise et on bâtit le logiciel sur mesure autour. Découvrez notre approche, la propriété et le processus." },
   },
 };
 

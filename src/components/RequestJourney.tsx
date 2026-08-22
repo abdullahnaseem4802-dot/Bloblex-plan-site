@@ -19,8 +19,16 @@ const BLUE = "#1787c4";
    already run to 12 min before it was ever scrolled to - the visitor saw a
    finished bar and no animation at all. Owning the clock lets each lane start
    when it is actually looked at. */
-const RUN_MS = 2600;       // the manual lane, end to end
-const SYSTEM_SHARE = 1 / 6; // the system finishes early and then waits, which is the point
+/* 2.6s felt like waiting rather than watching: by the time the twelve boxes had
+   ticked off, the point had already landed and the visitor was just holding
+   still for a bar. 1.7s is long enough to read as a slog and short enough that
+   nobody sits through it. */
+const RUN_MS = 1700;       // the manual lane, end to end
+/* the system finishes early and then waits, which is the point. Kept as a share
+   of the manual run rather than a fixed number, but not the literal 1/40 of the
+   real ratio: below about half a second the bar is finished before the eye finds
+   it, and "already complete" was the exact thing the client flagged. */
+const SYSTEM_SHARE = 0.3;
 
 export default function RequestJourney({ locale }: { locale: Locale }) {
   const t = JOURNEY_UI[locale];

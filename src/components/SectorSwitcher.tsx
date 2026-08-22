@@ -8,7 +8,7 @@ import AppIcon, { appForLabel } from "./AppIcon";
 import { CONTENT, type Locale } from "@/content/site";
 import { SECTORS, SECTOR_UI } from "@/content/sectors";
 
-export default function SectorSwitcher({ locale }: { locale: Locale }) {
+export default function SectorSwitcher({ locale, bare }: { locale: Locale; bare?: boolean }) {
   const t = CONTENT[locale].sectors;
   const ui = SECTOR_UI[locale];
   const [active, setActive] = useState(SECTORS[0].id);
@@ -44,16 +44,19 @@ export default function SectorSwitcher({ locale }: { locale: Locale }) {
   const yFor = (i: number) => 12 + i * (76 / (mods.length - 1)); // spread module rows 12%..88%
 
   return (
-    <section id="sectors" className="py-20 md:py-28">
+    <section id="sectors" className={bare ? "pt-14 pb-20 md:pt-16 md:pb-28" : "py-20 md:py-28"}>
       <div className="container">
-        <Reveal className="max-w-3xl">
-          <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-[var(--color-brand-600)]">{t.kicker}</p>
-          <h2 className="text-3xl md:text-[2.7rem] font-semibold">{t.title}</h2>
-          <p className="mt-5 text-lg text-[var(--color-slate)]">{t.lead}</p>
-        </Reveal>
+        {/* `bare` = the /industries masthead right above already says this */}
+        {!bare && (
+          <Reveal className="max-w-3xl">
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-[var(--color-brand-600)]">{t.kicker}</p>
+            <h2 className="text-3xl md:text-[2.7rem] font-semibold">{t.title}</h2>
+            <p className="mt-5 text-lg text-[var(--color-slate)]">{t.lead}</p>
+          </Reveal>
+        )}
 
         <Reveal delay={100}>
-          <div ref={boxRef} className="mt-12 grid lg:grid-cols-[minmax(0,320px)_1fr] gap-8 items-stretch">
+          <div ref={boxRef} className={(bare ? "" : "mt-12 ") + "grid lg:grid-cols-[minmax(0,320px)_1fr] gap-8 items-stretch"}>
             {/* Picker, the "Choisissez un secteur" menu, with obvious switch controls */}
             <div className="rounded-[var(--radius-lg)] border border-[var(--color-line)] bg-white shadow-[var(--shadow-soft)] overflow-hidden">
               <div className="px-4 py-3 bg-[var(--color-ink)] text-white flex items-center justify-between gap-2">
